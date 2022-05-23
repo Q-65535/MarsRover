@@ -12,13 +12,6 @@ public class FIFOAgent extends AbstractAgent {
 
     @Override
     public boolean reasoning() {
-        if (needRecharge()) {
-            isGoToRecharge = true;
-            currentAct = getActMoveTo(rechargePosition);
-            return true;
-        }
-
-        isGoToRecharge = false;
         if (currentTarget == null) {
             // if no goal to pursuit, return false
             if (targetPositions.isEmpty()) {
@@ -27,9 +20,30 @@ public class FIFOAgent extends AbstractAgent {
             // if no current goal, adopt one
             randomAdoptGoal();
         }
+
+        if (needGiveup()) {
+            return false;
+        }
+
+        if (needRecharge()) {
+            isGoToRecharge = true;
+            currentAct = getActMoveTo(rechargePosition);
+            return true;
+        } else {
+            isGoToRecharge = false;
+        }
+
         // finally set current action
         currentAct = getActMoveTo(currentTarget);
         return true;
+    }
+
+    boolean needGiveup() {
+        // if current fuel is less than 1, the agent can't do anything, give up
+        if (currentFuel <= 0) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -48,7 +62,7 @@ public class FIFOAgent extends AbstractAgent {
     /**
      * pick a target position as current goal
      */
-    private void randomAdoptGoal() {
+    void randomAdoptGoal() {
         for (Cell targetPosition : targetPositions) {
             currentTarget = targetPosition;
             return;
@@ -58,7 +72,7 @@ public class FIFOAgent extends AbstractAgent {
     /**
      * Estimate whether the agent need to do recharge operation
      */
-    private boolean needRecharge() {
+    boolean needRecharge() {
         return currentFuel <= estimateFuelConsumption(rechargePosition);
     }
 }

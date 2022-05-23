@@ -16,11 +16,7 @@ import javax.swing.JPanel;
 public class Points extends JPanel {
     Environment env;
 
-    public Points() {
-    }
-
     public Points(Environment env) {
-        this();
         this.env = env;
     }
 
@@ -56,26 +52,6 @@ public class Points extends JPanel {
         g2d.scale(0.1, 0.1);
         String recordStr = recordToStr(agent.getCurrentFuel(), agent.getNumOfAchieved(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
         g2d.drawString(recordStr, 100, 600);
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        JFrame frame = new JFrame("Points");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(700, 700);
-        frame.setLocationRelativeTo(null);
-
-        Environment env = Utils.defEnv;
-        boolean running = true;
-        while (running) {
-            running = env.run();
-
-            Points testPoints = new Points(env);
-            frame.add(testPoints);
-            frame.setVisible(true);
-
-            Thread.sleep(100);
-        }
-
     }
 
     private void drawCellTo2D(Graphics2D graphic, Cell cell) {

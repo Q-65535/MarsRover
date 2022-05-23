@@ -112,8 +112,15 @@ public abstract class AbstractAgent {
      * @param target the target position
      */
     int calculateDistance(Cell target) {
-        int xDiff = Math.abs(target.getX() - currentPosition.getX());
-        int yDiff = Math.abs(target.getY() - currentPosition.getY());
+        return calculateDistance(currentPosition, target);
+    }
+
+    /**
+     * Calculate the distance between any to cells
+     */
+    int calculateDistance(Cell from, Cell to) {
+        int xDiff = Math.abs(from.getX() - to.getX());
+        int yDiff = Math.abs(from.getY() - to.getY());
         return xDiff + yDiff;
     }
 
@@ -122,6 +129,11 @@ public abstract class AbstractAgent {
      */
     int estimateFuelConsumption(Cell target) {
         int distance = calculateDistance(target);
+        return distance * actFuelConsumption;
+    }
+
+    int estimateFuelConsumption(Cell from, Cell to) {
+        int distance = calculateDistance(from, to);
         return distance * actFuelConsumption;
     }
 

@@ -1,6 +1,6 @@
 package world;
 
-public class Cell {
+public class Cell implements Comparable<Cell>{
     // position
     final int x;
     final int y;
@@ -41,5 +41,13 @@ public class Cell {
         StringBuilder sb = new StringBuilder();
         sb.append("(").append(x).append(",").append(y).append(")");
         return sb.toString();
+    }
+
+    /**
+     * basic comparator
+     */
+    @Override
+    public int compareTo(Cell other) {
+        return (x + y) - (other.x + other.y);
     }
 }
