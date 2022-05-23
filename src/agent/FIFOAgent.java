@@ -63,10 +63,8 @@ public class FIFOAgent extends AbstractAgent {
      * pick a target position as current goal
      */
     void randomAdoptGoal() {
-        for (Cell targetPosition : targetPositions) {
-            currentTarget = targetPosition;
-            return;
-        }
+        // get the first element in the set
+        currentTarget = targetPositions.iterator().next();
     }
 
     /**

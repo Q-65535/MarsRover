@@ -2,10 +2,9 @@ package world;
 
 import agent.AbstractAgent;
 import agent.MoveAction;
+import running.Utils;
 
 public class Environment {
-    public static final Cell def_recharge_position = new Cell(0, 0);
-    public static final int def_actual_fuel_consumption = 1;
 
     private Cell[][] map;
     private Cell rechargePosition;
@@ -22,12 +21,6 @@ public class Environment {
         this.rechargePosition = rechargePosition;
         this.agent = agent;
         this.actualActFuelConsumption = actualActFuelConsumption;
-    }
-
-    public Environment(int mapSize, AbstractAgent agent) {
-        this(mapSize, new Cell(0, 0), agent, 1);
-        this.rechargePosition = def_recharge_position;
-        this.actualActFuelConsumption = def_actual_fuel_consumption;
     }
 
     public Cell get(int x, int y) {

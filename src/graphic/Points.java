@@ -26,7 +26,7 @@ public class Points extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.scale(10, 10);
+        g2d.scale(8, 8);
 
         AbstractAgent agent = env.getAgent();
 
@@ -51,7 +51,7 @@ public class Points extends JPanel {
         g2d.setColor(Color.BLACK);
         g2d.scale(0.1, 0.1);
         String recordStr = recordToStr(agent.getCurrentFuel(), agent.getNumOfAchieved(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
-        g2d.drawString(recordStr, 100, 600);
+        g2d.drawString(recordStr, 300, 800);
     }
 
     private void drawCellTo2D(Graphics2D graphic, Cell cell) {

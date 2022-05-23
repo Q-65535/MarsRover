@@ -1,12 +1,13 @@
 package agent;
 
+import running.Utils;
 import world.Cell;
 
 import java.sql.Array;
 import java.util.*;
 
 public abstract class AbstractAgent {
-    public static Random rm = new Random();
+    public static Random rm = new Random(Utils.SEED);
     Cell currentPosition;
     MoveAction currentAct;
     Set<Cell> targetPositions;
