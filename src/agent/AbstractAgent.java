@@ -1,12 +1,12 @@
 package agent;
 
 import running.Utils;
+import world.Calculator;
 import world.Cell;
 
-import java.sql.Array;
 import java.util.*;
 
-public abstract class AbstractAgent {
+public abstract class AbstractAgent implements Cloneable {
     public static Random rm = new Random(Utils.SEED);
     Cell currentPosition;
     MoveAction currentAct;
@@ -14,6 +14,7 @@ public abstract class AbstractAgent {
     Cell currentTarget;
     List<Cell> achievedGoalCells;
     Cell rechargePosition;
+    int mapSize;
     int maxCapacity;
     int currentFuel;
     int totalFuelConsumption;
@@ -25,17 +26,19 @@ public abstract class AbstractAgent {
     /**
      * how much fuel will be consumed for each action (agent's perspective)
      */
-    int actFuelConsumption;
+    int actionFuelConsumption;
 
-    public AbstractAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+    public AbstractAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
         init();
         this.currentPosition = currentPosition;
         this.targetPositions = targetPositions;
         this.rechargePosition = rechargePosition;
         this.maxCapacity = maxCapacity;
         this.currentFuel = maxCapacity;
-        this.actFuelConsumption = actFuelConsumption;
+        this.actionFuelConsumption = actionFuelConsumption;
     }
+
+
 
 
     private void init() {
@@ -86,7 +89,14 @@ public abstract class AbstractAgent {
     /**
      * Generate an action based on the target position and agent current position
      */
-    MoveAction getActMoveTo(Cell target) {
+    public MoveAction getActMoveTo(Cell target) {
+        ArrayList<MoveAction> acts = getAllActMoveTo(target);
+        // randomly pick a possible action
+        return acts.get(rm.nextInt(acts.size()));
+    }
+
+    public ArrayList<MoveAction> getAllActMoveTo(Cell target) {
+
         ArrayList<MoveAction> acts = new ArrayList<>();
         int tx = target.getX();
         int ty = target.getY();
@@ -104,38 +114,30 @@ public abstract class AbstractAgent {
             acts.add(MoveAction.DOWN);
         }
 
-        // randomly pick a possible action
-        return acts.get(rm.nextInt(acts.size()));
+        return acts;
+
     }
 
     /**
      * Calculate the distance between current position and target position
+     *
      * @param target the target position
      */
     int calculateDistance(Cell target) {
-        return calculateDistance(currentPosition, target);
-    }
-
-    /**
-     * Calculate the distance between any to cells
-     */
-    int calculateDistance(Cell from, Cell to) {
-        int xDiff = Math.abs(from.getX() - to.getX());
-        int yDiff = Math.abs(from.getY() - to.getY());
-        return xDiff + yDiff;
+        return Calculator.calculateDistance(currentPosition, target);
     }
 
     /**
      * Estimate how much fuel will be consumed if travel to target position
      */
-    int estimateFuelConsumption(Cell target) {
+    public int estimateFuelConsumption(Cell target) {
         int distance = calculateDistance(target);
-        return distance * actFuelConsumption;
+        return distance * actionFuelConsumption;
     }
 
-    int estimateFuelConsumption(Cell from, Cell to) {
-        int distance = calculateDistance(from, to);
-        return distance * actFuelConsumption;
+    public int estimateFuelConsumption(Cell from, Cell to) {
+        int distance = Calculator.calculateDistance(from, to);
+        return distance * actionFuelConsumption;
     }
 
     public void updatePosition(Cell newPosition) {
@@ -158,7 +160,7 @@ public abstract class AbstractAgent {
         this.currentFuel -= amount;
 
         // update the total fuel records
-        totalFuelConsumption +=amount;
+        totalFuelConsumption += amount;
         if (isGoToRecharge) {
             rechargeFuelConsumption += amount;
         }
@@ -167,10 +169,17 @@ public abstract class AbstractAgent {
     /**
      * if current position is recharge position, recharge the fuel
      */
-    public void updateFuel() {
+    public void updateRecharge() {
         if (currentPosition.equals(rechargePosition)) {
             currentFuel = maxCapacity;
         }
+    }
+
+    /**
+     * Estimate whether the agent need to do recharge operation
+     */
+    boolean needRecharge() {
+        return currentFuel <= estimateFuelConsumption(rechargePosition);
     }
 }
 

@@ -1,33 +1,45 @@
 package running;
 
+import MCTSstate.AbstractState;
 import agent.AbstractAgent;
 import agent.FIFOAgent;
+import agent.MCTSAgent;
 import agent.ProactiveFIFOAgent;
 import world.Cell;
 import world.Environment;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Utils {
-    public static int SEED;
+    public static Random tempRandom = new Random();
+    public static int SEED = tempRandom.nextInt();
     public static Random rm = new Random(SEED);
-    public static final int def_map_size = 70;
-    public static final int def_num_goals = 100;
-    public static final int def_max_capacity = 280;
+    public static final int def_map_size = 20;
+    public static final int def_num_goals = 10;
+    public static final int def_max_capacity = def_map_size * 2;
     public static final int def_act_consumption = 1;
     public static final Cell middle_Position = new Cell(def_map_size / 2, def_map_size / 2);
     public static final Cell initial_Position = middle_Position;
     public static final Cell def_recharge_position = middle_Position;
-    public static final Set<Cell> def_goals = randomGenerateTargetPositions(def_map_size, def_num_goals, initial_Position);
 
-    public static final AbstractAgent FIFOAgent = new FIFOAgent(initial_Position, def_goals, def_recharge_position, def_max_capacity, def_act_consumption);
+    public static Set<Cell> def_goals;
 
-    public static final AbstractAgent proFIFOAgent = new ProactiveFIFOAgent(initial_Position, def_goals, def_recharge_position, def_max_capacity, def_act_consumption);
+    public static AbstractAgent getNewDefProFIFOAgent() {
+        return new ProactiveFIFOAgent(initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
+    }
 
-    public static final Environment defEnv = new Environment(def_map_size, def_recharge_position, FIFOAgent, def_act_consumption);
+    public static AbstractAgent getNewDefMctsAgent() {
+        return new MCTSAgent(initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
+    }
+
+    public static Environment getNewDefEnv() {
+        return new Environment(def_map_size, def_recharge_position, getNewDefProFIFOAgent(), def_act_consumption);
+    }
+
+    public static Environment getNewMctsEnv() {
+        return new Environment(def_map_size, def_recharge_position, getNewDefMctsAgent(), def_act_consumption);
+    }
+
 
     /**
      * given the map size and number of goals to generate, randomly generate a specific number of goal cells
@@ -37,7 +49,7 @@ public class Utils {
      * @return a set of target cells
      */
     public static Set<Cell> randomGenerateTargetPositions(int mapSize, int numOfGoals, Cell except) {
-        Set<Cell> res = new TreeSet<>();
+        Set<Cell> res = new HashSet<>();
         while (res.size() < numOfGoals) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
@@ -49,5 +61,21 @@ public class Utils {
             res.add(cell);
         }
         return res;
+    }
+
+    public static Set<Cell> cloneCellSet(Set<Cell> cells) {
+        HashSet<Cell> cloneSet = new HashSet<>();
+        for (Cell cell : cells) {
+            cloneSet.add(cell);
+        }
+        return cloneSet;
+    }
+
+    public static List<Cell> cloneCellList(List<Cell> cells) {
+        ArrayList<Cell> cloneList = new ArrayList<>();
+        for (Cell cell : cells) {
+            cloneList.add(cell);
+        }
+        return cloneList;
     }
 }

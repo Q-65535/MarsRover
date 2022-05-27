@@ -2,6 +2,7 @@ package agent;
 
 public enum MoveAction {
 
+
     LEFT("left"),
     RIGHT("right"),
     UP("up"),

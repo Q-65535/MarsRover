@@ -1,6 +1,6 @@
 package world;
 
-public class Cell implements Comparable<Cell>{
+public class Cell {
     // position
     final int x;
     final int y;
@@ -43,11 +43,4 @@ public class Cell implements Comparable<Cell>{
         return sb.toString();
     }
 
-    /**
-     * basic comparator
-     */
-    @Override
-    public int compareTo(Cell other) {
-        return (x + y) - (other.x + other.y);
-    }
 }

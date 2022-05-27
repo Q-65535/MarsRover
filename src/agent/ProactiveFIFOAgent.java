@@ -34,16 +34,7 @@ public class ProactiveFIFOAgent extends FIFOAgent {
         int goToTargetFuelConsumption = estimateFuelConsumption(currentTarget);
         int targetToDepotFuelConsumption = estimateFuelConsumption(currentTarget, rechargePosition);
         // we use < because if ==, the agent is confident that it can successfully achieve current goal
-        // and recharge
         boolean isProactiveTrigger = currentFuel < goToTargetFuelConsumption + targetToDepotFuelConsumption;
-
-        if (isReactiveTrigger && isProactiveTrigger) {
-            return true;
-        }
-        if (!isReactiveTrigger && isProactiveTrigger) {
-            return true;
-        }
-
-        return false;
+        return isProactiveTrigger;
     }
 }

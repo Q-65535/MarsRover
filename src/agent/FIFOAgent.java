@@ -18,7 +18,7 @@ public class FIFOAgent extends AbstractAgent {
                 return false;
             }
             // if no current goal, adopt one
-            randomAdoptGoal();
+            adoptNearestGoal();
         }
 
         if (needGiveup()) {
@@ -51,26 +51,41 @@ public class FIFOAgent extends AbstractAgent {
         if (currentTarget == null) {
             return;
         }
+        // deal with current goal
         if (currentTarget.equals(currentPosition)) {
             // add to achieved and remove from targets
             achievedGoalCells.add(currentTarget);
             targetPositions.remove(currentTarget);
             currentTarget = null;
         }
+        // if the agent pass by a goal position, also achieve it
+        if (targetPositions.contains(currentPosition)) {
+            achievedGoalCells.add(currentPosition);
+            targetPositions.remove(currentPosition);
+        }
     }
 
     /**
      * pick a target position as current goal
      */
-    void randomAdoptGoal() {
+    void adoptRandomGoal() {
         // get the first element in the set
         currentTarget = targetPositions.iterator().next();
     }
 
-    /**
-     * Estimate whether the agent need to do recharge operation
-     */
-    boolean needRecharge() {
-        return currentFuel <= estimateFuelConsumption(rechargePosition);
+    void adoptNearestGoal() {
+        Cell nearestTarget = null;
+        int minConsumption = Integer.MAX_VALUE;
+        for (Cell targetPosition : targetPositions) {
+            int consumption = this.estimateFuelConsumption(targetPosition);
+            if (consumption < minConsumption) {
+                nearestTarget = targetPosition;
+                minConsumption = consumption;
+            }
+        }
+
+        currentTarget = nearestTarget;
     }
+
+
 }

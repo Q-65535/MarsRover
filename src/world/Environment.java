@@ -2,16 +2,17 @@ package world;
 
 import agent.AbstractAgent;
 import agent.MoveAction;
-import running.Utils;
 
 public class Environment {
 
-    private Cell[][] map;
-    private Cell rechargePosition;
-    private AbstractAgent agent;
-    private int actualActFuelConsumption;
+    Cell[][] map;
+    int mapSize;
+    Cell rechargePosition;
+    AbstractAgent agent;
+    int actualActFuelConsumption;
 
     public Environment(int mapSize, Cell rechargePosition, AbstractAgent agent, int actualActFuelConsumption) {
+        this.mapSize = mapSize;
         map = new Cell[mapSize][mapSize];
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
@@ -49,7 +50,7 @@ public class Environment {
         return runnable;
     }
 
-    private void executeAct(MoveAction act) {
+    void executeAct(MoveAction act) {
         Cell currentPosition = agent.getCurrentPosition();
         int curX = currentPosition.getX();
         int curY = currentPosition.getY();
@@ -59,8 +60,11 @@ public class Environment {
             case LEFT -> agent.updatePosition(curX - 1, curY);
             case RIGHT -> agent.updatePosition(curX + 1, curY);
         }
+        // update internal state based on this new position
         agent.updateGoal();
         agent.consumeFuel(actualActFuelConsumption);
-        agent.updateFuel();
+        agent.updateRecharge();
     }
+
+
 }
