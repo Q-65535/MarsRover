@@ -18,7 +18,7 @@ public class FIFOAgent extends AbstractAgent {
                 return false;
             }
             // if no current goal, adopt one
-            adoptNearestGoal();
+            adoptRandomGoal();
         }
 
         if (needGiveup()) {

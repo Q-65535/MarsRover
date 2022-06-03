@@ -2,7 +2,7 @@ package mcts;
 
 import MCTSstate.AbstractState;
 import agent.MoveAction;
-import running.Utils;
+import running.Default;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MCTSWorkSpace {
-    Random rm = new Random(Utils.SEED);
+    Random rm = new Random(Default.SEED);
     /**
      * The number of complete selections
      */

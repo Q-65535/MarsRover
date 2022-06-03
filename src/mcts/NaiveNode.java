@@ -54,6 +54,9 @@ public class NaiveNode extends AbstractMCTSNode {
 
     }
 
+    /**
+     * Select the child node with maximum best value
+     */
     @Override
     public AbstractMCTSNode exploitSelect() {
         NaiveNode selected = null;
@@ -70,8 +73,7 @@ public class NaiveNode extends AbstractMCTSNode {
 
     @Override
     public double rollOut(AbstractState sState) {
-        AbstractState cloneState = sState.clone();
-        AbstractState endState = cloneState.randomSim();
+        AbstractState endState = sState.randomSim();
         return endState.evaluateState();
     }
 

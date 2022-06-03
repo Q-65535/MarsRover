@@ -1,13 +1,13 @@
 package agent;
 
-import running.Utils;
+import running.Default;
 import world.Calculator;
 import world.Cell;
 
 import java.util.*;
 
 public abstract class AbstractAgent implements Cloneable {
-    public static Random rm = new Random(Utils.SEED);
+    Random rm = new Random(Default.SEED);
     Cell currentPosition;
     MoveAction currentAct;
     Set<Cell> targetPositions;
@@ -38,14 +38,15 @@ public abstract class AbstractAgent implements Cloneable {
         this.actionFuelConsumption = actionFuelConsumption;
     }
 
-
-
-
     private void init() {
         targetPositions = new HashSet<>();
         achievedGoalCells = new ArrayList<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
+    }
+
+    public void setGoals(Set<Cell> goals) {
+        this.targetPositions = goals;
     }
 
     public void adoptGoal(Cell target) {
@@ -113,7 +114,6 @@ public abstract class AbstractAgent implements Cloneable {
         if (ty < currentPosition.getY()) {
             acts.add(MoveAction.DOWN);
         }
-
         return acts;
 
     }

@@ -42,13 +42,8 @@ public class MarsRoverState extends AbstractState {
     }
 
     @Override
-    public void exeJump(int x, int y) {
-        simEnv.executeJump(new Cell(x, y));
-    }
-
-    @Override
     public double evaluateState() {
-        return 100000 / simAgent.getTotalFuelConsumption() + 1;
+        return 1000 / (simAgent.getTotalFuelConsumption() + 1);
     }
 
 
@@ -98,13 +93,17 @@ public class MarsRoverState extends AbstractState {
             return null;
         }
 
+        if (simAgent.getCurrentFuel() < simAgent.estimateFuelConsumption(rechargePosition)) {
+            return null;
+        }
+
         if (simAgent.needRecharge()) {
-            return simAgent.getAllActMoveTo(simEnv.getRechargePosition());
+            return simAgent.getAllActMoveTo(rechargePosition);
         }
 
         Set<MoveAction> moveActions = new HashSet<>();
         // add move to recharge position actions
-        moveActions.addAll(simAgent.getAllActMoveTo(simEnv.getRechargePosition()));
+        moveActions.addAll(simAgent.getAllActMoveTo(rechargePosition));
         // add all possible choices
         for (Cell targetPosition : simAgent.getTargetPositions()) {
             moveActions.addAll(simAgent.getAllActMoveTo(targetPosition));

@@ -1,9 +1,8 @@
 package running;
 
-import agent.AbstractAgent;
 import graphic.EnvironmentDisplayer;
 import world.Environment;
-import static running.Utils.*;
+import static running.Default.*;
 
 public class Main {
     static int defEnvTotal = 0;
@@ -11,20 +10,20 @@ public class Main {
 
     public static void main(String[] args) {
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
-        Utils.def_goals = Utils.randomGenerateTargetPositions(def_map_size, def_num_goals, initial_Position);
-        Environment defEnv = Utils.getNewDefEnv();
-        Environment mctsEnv = Utils.getNewMctsEnv();
+        Default.def_goals = Default.randomGenerateTargetPositions(def_map_size, def_num_goals, def_initial_Position);
+        Environment defEnv = Default.getNewDefEnv();
+        Environment mctsEnv = Default.getNewMctsEnv();
 
         boolean running = true;
         while (running) {
             running = mctsEnv.run();
-//            displayer.display(mctsEnv);
+            displayer.display(mctsEnv);
         }
-        running = true;
-        while (running) {
-            running = defEnv.run();
+//        running = true;
+//        while (running) {
+//            running = defEnv.run();
 //            displayer.display(defEnv);
-        }
+//        }
 
         defEnvTotal += defEnv.getAgent().getTotalFuelConsumption();
         mctsEnvTotal += mctsEnv.getAgent().getTotalFuelConsumption();

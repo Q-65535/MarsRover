@@ -29,7 +29,6 @@ public class ProactiveFIFOAgent extends FIFOAgent {
      */
     @Override
     boolean needRecharge() {
-        boolean isReactiveTrigger = currentFuel <= estimateFuelConsumption(rechargePosition);
 
         int goToTargetFuelConsumption = estimateFuelConsumption(currentTarget);
         int targetToDepotFuelConsumption = estimateFuelConsumption(currentTarget, rechargePosition);

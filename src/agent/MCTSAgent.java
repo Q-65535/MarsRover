@@ -3,7 +3,7 @@ package agent;
 import MCTSstate.MarsRoverState;
 import mcts.MCTSWorkSpace;
 import mcts.NaiveNode;
-import running.Utils;
+import running.Default;
 import world.Cell;
 import world.SimEnvironment;
 
@@ -62,8 +62,8 @@ public class MCTSAgent extends AbstractAgent {
     @Override
     public MCTSAgent clone() {
         // clone new goal set and achieved list
-        Set<Cell> cloneTargets = Utils.cloneCellSet(targetPositions);
-        List<Cell> cloneAchieved = Utils.cloneCellList(achievedGoalCells);
+        Set<Cell> cloneTargets = Default.cloneCellSet(targetPositions);
+        List<Cell> cloneAchieved = Default.cloneCellList(achievedGoalCells);
 
         MCTSAgent cloneAgent = new MCTSAgent(currentPosition, cloneTargets, rechargePosition, maxCapacity, actionFuelConsumption);
 

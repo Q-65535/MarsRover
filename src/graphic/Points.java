@@ -1,7 +1,6 @@
 package graphic;
 
 import agent.AbstractAgent;
-import running.Utils;
 import world.Cell;
 import world.Environment;
 
@@ -10,7 +9,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.Set;
 
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class Points extends JPanel {

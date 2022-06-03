@@ -1,16 +1,15 @@
 package mcts;
 
 import MCTSstate.AbstractState;
-import agent.AbstractAgent;
 import agent.MoveAction;
-import running.Utils;
+import running.Default;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public abstract class AbstractMCTSNode {
     static final double epsilon = 1e-6;
-    static Random rm = new Random(Utils.SEED);
+    Random rm = new Random(Default.SEED);
 
     AbstractState rootState;
     /**

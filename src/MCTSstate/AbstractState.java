@@ -1,20 +1,17 @@
 package MCTSstate;
 
 import agent.MoveAction;
-import running.Utils;
+import running.Default;
 import world.Cell;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public abstract class AbstractState implements Cloneable {
-    public static Random rm = new Random(Utils.SEED);
+    Random rm = new Random(Default.SEED);
     public abstract void exeAct(MoveAction act);
 
     public abstract void exeJump(Cell target);
-
-    public abstract void exeJump(int x, int y);
 
     public abstract double evaluateState();
 
