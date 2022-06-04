@@ -3,11 +3,20 @@ package agent;
 import running.Default;
 import world.Calculator;
 import world.Cell;
+import world.Norm;
 
 import java.util.*;
 
 public abstract class AbstractAgent implements Cloneable {
+    public static final int def_act_fuel_consumption = 1;
+    public static final int infinite_capacity = Integer.MAX_VALUE;
     Random rm = new Random(Default.SEED);
+
+    /**
+     * The total penalty received
+     */
+    double penalty;
+    HashMap<Cell, Norm> norms;
     Cell currentPosition;
     MoveAction currentAct;
     Set<Cell> targetPositions;
@@ -149,7 +158,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     /**
-     * different types of agent have different update strategy
+     * different types of agent have different update strategies
      */
     public abstract void updateGoal();
 
@@ -176,10 +185,33 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     /**
-     * Estimate whether the agent need to do recharge operation
+     * Estimate whether the agent needs to do recharge operation
      */
     boolean needRecharge() {
         return currentFuel <= estimateFuelConsumption(rechargePosition);
+    }
+
+    /**
+     * update total penalty value according to current position and norms
+     */
+    public void updatePunish() {
+        // if no norm, nothing happens
+        if (norms == null) {
+            return;
+        }
+
+        if (norms.containsKey(currentPosition)) {
+            Norm relatedNorm = norms.get(currentPosition);
+            this.penalty += relatedNorm.getPenalty();
+        }
+    }
+
+    public double getTotalPenalty() {
+        return penalty;
+    }
+
+    public Set<Cell> getNormPositions() {
+        return norms.keySet();
     }
 }
 

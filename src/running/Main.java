@@ -19,11 +19,11 @@ public class Main {
             running = mctsEnv.run();
             displayer.display(mctsEnv);
         }
-//        running = true;
-//        while (running) {
-//            running = defEnv.run();
-//            displayer.display(defEnv);
-//        }
+        running = true;
+        while (running) {
+            running = defEnv.run();
+            displayer.display(defEnv);
+        }
 
         defEnvTotal += defEnv.getAgent().getTotalFuelConsumption();
         mctsEnvTotal += mctsEnv.getAgent().getTotalFuelConsumption();

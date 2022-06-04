@@ -45,6 +45,10 @@ public class Points extends JPanel {
         g2d.setColor(Color.green);
         drawCellTo2D(g2d, env.getRechargePosition());
 
+        // draw norm positions
+        g2d.setColor(Color.DARK_GRAY);
+        drawCellTo2D(g2d, agent.getNormPositions());
+
         //draw info
         g2d.setColor(Color.BLACK);
         g2d.scale(0.1, 0.1);

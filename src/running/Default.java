@@ -5,12 +5,13 @@ import agent.MCTSAgent;
 import agent.ProactiveFIFOAgent;
 import world.Cell;
 import world.Environment;
+import world.Norm;
 
 import java.util.*;
 
 public class Default {
     public static int SEED = 1;
-    public static Random rm = new Random(SEED);
+    public static Random rm = new Random();
     public static Random goalGenerateRM = new Random(SEED);
     public static final int def_map_size = 20;
     public static final int def_num_goals = 12;
@@ -69,6 +70,14 @@ public class Default {
         return res;
     }
 
+    /**
+     * Randomly generate a set of goal positions with an except location
+     * @param mapSize the length of the map
+     * @param numOfGoals number of goals to generate
+     * @param except the excluded location, this is usually the initial location of agent
+     * @param rm random object
+     * @return a set of location cells
+     */
     public static Set<Cell> randomGenerateTargetPositions(int mapSize, int numOfGoals, Cell except, Random rm) {
         Set<Cell> res = new HashSet<>();
         while (res.size() < numOfGoals) {
@@ -76,12 +85,41 @@ public class Default {
             int y = rm.nextInt(mapSize);
             Cell cell = new Cell(x, y);
 
-            if (except.equals(cell)) {
+            if (cell.equals(except)) {
                 continue;
             }
             res.add(cell);
         }
         return res;
+    }
+
+    public static HashMap<Cell, Norm> randomGenerateNorms(int mapSize, int numOfNorms, Cell except, Random rm) {
+        HashMap<Cell, Norm> norms = new HashMap<>();
+        while (norms.size() < numOfNorms) {
+            int x = rm.nextInt(mapSize);
+            int y = rm.nextInt(mapSize);
+            Cell cell = new Cell(x, y);
+
+            if (cell.equals(except)) {
+                continue;
+            }
+            double penaltyValue = gaussianDistributionWithRange(1, 0.2, 0, 2, rm);
+            norms.put(cell, new Norm(cell, penaltyValue));
+        }
+        return norms;
+    }
+
+    /**
+     * Generate a number according to normal distribution with specified mean, standard deviation and bounds
+     */
+    private static double gaussianDistributionWithRange(int mean, double stdDeviation, int leftBound, int rightBound, Random rm) {
+        // the generated value
+        double value = rm.nextGaussian() * stdDeviation + mean;
+        // if the value is not in bounds, generate again and again
+        while (value < leftBound || value > rightBound) {
+            value = rm.nextGaussian() * stdDeviation + mean;
+        }
+        return value;
     }
 
     public static Set<Cell> cloneCellSet(Set<Cell> cells) {

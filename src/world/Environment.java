@@ -54,16 +54,18 @@ public class Environment {
         Cell currentPosition = agent.getCurrentPosition();
         int curX = currentPosition.getX();
         int curY = currentPosition.getY();
+        // first update new position
         switch (act) {
             case UP -> agent.updatePosition(curX, curY + 1);
             case DOWN -> agent.updatePosition(curX, curY - 1);
             case LEFT -> agent.updatePosition(curX - 1, curY);
             case RIGHT -> agent.updatePosition(curX + 1, curY);
         }
-        // update internal state based on this new position
+        // then, update internal state based on this new position
         agent.updateGoal();
         agent.consumeFuel(actualActFuelConsumption);
         agent.updateRecharge();
+        agent.updatePunish();
     }
 
 
