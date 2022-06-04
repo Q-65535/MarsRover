@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Default {
     public static int SEED = 1;
-    public static Random rm = new Random();
+    public static Random rm = new Random(1);
     public static Random goalGenerateRM = new Random(SEED);
     public static final int def_map_size = 20;
     public static final int def_num_goals = 12;

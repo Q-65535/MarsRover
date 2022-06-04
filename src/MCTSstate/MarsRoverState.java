@@ -13,9 +13,9 @@ import java.util.Set;
 
 
 public class MarsRoverState extends AbstractState {
-    private SimEnvironment simEnv;
-    private MCTSAgent simAgent;
-    private Cell rechargePosition;
+    SimEnvironment simEnv;
+    MCTSAgent simAgent;
+    Cell rechargePosition;
 
     public MarsRoverState(SimEnvironment simEnv) {
         this.simEnv = simEnv.clone();

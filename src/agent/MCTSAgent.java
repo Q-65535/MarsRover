@@ -72,6 +72,9 @@ public class MCTSAgent extends AbstractAgent {
         cloneAgent.totalFuelConsumption = this.totalFuelConsumption;
         cloneAgent.rechargeFuelConsumption = this.rechargeFuelConsumption;
         cloneAgent.achievedGoalCells = cloneAchieved;
+        // clone norm information
+        cloneAgent.norms = this.norms;
+        cloneAgent.penalty = this.penalty;
 
         return cloneAgent;
     }

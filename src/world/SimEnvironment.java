@@ -32,6 +32,7 @@ public class SimEnvironment extends Environment implements Cloneable {
         agent.updateGoal();
         agent.consumeFuel(actualActFuelConsumption);
         agent.updateRecharge();
+        agent.updatePunish();
     }
 
     public void executeJump(Cell target) {
