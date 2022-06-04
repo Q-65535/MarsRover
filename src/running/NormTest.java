@@ -2,6 +2,7 @@ package running;
 
 import agent.AbstractAgent;
 import agent.NFIFOAgent;
+import agent.VBDIAgent;
 import graphic.EnvironmentDisplayer;
 import org.junit.jupiter.api.Test;
 import world.Cell;
@@ -18,8 +19,9 @@ public class NormTest {
     public void normFIFO() {
         HashMap<Cell, Norm> norms = randomGenerateNorms(def_map_size, 10, def_initial_Position, rm);
         Set<Cell> goals = randomGenerateTargetPositions(def_map_size, 10, def_initial_Position, rm);
-        AbstractAgent nfifoAgent = new NFIFOAgent(def_initial_Position, goals, norms);
-        Environment environment = new Environment(def_map_size, def_recharge_position, nfifoAgent, def_act_consumption);
+        AbstractAgent agent = new NFIFOAgent(def_initial_Position, goals, norms);
+//        agent = new VBDIAgent(def_initial_Position, goals, norms);
+        Environment environment = new Environment(def_map_size, def_recharge_position, agent, def_act_consumption);
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
 
         boolean running = true;
@@ -27,7 +29,7 @@ public class NormTest {
             running = environment.run();
             displayer.display(environment);
         }
-        double totalPenalty = nfifoAgent.getTotalPenalty();
+        double totalPenalty = agent.getTotalPenalty();
         System.out.println(totalPenalty);
     }
 

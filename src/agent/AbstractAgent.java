@@ -128,6 +128,24 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     /**
+     * Get the next position if the given action is executed
+     */
+    public Cell getNextPosition(MoveAction act) {
+        Cell currentPosition = this.getCurrentPosition();
+        int curX = currentPosition.getX();
+        int curY = currentPosition.getY();
+
+        switch (act) {
+            case UP -> {return new Cell(curX, curY + 1);}
+            case DOWN -> {return new Cell(curX, curY - 1);}
+            case LEFT -> {return new Cell(curX - 1, curY);}
+            case RIGHT -> {return new Cell(curX + 1, curY);}
+        }
+        // error case
+        return null;
+    }
+
+    /**
      * Calculate the distance between current position and target position
      *
      * @param target the target position
