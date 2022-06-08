@@ -17,10 +17,10 @@ import static running.Default.*;
 
 public class NormTest {
     @Test
-    public double normFIFO() {
+    public double normAgentTest() {
 
-        HashMap<Cell, Norm> norms = randomGenerateNorms(def_map_size, 10, def_initial_Position, rm);
-        Set<Cell> goals = randomGenerateTargetPositions(def_map_size, 10, def_initial_Position, rm);
+        HashMap<Cell, Norm> norms = randomGenerateNorms(def_map_size, 47, 3, def_initial_Position, rm);
+        Set<Cell> goals = randomGenerateTargetPositions(def_map_size, 8, def_initial_Position, rm);
         AbstractAgent agent = new NFIFOAgent(def_initial_Position, goals, norms);
         agent = new VBDIAgent(def_initial_Position, goals, norms);
         agent = new NMCTSAgent(def_initial_Position, goals, norms);
@@ -30,7 +30,7 @@ public class NormTest {
         boolean running = true;
         while (running) {
             running = environment.run();
-//            displayer.display(environment);
+            displayer.display(environment);
         }
         double totalPenalty = agent.getTotalPenalty();
         System.out.println(totalPenalty);
@@ -40,8 +40,8 @@ public class NormTest {
     @Test
     public void loopTest() {
         double penaltySum = 0;
-        for (int i = 0; i < 100; i++) {
-            penaltySum += normFIFO();
+        for (int i = 0; i < 50; i++) {
+            penaltySum += normAgentTest();
         }
         System.out.println(penaltySum);
     }

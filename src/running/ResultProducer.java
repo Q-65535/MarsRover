@@ -16,15 +16,24 @@ import static running.Utils.*;
 import static running.Default.*;
 
 public class ResultProducer {
+    public static final String doubleFormatter = "%.3f";
+    public static final int repetitionCount = 50;
+    static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
     /**
      * The result directory
      */
-    public static final String RESULT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MS_results";
-    public static final String doubleFormatter = "%.3f";
-    static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
-    public static final int maxMultiplier = 9;
-    public static final int maxGoalNum = 15;
-    public static final int repetitionCount = 50;
+    public final String RESULT_DIR;
+    /**
+     * Capacity is multiplier x mapSize
+     */
+    public final int maxMultiplier;
+    public final int maxGoalNum;
+
+    public ResultProducer(String RESULT_DIR, int maxMultiplier, int maxGoalNum) {
+        this.RESULT_DIR = RESULT_DIR;
+        this.maxMultiplier = maxMultiplier;
+        this.maxGoalNum = maxGoalNum;
+    }
 
     /**
      * experiment a type of agent and write the result to a file
@@ -61,7 +70,7 @@ public class ResultProducer {
         matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
     }
 
-    private AbstractAgent genNewAgent(String agentType, int capacity, Set<Cell> goals) {
+    AbstractAgent genNewAgent(String agentType, int capacity, Set<Cell> goals) {
         AbstractAgent agent;
         switch (agentType) {
             case "mcts":
@@ -85,7 +94,7 @@ public class ResultProducer {
     /**
      * transform the result matrix to a text file
      */
-    private void matrixToFile(double[][] matrix, File resultFile) {
+    void matrixToFile(double[][] matrix, File resultFile) {
         try {
             FileWriter writer = new FileWriter(resultFile);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);

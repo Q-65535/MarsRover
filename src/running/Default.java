@@ -10,13 +10,16 @@ import world.Norm;
 import java.util.*;
 
 public class Default {
+    public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MS_results";
     public static int SEED = 1;
-    public static Random rm = new Random(1);
+    public static Random rm = new Random(SEED);
     public static Random goalGenerateRM = new Random(SEED);
     public static final int def_map_size = 20;
     public static final int def_num_goals = 12;
     public static final int def_max_capacity = def_map_size * 2;
     public static final int def_act_consumption = 1;
+    public static final int def_penalty = 3;
+    public static final int def_num_norms = 10;
     public static final Cell middle_Position = new Cell(def_map_size / 2, def_map_size / 2);
     public static final Cell def_initial_Position = middle_Position;
     public static final Cell def_recharge_position = middle_Position;
@@ -93,7 +96,7 @@ public class Default {
         return res;
     }
 
-    public static HashMap<Cell, Norm> randomGenerateNorms(int mapSize, int numOfNorms, Cell except, Random rm) {
+    public static HashMap<Cell, Norm> randomGenerateNorms(int mapSize, int numOfNorms, int avgPenalty, Cell except, Random rm) {
         HashMap<Cell, Norm> norms = new HashMap<>();
         while (norms.size() < numOfNorms) {
             int x = rm.nextInt(mapSize);
@@ -103,7 +106,7 @@ public class Default {
             if (cell.equals(except)) {
                 continue;
             }
-            double penaltyValue = gaussianDistributionWithRange(1, 0.2, 0, 2, rm);
+            double penaltyValue = gaussianDistributionWithRange(avgPenalty, 0.2, 2, rm);
             norms.put(cell, new Norm(cell, penaltyValue));
         }
         return norms;
@@ -112,11 +115,11 @@ public class Default {
     /**
      * Generate a number according to normal distribution with specified mean, standard deviation and bounds
      */
-    private static double gaussianDistributionWithRange(int mean, double stdDeviation, int leftBound, int rightBound, Random rm) {
+    private static double gaussianDistributionWithRange(int mean, double stdDeviation, int range, Random rm) {
         // the generated value
         double value = rm.nextGaussian() * stdDeviation + mean;
         // if the value is not in bounds, generate again and again
-        while (value < leftBound || value > rightBound) {
+        while (value < mean - range || value > mean + range) {
             value = rm.nextGaussian() * stdDeviation + mean;
         }
         return value;

@@ -1,10 +1,12 @@
 package MCTSstate;
 
 import agent.MCTSAgent;
+import agent.MoveAction;
 import world.Cell;
 import world.SimEnvironment;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class NMarsRoverState extends MarsRoverState {
@@ -37,12 +39,6 @@ public class NMarsRoverState extends MarsRoverState {
             Cell selectedTarget = rm.nextDouble() < 0.9 ? nearestTarget : randomTarget;
 //            selectedTarget = randomTarget;
 
-            // evaluate resource consumption
-            int totalConsumption = cloneAgent.estimateFuelConsumption(selectedTarget) + cloneAgent.estimateFuelConsumption(selectedTarget, cloneState.rechargePosition);
-            if (totalConsumption > cloneAgent.getCurrentFuel()) {
-                cloneState.exeJump(cloneState.rechargePosition);
-            }
-
             // simulate all the movement actions
             while (!cloneAgent.getCurrentPosition().equals(selectedTarget)) {
                 cloneState.exeAct(cloneAgent.getActMoveTo(selectedTarget));
@@ -54,7 +50,10 @@ public class NMarsRoverState extends MarsRoverState {
 
     @Override
     public double evaluateState() {
-        return super.evaluateState() + (1 / (simAgent.getTotalPenalty() + 2));
+        double resourceValue = super.evaluateState();
+        double penaltyValue = simAgent.getTotalPenalty();
+
+        return resourceValue + 0.1 * resourceValue * (1 / (penaltyValue + 1));
     }
 
     @Override
