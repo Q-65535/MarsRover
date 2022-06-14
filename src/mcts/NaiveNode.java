@@ -6,7 +6,11 @@ import agent.MoveAction;
 import java.util.ArrayList;
 
 public class NaiveNode extends AbstractMCTSNode {
-    private ArrayList<NaiveNode> children = new ArrayList<>();
+    ArrayList<NaiveNode> children = new ArrayList<>();
+
+    public NaiveNode(AbstractState rootState) {
+        super(rootState);
+    }
 
     public NaiveNode(MoveAction act, AbstractState rootState) {
         super(act, rootState);
@@ -35,7 +39,7 @@ public class NaiveNode extends AbstractMCTSNode {
      * Select the child with the maximum UCT value
      */
     @Override
-    public NaiveNode select() {
+    protected NaiveNode select() {
         NaiveNode selected = null;
         // first random selection
         selected = children.get(rm.nextInt(children.size()));
@@ -54,36 +58,6 @@ public class NaiveNode extends AbstractMCTSNode {
 
     }
 
-    /**
-     * Select the child node with maximum best value
-     */
-    @Override
-    public AbstractMCTSNode exploitSelect() {
-        NaiveNode selected = null;
-        selected = children.get(rm.nextInt(children.size()));
-        double bestValue = Double.NEGATIVE_INFINITY;
-        for (NaiveNode child : children) {
-            if (child.statistic.best > bestValue) {
-                bestValue = child.statistic.best;
-                selected = child;
-            }
-        }
-        return selected;
-    }
-
-    @Override
-    public double rollOut(AbstractState sState) {
-        AbstractState endState = sState.randomSim();
-        return endState.evaluateState();
-    }
-
-    @Override
-    protected double calUCT() {
-        double uctVal = statistic.totValue / (statistic.nVisits + epsilon) +
-                Math.sqrt(Math.log(statistic.nVisits + 1) / (statistic.nVisits + epsilon)) + rm.nextDouble() * epsilon;
-        return uctVal;
-    }
-
     @Override
     public AbstractMCTSNode randomChild() {
         if (!hasChildren()) {
@@ -96,10 +70,5 @@ public class NaiveNode extends AbstractMCTSNode {
     @Override
     public ArrayList<NaiveNode> getChildren() {
         return children;
-    }
-
-    @Override
-    public AbstractState getCurrentState() {
-        return null;
     }
 }

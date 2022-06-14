@@ -90,7 +90,7 @@ public abstract class AbstractAgent implements Cloneable {
         return rechargeFuelConsumption;
     }
 
-    public abstract boolean reasoning();
+    public abstract boolean reason();
 
     public MoveAction execute() {
         return currentAct;
@@ -229,6 +229,9 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public Set<Cell> getNormPositions() {
+        if (norms == null) {
+            return new HashSet<>();
+        }
         return norms.keySet();
     }
 }

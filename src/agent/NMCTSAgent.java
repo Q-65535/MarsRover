@@ -1,5 +1,6 @@
 package agent;
 
+import MCTSstate.AbstractState;
 import MCTSstate.MarsRoverState;
 import MCTSstate.NMarsRoverState;
 import mcts.MCTSWorkSpace;
@@ -21,19 +22,7 @@ public class NMCTSAgent extends MCTSAgent {
     }
 
     @Override
-    public boolean reasoning() {
-        SimEnvironment simEnv = new SimEnvironment(mapSize, rechargePosition, this, actionFuelConsumption);
-        NMarsRoverState rootState = new NMarsRoverState(simEnv);
-        //TODO is there a problem to pass null?
-        NaiveNode rootNaiveNode = new NaiveNode(null, rootState);
-        MCTSWorkSpace mctsWorkSpace = new MCTSWorkSpace(rootState, rootNaiveNode);
-        mctsWorkSpace.run(100, 10);
-        MoveAction act = mctsWorkSpace.bestChoice();
-
-        if (act != null) {
-            this.currentAct = act;
-            return true;
-        }
-        return false;
+    AbstractState constructState(SimEnvironment simEnv) {
+        return new NMarsRoverState(simEnv);
     }
 }

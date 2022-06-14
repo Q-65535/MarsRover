@@ -1,8 +1,6 @@
 package running;
 
-import agent.AbstractAgent;
-import agent.MCTSAgent;
-import agent.ProactiveFIFOAgent;
+import agent.*;
 import world.Cell;
 import world.Environment;
 import world.Norm;
@@ -10,36 +8,40 @@ import world.Norm;
 import java.util.*;
 
 public class Default {
-    public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MS_results";
     public static int SEED = 1;
     public static Random rm = new Random(SEED);
     public static Random goalGenerateRM = new Random(SEED);
     public static final int def_map_size = 20;
-    public static final int def_num_goals = 12;
+    public static final int def_num_goals = 15;
     public static final int def_max_capacity = def_map_size * 2;
     public static final int def_act_consumption = 1;
-    public static final int def_penalty = 3;
-    public static final int def_num_norms = 10;
     public static final Cell middle_Position = new Cell(def_map_size / 2, def_map_size / 2);
     public static final Cell def_initial_Position = middle_Position;
     public static final Cell def_recharge_position = middle_Position;
 
     public static Set<Cell> def_goals;
 
-    public static AbstractAgent getNewDefProFIFOAgent() {
+    public static AbstractAgent genNewDefFIFOAgent() {
+        return new FIFOAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
+    }
+    public static AbstractAgent genNewDefProFIFOAgent() {
         return new ProactiveFIFOAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
     }
 
-    public static AbstractAgent getNewDefMctsAgent() {
+    public static AbstractAgent genNewDefGreedyAgent() {
+        return new GreedyAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
+    }
+
+    public static AbstractAgent genNewDefMctsAgent() {
         return new MCTSAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
     }
 
-    public static Environment getNewDefEnv() {
-        return new Environment(def_map_size, def_recharge_position, getNewDefProFIFOAgent(), def_act_consumption);
+    public static AbstractAgent genNewDefSPMctsAgent() {
+        return new SPMCTSAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
     }
 
-    public static Environment getNewMctsEnv() {
-        return new Environment(def_map_size, def_recharge_position, getNewDefMctsAgent(), def_act_consumption);
+    public static Environment getNewDefEnv() {
+        return new Environment(def_map_size, def_recharge_position, def_act_consumption);
     }
 
     public static MCTSAgent genNewMctsAgentWithTargetsAndCapacity(Set<Cell> targets, int capacity) {

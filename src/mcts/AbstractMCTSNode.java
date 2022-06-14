@@ -19,11 +19,15 @@ public abstract class AbstractMCTSNode {
 
     Statistic statistic = new Statistic();
 
+
     public AbstractMCTSNode(MoveAction act, AbstractState rootState) {
         this.rootState = rootState;
         this.act = act;
     }
 
+    public AbstractMCTSNode(AbstractState rootState) {
+        this.rootState = rootState;
+    }
 
     public abstract boolean isLeaf();
 
@@ -37,21 +41,12 @@ public abstract class AbstractMCTSNode {
 
     public abstract void expand(AbstractState sState);
 
-    public abstract AbstractMCTSNode select();
+    protected abstract AbstractMCTSNode select();
 
-    /**
-     * exploit select child node, no exploration considered
-     */
-    public abstract AbstractMCTSNode exploitSelect();
-
-    public abstract double rollOut(AbstractState sState);
-
-    protected abstract double calUCT();
 
     public abstract AbstractMCTSNode randomChild();
 
     public abstract ArrayList<? extends AbstractMCTSNode> getChildren();
 
-    public abstract AbstractState getCurrentState();
 }
 

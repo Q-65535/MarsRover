@@ -1,6 +1,8 @@
 package agent;
 
+import MCTSstate.AbstractState;
 import MCTSstate.MarsRoverState;
+import mcts.AbstractMCTSNode;
 import mcts.MCTSWorkSpace;
 import mcts.NaiveNode;
 import running.Default;
@@ -12,33 +14,45 @@ import java.util.List;
 import java.util.Set;
 
 public class MCTSAgent extends AbstractAgent {
-    List<MoveAction> bestActs;
+    MCTSWorkSpace ws;
 
     public MCTSAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
         super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
-        bestActs = new ArrayList<>();
     }
 
     @Override
-    public boolean reasoning() {
-        SimEnvironment simEnv = new SimEnvironment(mapSize, rechargePosition, this, actionFuelConsumption);
-        MarsRoverState rootState = new MarsRoverState(simEnv);
-        //TODO is there a problem to pass null?
-        NaiveNode rootNaiveNode = new NaiveNode(null, rootState);
-        MCTSWorkSpace mctsWorkSpace = new MCTSWorkSpace(rootState, rootNaiveNode);
-        mctsWorkSpace.run(100, 10);
-        MoveAction act = mctsWorkSpace.bestChoice();
+    public boolean reason() {
+        SimEnvironment simEnv = constructSimEnvironment();
+        AbstractState rootState = constructState(simEnv);
+        AbstractMCTSNode rootNode = constructNode(rootState);
+        // if it is the first time to run mcts
+        if (ws == null) {
+            ws = new MCTSWorkSpace(rootState, rootNode);
+        } else {
+            ws.setRootState(rootState);
+            ws.setRootMCTSNode(rootNode);
+        }
+        ws.run(100, 10);
 
-        if (act != null) {
-            this.currentAct = act;
+        if (ws.hasNextBestAct()) {
+            this.currentAct = ws.nextBestAct();
             return true;
         }
         return false;
     }
 
-    private boolean simulation() {
-        return true;
+    SimEnvironment constructSimEnvironment() {
+        return new SimEnvironment(mapSize, rechargePosition, this, actionFuelConsumption);
     }
+
+    AbstractState constructState(SimEnvironment simEnv) {
+        return new MarsRoverState(simEnv);
+    }
+
+    AbstractMCTSNode constructNode(AbstractState rootState) {
+        return new NaiveNode(rootState);
+    }
+
 
 
     /**

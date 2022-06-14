@@ -11,7 +11,7 @@ public class FIFOAgent extends AbstractAgent {
     }
 
     @Override
-    public boolean reasoning() {
+    public boolean reason() {
         if (currentTarget == null) {
             // if no goal to pursuit, return false
             if (targetPositions.isEmpty()) {

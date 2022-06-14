@@ -13,7 +13,11 @@ import static running.Default.*;
 import static running.Default.def_act_consumption;
 import static running.Utils.join;
 
-public class NormResultProducer extends ResultProducer {
+public class NormResultProducer extends MGResultProducer {
+    public static final String penaltyResultPrefix = "penalty-";
+    public static final String consumptionResultPrefix = "consumption-";
+    public static final int def_penalty = 3;
+    public static final int def_num_norms = 30;
     final int maxNormPenalty;
     final int maxNumOfNorms;
 
@@ -23,10 +27,12 @@ public class NormResultProducer extends ResultProducer {
         this.maxNumOfNorms = maxNumOfNorms;
     }
     /**
-     * experiment a type of agent and write the result to a file
+     * experiment varying number of norms
      */
     public void expAgentVaryNumOfNorms(String agentType, String fileName) {
+        double[][] penaltyRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
+
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
             for (int numOfNorm = 0; numOfNorm <= maxNumOfNorms; numOfNorm++) {
                 // always init the random object to make sure consistency
@@ -41,24 +47,33 @@ public class NormResultProducer extends ResultProducer {
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-                        displayer.display(environment);
+//                        displayer.display(environment);
                     }
                     // add consumption value to record
-                    consumptionRecords[goalNum][numOfNorm] += agent.getTotalPenalty();
+                    penaltyRecords[goalNum][numOfNorm] += agent.getTotalPenalty();
+                    consumptionRecords[goalNum][numOfNorm] += agent.getTotalFuelConsumption();
                 }
+                System.out.println("penalty: " + penaltyRecords[goalNum][numOfNorm]);
+                System.out.println("consumption: " + consumptionRecords[goalNum][numOfNorm]);
             }
         }
         // get average value
-        for (int i = 0; i < consumptionRecords.length; i++) {
-            for (int j = 0; j < consumptionRecords[i].length; j++) {
+        for (int i = 0; i < penaltyRecords.length; i++) {
+            for (int j = 0; j < penaltyRecords[i].length; j++) {
+                penaltyRecords[i][j] /= repetitionCount;
                 consumptionRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
     }
 
+    /**
+     * Experiment varying norm penalty value
+     */
     public void expAgentVaryNormPenalty(String agentType, String fileName) {
-        double[][] consumptionRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
+        double[][] penaltyRecords = new double[maxGoalNum + 1][maxNormPenalty + 1];
+        double[][] consumptionRecords = new double[maxGoalNum + 1][maxNormPenalty + 1];
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
             for (int normPenalty = 0; normPenalty <= maxNormPenalty; normPenalty++) {
                 // always init the random object to make sure consistency
@@ -76,17 +91,22 @@ public class NormResultProducer extends ResultProducer {
 //                        displayer.display(environment);
                     }
                     // add consumption value to record
+                    penaltyRecords[goalNum][normPenalty] += agent.getTotalPenalty();
                     consumptionRecords[goalNum][normPenalty] += agent.getTotalFuelConsumption();
                 }
+                System.out.println("penalty: " + penaltyRecords[goalNum][normPenalty]);
+                System.out.println("consumption: " + consumptionRecords[goalNum][normPenalty]);
             }
         }
         // get average value
-        for (int i = 0; i < consumptionRecords.length; i++) {
-            for (int j = 0; j < consumptionRecords[i].length; j++) {
-                consumptionRecords[i][j] /= 50;
+        for (int i = 0; i < penaltyRecords.length; i++) {
+            for (int j = 0; j < penaltyRecords[i].length; j++) {
+                penaltyRecords[i][j] /= repetitionCount;
+                consumptionRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
     }
 
 
@@ -95,6 +115,9 @@ public class NormResultProducer extends ResultProducer {
         switch (agentType) {
             case "mcts":
                 agent = new NMCTSAgent(def_initial_Position, goals, norms);
+                break;
+            case "spmcts":
+                agent = new NSPMCTSAgent(def_initial_Position, goals, norms);
                 break;
             case "vbdi":
                 agent = new VBDIAgent(def_initial_Position, goals, norms);

@@ -24,6 +24,10 @@ public class Environment {
         this.actualActFuelConsumption = actualActFuelConsumption;
     }
 
+    public Environment(int mapSize, Cell rechargePosition, int actualActFuelConsumption) {
+        this(mapSize, rechargePosition, null, actualActFuelConsumption);
+    }
+
     public Cell get(int x, int y) {
         return map[x][y];
     }
@@ -36,9 +40,13 @@ public class Environment {
         return agent;
     }
 
+    public void setAgent(AbstractAgent agent) {
+        this.agent = agent;
+    }
+
     public boolean run() {
         boolean runnable = false;
-        boolean executable = agent.reasoning();
+        boolean executable = agent.reason();
         if (executable) {
             runnable = true;
             MoveAction act = agent.execute();

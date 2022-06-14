@@ -15,7 +15,7 @@ import static running.Utils.*;
 
 import static running.Default.*;
 
-public class ResultProducer {
+public class MGResultProducer {
     public static final String doubleFormatter = "%.3f";
     public static final int repetitionCount = 50;
     static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
@@ -29,7 +29,7 @@ public class ResultProducer {
     public final int maxMultiplier;
     public final int maxGoalNum;
 
-    public ResultProducer(String RESULT_DIR, int maxMultiplier, int maxGoalNum) {
+    public MGResultProducer(String RESULT_DIR, int maxMultiplier, int maxGoalNum) {
         this.RESULT_DIR = RESULT_DIR;
         this.maxMultiplier = maxMultiplier;
         this.maxGoalNum = maxGoalNum;
@@ -54,8 +54,9 @@ public class ResultProducer {
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-//                        displayer.display(environment);
+                        displayer.display(environment);
                     }
+                    System.out.println("goals achieved: "+agent.getNumOfAchieved());
                     // add consumption value to record
                     consumptionRecords[goalNum][multiplier] += agent.getTotalFuelConsumption();
                 }
@@ -75,6 +76,9 @@ public class ResultProducer {
         switch (agentType) {
             case "mcts":
                 agent = new MCTSAgent(def_initial_Position, goals, def_recharge_position, capacity, def_act_consumption);
+                break;
+            case "spmcts":
+                agent = new SPMCTSAgent(def_initial_Position, goals, def_recharge_position, capacity, def_act_consumption);
                 break;
             case "profifo":
                 agent = new ProactiveFIFOAgent(def_initial_Position, goals, def_recharge_position, capacity, def_act_consumption);
