@@ -8,7 +8,6 @@ import world.Norm;
 import java.util.*;
 
 public abstract class AbstractAgent implements Cloneable {
-    public static final int def_act_fuel_consumption = 1;
     public static final int infinite_capacity = Integer.MAX_VALUE;
     Random rm = new Random(Default.SEED);
 
@@ -19,9 +18,9 @@ public abstract class AbstractAgent implements Cloneable {
     HashMap<Cell, Norm> norms;
     Cell currentPosition;
     MoveAction currentAct;
-    Set<Cell> targetPositions;
-    Cell currentTarget;
-    List<Cell> achievedGoalCells;
+    List<Cell> goals;
+    Cell currentGoal;
+    List<Cell> achievedGoals;
     Cell rechargePosition;
     int mapSize;
     int maxCapacity;
@@ -35,43 +34,53 @@ public abstract class AbstractAgent implements Cloneable {
     /**
      * how much fuel will be consumed for each action (agent's perspective)
      */
-    int actionFuelConsumption;
+    int actFuelConsumption;
 
-    public AbstractAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
+    public AbstractAgent(Cell initialPosition, List<Cell> goals, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
         init();
-        this.currentPosition = currentPosition;
-        this.targetPositions = targetPositions;
+        this.currentPosition = initialPosition;
+        this.goals = new ArrayList<>(goals);
         this.rechargePosition = rechargePosition;
         this.maxCapacity = maxCapacity;
         this.currentFuel = maxCapacity;
-        this.actionFuelConsumption = actionFuelConsumption;
+        this.actFuelConsumption = actFuelConsumption;
+    }
+
+    public AbstractAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+        init();
+        this.currentPosition = currentPosition;
+        this.rechargePosition = rechargePosition;
+        this.maxCapacity = maxCapacity;
+        this.currentFuel = maxCapacity;
+        this.actFuelConsumption = actFuelConsumption;
     }
 
     private void init() {
-        targetPositions = new HashSet<>();
-        achievedGoalCells = new ArrayList<>();
+        goals = new ArrayList<>();
+        achievedGoals = new ArrayList<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
+        penalty = 0;
     }
 
-    public void setGoals(Set<Cell> goals) {
-        this.targetPositions = goals;
+    public void setGoals(List<Cell> goals) {
+        this.goals = goals;
     }
 
     public void adoptGoal(Cell target) {
-        targetPositions.add(target);
+        goals.add(target);
     }
 
-    public Cell getCurrentTarget() {
-        return currentTarget;
+    public Cell getCurrentGoal() {
+        return currentGoal;
     }
 
     public int getCurrentFuel() {
         return currentFuel;
     }
 
-    public Set<Cell> getTargetPositions() {
-        return targetPositions;
+    public List<Cell> getGoals() {
+        return goals;
     }
 
     public Cell getCurrentPosition() {
@@ -79,7 +88,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public int getNumOfAchieved() {
-        return achievedGoalCells.size();
+        return achievedGoals.size();
     }
 
     public int getTotalFuelConsumption() {
@@ -123,6 +132,10 @@ public abstract class AbstractAgent implements Cloneable {
         if (ty < currentPosition.getY()) {
             acts.add(MoveAction.DOWN);
         }
+        //TODO properly deal with the case when the goal is just at the agent's position
+        if (acts.size() == 0) {
+            acts.add(MoveAction.RIGHT);
+        }
         return acts;
 
     }
@@ -145,6 +158,19 @@ public abstract class AbstractAgent implements Cloneable {
         return null;
     }
 
+    public Cell getNearestGoal() {
+        Cell nearestTarget = null;
+        int minConsumption = Integer.MAX_VALUE;
+        for (Cell targetPosition : goals) {
+            int consumption = this.estimateFuelConsumption(targetPosition);
+            if (consumption < minConsumption) {
+                nearestTarget = targetPosition;
+                minConsumption = consumption;
+            }
+        }
+        return nearestTarget;
+    }
+
     /**
      * Calculate the distance between current position and target position
      *
@@ -159,12 +185,12 @@ public abstract class AbstractAgent implements Cloneable {
      */
     public int estimateFuelConsumption(Cell target) {
         int distance = calculateDistance(target);
-        return distance * actionFuelConsumption;
+        return distance * actFuelConsumption;
     }
 
     public int estimateFuelConsumption(Cell from, Cell to) {
         int distance = Calculator.calculateDistance(from, to);
-        return distance * actionFuelConsumption;
+        return distance * actFuelConsumption;
     }
 
     public void updatePosition(Cell newPosition) {

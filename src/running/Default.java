@@ -1,9 +1,8 @@
 package running;
 
-import agent.*;
 import world.Cell;
-import world.Environment;
 import world.Norm;
+import static world.Calculator.*;
 
 import java.util.*;
 
@@ -12,45 +11,14 @@ public class Default {
     public static Random rm = new Random(SEED);
     public static Random goalGenerateRM = new Random(SEED);
     public static final int def_map_size = 20;
-    public static final int def_num_goals = 15;
+    public static final int def_num_goals = 10;
     public static final int def_max_capacity = def_map_size * 2;
     public static final int def_act_consumption = 1;
     public static final Cell middle_Position = new Cell(def_map_size / 2, def_map_size / 2);
     public static final Cell def_initial_Position = middle_Position;
     public static final Cell def_recharge_position = middle_Position;
 
-    public static Set<Cell> def_goals;
-
-    public static AbstractAgent genNewDefFIFOAgent() {
-        return new FIFOAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
-    }
-    public static AbstractAgent genNewDefProFIFOAgent() {
-        return new ProactiveFIFOAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
-    }
-
-    public static AbstractAgent genNewDefGreedyAgent() {
-        return new GreedyAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
-    }
-
-    public static AbstractAgent genNewDefMctsAgent() {
-        return new MCTSAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
-    }
-
-    public static AbstractAgent genNewDefSPMctsAgent() {
-        return new SPMCTSAgent(def_initial_Position, cloneCellSet(def_goals), def_recharge_position, def_max_capacity, def_act_consumption);
-    }
-
-    public static Environment getNewDefEnv() {
-        return new Environment(def_map_size, def_recharge_position, def_act_consumption);
-    }
-
-    public static MCTSAgent genNewMctsAgentWithTargetsAndCapacity(Set<Cell> targets, int capacity) {
-        return new MCTSAgent(def_initial_Position, targets, def_recharge_position, capacity, def_act_consumption);
-    }
-
-    public static ProactiveFIFOAgent genNewProFIFOAgentWithTargetsAndCapacity(Set<Cell> targets, int capacity) {
-        return new ProactiveFIFOAgent(def_initial_Position, targets, def_recharge_position, capacity, def_act_consumption);
-    }
+    public static List<Cell> def_goals;
 
 
     /**
@@ -60,14 +28,15 @@ public class Default {
      * @param except the excepted cell position
      * @return a set of target cells
      */
-    public static Set<Cell> randomGenerateTargetPositions(int mapSize, int numOfGoals, Cell except) {
-        Set<Cell> res = new HashSet<>();
+    public static List<Cell> genGoals(int mapSize, int numOfGoals, Cell except) {
+        List<Cell> res = new ArrayList<>();
         while (res.size() < numOfGoals) {
             int x = goalGenerateRM.nextInt(mapSize);
             int y = goalGenerateRM.nextInt(mapSize);
             Cell cell = new Cell(x, y);
 
-            if (except.equals(cell)) {
+            // if the newly generated goal is at the forbidden position or already added to the list, continue
+            if (except.equals(cell) || res.contains(cell)) {
                 continue;
             }
             res.add(cell);
@@ -83,14 +52,14 @@ public class Default {
      * @param rm random object
      * @return a set of location cells
      */
-    public static Set<Cell> randomGenerateTargetPositions(int mapSize, int numOfGoals, Cell except, Random rm) {
-        Set<Cell> res = new HashSet<>();
+    public static List<Cell> genGoals(int mapSize, int numOfGoals, Cell except, Random rm) {
+        List<Cell> res = new ArrayList<>();
         while (res.size() < numOfGoals) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
             Cell cell = new Cell(x, y);
 
-            if (cell.equals(except)) {
+            if (cell.equals(except) || res.contains(cell)) {
                 continue;
             }
             res.add(cell);
@@ -98,7 +67,40 @@ public class Default {
         return res;
     }
 
-    public static HashMap<Cell, Norm> randomGenerateNorms(int mapSize, int numOfNorms, int avgPenalty, Cell except, Random rm) {
+    /**
+     * Generate a list of goals. The distance between any two goals must be equal or greater than the minimum distance
+    */
+    public static List<Cell> genGoals(int mapSize, int goalCount, Cell except, Random rm, int minDistance) {
+        List<Cell> goals = new ArrayList<>();
+        while (goals.size() < goalCount) {
+            int x = rm.nextInt(mapSize);
+            int y = rm.nextInt(mapSize);
+            Cell newGoal = new Cell(x, y);
+
+            // make sure no duplicate locations
+            if (newGoal.equals(except) || goals.contains(newGoal)) {
+                continue;
+            }
+            // the distance between any two goals shall not be greater than the minimum distance
+            if (exceedMinDistance(newGoal, goals, minDistance)) {
+                continue;
+            }
+            goals.add(newGoal);
+        }
+        return goals;
+    }
+
+    private static boolean exceedMinDistance(Cell newGoal, List<Cell> goals, int minDistance) {
+        for (Cell goal : goals) {
+            int curDistance = calculateDistance(newGoal, goal);
+            if (curDistance < minDistance) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static HashMap<Cell, Norm> genNorms(int mapSize, int numOfNorms, int avgPenalty, Cell except, Random rm) {
         HashMap<Cell, Norm> norms = new HashMap<>();
         while (norms.size() < numOfNorms) {
             int x = rm.nextInt(mapSize);
@@ -108,7 +110,7 @@ public class Default {
             if (cell.equals(except)) {
                 continue;
             }
-            double penaltyValue = gaussianDistributionWithRange(avgPenalty, 0.2, 2, rm);
+            double penaltyValue = gaussian(avgPenalty, 0.2, 2, rm);
             norms.put(cell, new Norm(cell, penaltyValue));
         }
         return norms;
@@ -117,29 +119,21 @@ public class Default {
     /**
      * Generate a number according to normal distribution with specified mean, standard deviation and bounds
      */
-    private static double gaussianDistributionWithRange(int mean, double stdDeviation, int range, Random rm) {
+    private static double gaussian(int mean, double stdDeviation, int rangeRadius, Random rm) {
         // the generated value
         double value = rm.nextGaussian() * stdDeviation + mean;
         // if the value is not in bounds, generate again and again
-        while (value < mean - range || value > mean + range) {
+        while (value < mean - rangeRadius || value > mean + rangeRadius) {
             value = rm.nextGaussian() * stdDeviation + mean;
         }
         return value;
     }
 
-    public static Set<Cell> cloneCellSet(Set<Cell> cells) {
-        HashSet<Cell> cloneSet = new HashSet<>();
+    public static List<Cell> cloneCells(List<Cell> cells) {
+        List<Cell> cloneSet = new ArrayList<>();
         for (Cell cell : cells) {
             cloneSet.add(cell);
         }
         return cloneSet;
-    }
-
-    public static List<Cell> cloneCellList(List<Cell> cells) {
-        ArrayList<Cell> cloneList = new ArrayList<>();
-        for (Cell cell : cells) {
-            cloneList.add(cell);
-        }
-        return cloneList;
     }
 }

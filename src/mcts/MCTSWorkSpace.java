@@ -78,7 +78,8 @@ public class MCTSWorkSpace {
     }
 
     /**
-     * The best child of root node
+     * The best child of root node based on the node's value. Notice that this evaluation is not based on UCT value, we
+     * don't consider exploration at all.
      */
     public AbstractMCTSNode bestChild() {
         // if the root node cannot be expanded any further

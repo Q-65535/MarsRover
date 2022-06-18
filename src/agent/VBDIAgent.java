@@ -3,15 +3,17 @@ package agent;
 import world.Cell;
 import world.Norm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class VBDIAgent extends NFIFOAgent {
 
-    public VBDIAgent(Cell initPosition, Set<Cell> targetPositions, HashMap<Cell, Norm> norms) {
+
+    public VBDIAgent(Cell initPosition, List<Cell> targetPositions, HashMap<Cell, Norm> norms) {
         super(initPosition, targetPositions, norms);
+    }
+
+    public VBDIAgent(Cell initialPosition, HashMap<Cell, Norm> norms) {
+        super(initialPosition, norms);
     }
 
     /**

@@ -1,10 +1,8 @@
 package MCTSstate;
 
-import agent.AbstractAgent;
 import agent.MCTSAgent;
 import agent.MoveAction;
 import world.Cell;
-import world.Environment;
 import world.SimEnvironment;
 
 import java.util.ArrayList;
@@ -21,6 +19,7 @@ public class MarsRoverState extends AbstractState {
     public MarsRoverState(SimEnvironment simEnv) {
         this.simEnv = simEnv.clone();
         if (!(simEnv.getAgent() instanceof MCTSAgent)) {
+
             throw new RuntimeException("only mcts agent can be added to state");
         }
         rechargePosition = simEnv.getRechargePosition();
@@ -39,7 +38,9 @@ public class MarsRoverState extends AbstractState {
 
     @Override
     public double evaluateState() {
-        return 1000.0 / (simAgent.getTotalFuelConsumption() + 1);
+
+        double consumptionEval = 100.0 / (simAgent.getTotalFuelConsumption() + 100);
+        return simAgent.getNumOfAchieved() + consumptionEval;
     }
 
 
@@ -47,35 +48,27 @@ public class MarsRoverState extends AbstractState {
     public AbstractState randomSim(List<MoveAction> actContainer) {
         MarsRoverState cloneState = this.clone();
         MCTSAgent cloneAgent = cloneState.simAgent;
-        Set<Cell> targetPositions = cloneAgent.getTargetPositions();
+        List<Cell> targetPositions = cloneAgent.getGoals();
         while (!targetPositions.isEmpty()) {
             // get the nearest target
-            Cell nearestTarget = null;
-            int minConsumption = Integer.MAX_VALUE;
-            for (Cell targetPosition : targetPositions) {
-                int consumption = cloneAgent.estimateFuelConsumption(targetPosition);
-                if (consumption < minConsumption) {
-                    nearestTarget = targetPosition;
-                    minConsumption = consumption;
-                }
-            }
+            Cell nearestTarget = cloneAgent.getNearestGoal();
             // get a random target
             ArrayList<Cell> targetList = new ArrayList<>(targetPositions);
             Cell randomTarget = targetList.get(rm.nextInt(targetList.size()));
 
-            // stochastically choose the target to jump
+            // stochastically choose a goal to jump
             Cell selectedTarget = rm.nextDouble() < 0.8 ? nearestTarget : randomTarget;
-//            selectedTarget = randomTarget;
 
             // evaluate resource consumption
             int totalConsumption = cloneAgent.estimateFuelConsumption(selectedTarget) + cloneAgent.estimateFuelConsumption(selectedTarget, cloneState.rechargePosition);
 
-            if (totalConsumption > cloneAgent.getCurrentFuel()) {
-                while (!cloneAgent.getCurrentPosition().equals(cloneState.rechargePosition)) {
-                    MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
-                    cloneState.exeAct(act);
-                    actContainer.add(act);
-                }
+            while (totalConsumption > cloneAgent.getCurrentFuel()) {
+                // go to recharge action
+                MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
+                cloneState.exeAct(act);
+                actContainer.add(act);
+                // refresh the consumption amount
+                totalConsumption = cloneAgent.estimateFuelConsumption(selectedTarget) + cloneAgent.estimateFuelConsumption(selectedTarget, cloneState.rechargePosition);
             }
 
             while (!cloneAgent.getCurrentPosition().equals(selectedTarget)) {
@@ -94,7 +87,7 @@ public class MarsRoverState extends AbstractState {
             return null;
         }
         // no goals to pursuit
-        if (simAgent.getTargetPositions().size() == 0) {
+        if (simAgent.getGoals().size() == 0) {
             return null;
         }
         // fuel is not enough
@@ -107,10 +100,8 @@ public class MarsRoverState extends AbstractState {
         }
 
         Set<MoveAction> moveActions = new HashSet<>();
-        // add move to recharge position actions
-        moveActions.addAll(simAgent.getAllActMoveTo(rechargePosition));
         // add all possible choices
-        for (Cell targetPosition : simAgent.getTargetPositions()) {
+        for (Cell targetPosition : simAgent.getGoals()) {
             moveActions.addAll(simAgent.getAllActMoveTo(targetPosition));
             // if all 4 directions are included, immediately return
             if (moveActions.size() == 4) {

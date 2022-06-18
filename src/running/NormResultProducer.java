@@ -6,8 +6,8 @@ import world.Environment;
 import world.Norm;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import static running.Default.*;
 import static running.Default.def_act_consumption;
@@ -22,7 +22,7 @@ public class NormResultProducer extends MGResultProducer {
     final int maxNumOfNorms;
 
     public NormResultProducer(String RESULT_DIR, int maxGoalNum, int maxNormPenalty, int maxNumOfNorms) {
-        super(RESULT_DIR, 0, maxGoalNum);
+        super(RESULT_DIR, 0, maxGoalNum, 0);
         this.maxNormPenalty = maxNormPenalty;
         this.maxNumOfNorms = maxNumOfNorms;
     }
@@ -34,13 +34,14 @@ public class NormResultProducer extends MGResultProducer {
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
 
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
-            for (int numOfNorm = 0; numOfNorm <= maxNumOfNorms; numOfNorm++) {
+            for (int normNum = 0; normNum <= maxNumOfNorms; normNum++) {
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
-                Random normRandomObj = new Random(SEED);
+                // important: make sure that the random seeds for generating goals and goals are different
+                Random normRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
-                    HashMap<Cell, Norm> norms = randomGenerateNorms(def_map_size, numOfNorm, def_penalty, def_recharge_position, normRandomObj);
-                    Set<Cell> targets = randomGenerateTargetPositions(def_map_size, goalNum, def_initial_Position, goalRandomObj);
+                    HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
+                    List<Cell> targets = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, targets, norms);
                     Environment environment = new Environment(def_map_size, def_recharge_position, agent, def_act_consumption);
 
@@ -50,11 +51,12 @@ public class NormResultProducer extends MGResultProducer {
 //                        displayer.display(environment);
                     }
                     // add consumption value to record
-                    penaltyRecords[goalNum][numOfNorm] += agent.getTotalPenalty();
-                    consumptionRecords[goalNum][numOfNorm] += agent.getTotalFuelConsumption();
+                    penaltyRecords[goalNum][normNum] += agent.getTotalPenalty();
+                    consumptionRecords[goalNum][normNum] += agent.getTotalFuelConsumption();
                 }
-                System.out.println("penalty: " + penaltyRecords[goalNum][numOfNorm]);
-                System.out.println("consumption: " + consumptionRecords[goalNum][numOfNorm]);
+                System.out.println("goalNum: " + goalNum +", normNum: " + normNum);
+                System.out.println("avg penalty: " + penaltyRecords[goalNum][normNum] / repetitionCount);
+                System.out.println("avg consumption: " + consumptionRecords[goalNum][normNum] / repetitionCount);
             }
         }
         // get average value
@@ -80,8 +82,8 @@ public class NormResultProducer extends MGResultProducer {
                 Random goalRandomObj = new Random(SEED);
                 Random normRandomObj = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
-                    HashMap<Cell, Norm> norms = randomGenerateNorms(def_map_size, def_num_norms, normPenalty, def_recharge_position, normRandomObj);
-                    Set<Cell> targets = randomGenerateTargetPositions(def_map_size, goalNum, def_initial_Position, goalRandomObj);
+                    HashMap<Cell, Norm> norms = genNorms(def_map_size, def_num_norms, normPenalty, def_recharge_position, normRandomObj);
+                    List<Cell> targets = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, targets, norms);
                     Environment environment = new Environment(def_map_size, def_recharge_position, agent, def_act_consumption);
 
@@ -110,7 +112,7 @@ public class NormResultProducer extends MGResultProducer {
     }
 
 
-    AbstractAgent genNewAgent(String agentType, Set<Cell> goals, HashMap<Cell, Norm> norms) {
+    AbstractAgent genNewAgent(String agentType, List<Cell> goals, HashMap<Cell, Norm> norms) {
         AbstractAgent agent;
         switch (agentType) {
             case "mcts":

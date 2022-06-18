@@ -11,13 +11,19 @@ import world.Norm;
 import world.SimEnvironment;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 public class NSPMCTSAgent extends NMCTSAgent {
-    public NSPMCTSAgent(Cell currentPosition, Set<Cell> targetPositions, HashMap<Cell, Norm> norms) {
-        super(currentPosition, targetPositions, norms);
+
+
+    public NSPMCTSAgent(Cell initialPosition, List<Cell> targetPositions, HashMap<Cell, Norm> norms) {
+        super(initialPosition, targetPositions, norms);
     }
 
+    public NSPMCTSAgent(Cell initialPosition, HashMap<Cell, Norm> norms) {
+        super(initialPosition, norms);
+    }
 
     @Override
     AbstractMCTSNode constructNode(AbstractState rootState) {

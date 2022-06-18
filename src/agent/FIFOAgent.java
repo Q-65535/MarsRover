@@ -2,23 +2,27 @@ package agent;
 
 import world.Cell;
 
-import java.util.Set;
+import java.util.List;
 
 public class FIFOAgent extends AbstractAgent {
 
-    public FIFOAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+    public FIFOAgent(Cell currentPosition, List<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
         super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
+    }
+
+    public FIFOAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
+        super(currentPosition, rechargePosition, maxCapacity, actionFuelConsumption);
     }
 
     @Override
     public boolean reason() {
-        if (currentTarget == null) {
+        if (currentGoal == null) {
             // if no goal to pursuit, return false
-            if (targetPositions.isEmpty()) {
+            if (goals.isEmpty()) {
                 return false;
             }
             // if no current goal, adopt one
-            adoptRandomGoal();
+            setFirstAsCurrentGoal();
         }
 
         if (needGiveup()) {
@@ -34,7 +38,7 @@ public class FIFOAgent extends AbstractAgent {
         }
 
         // finally set current action
-        currentAct = getActMoveTo(currentTarget);
+        currentAct = getActMoveTo(currentGoal);
         return true;
     }
 
@@ -48,44 +52,38 @@ public class FIFOAgent extends AbstractAgent {
 
     @Override
     public void updateGoal() {
-        if (currentTarget == null) {
+        if (currentGoal == null) {
             return;
         }
         // deal with current goal
-        if (currentTarget.equals(currentPosition)) {
+        if (currentGoal.equals(currentPosition)) {
             // add to achieved and remove from targets
-            achievedGoalCells.add(currentTarget);
-            targetPositions.remove(currentTarget);
-            currentTarget = null;
+            achievedGoals.add(currentGoal);
+            goals.remove(currentGoal);
+            currentGoal = null;
         }
         // if the agent pass by a goal position, also achieve it
-        if (targetPositions.contains(currentPosition)) {
-            achievedGoalCells.add(currentPosition);
-            targetPositions.remove(currentPosition);
+        if (goals.contains(currentPosition)) {
+            achievedGoals.add(currentPosition);
+            goals.remove(currentPosition);
         }
     }
 
     /**
-     * pick a target position as current goal
+     * set the first goal in the list of goals as current goal (FIFO)
      */
-    void adoptRandomGoal() {
+    void setFirstAsCurrentGoal() {
         // get the first element in the set
-        currentTarget = targetPositions.iterator().next();
+        currentGoal = goals.iterator().next();
     }
 
-    void adoptNearestGoal() {
-        Cell nearestTarget = null;
-        int minConsumption = Integer.MAX_VALUE;
-        for (Cell targetPosition : targetPositions) {
-            int consumption = this.estimateFuelConsumption(targetPosition);
-            if (consumption < minConsumption) {
-                nearestTarget = targetPosition;
-                minConsumption = consumption;
-            }
-        }
-
-        currentTarget = nearestTarget;
+    /**
+     * set the nearest goals in the list of goals as current goal (greedy)
+     */
+    void setNearestAsCurrentGoal() {
+        currentGoal = getNearestGoal();
     }
+
 
 
 }

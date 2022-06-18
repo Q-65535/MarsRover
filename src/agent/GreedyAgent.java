@@ -2,23 +2,28 @@ package agent;
 
 import world.Cell;
 
+import java.util.List;
 import java.util.Set;
 
 public class GreedyAgent extends ProactiveFIFOAgent {
 
-    public GreedyAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+    public GreedyAgent(Cell currentPosition, List<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
         super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
+    }
+
+    public GreedyAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
+        super(currentPosition, rechargePosition, maxCapacity, actionFuelConsumption);
     }
 
     @Override
     public boolean reason() {
-        if (currentTarget == null) {
+        if (currentGoal == null) {
             // if no goal to pursuit, return false
-            if (targetPositions.isEmpty()) {
+            if (goals.isEmpty()) {
                 return false;
             }
             // if no current goal, adopt one
-            adoptNearestGoal();
+            setNearestAsCurrentGoal();
         }
 
         if (needGiveup()) {
@@ -33,8 +38,9 @@ public class GreedyAgent extends ProactiveFIFOAgent {
             isGoToRecharge = false;
         }
 
-        // finally set current action
-        currentAct = getActMoveTo(currentTarget);
+        // finally set nearest and generate an action
+        setNearestAsCurrentGoal();
+        currentAct = getActMoveTo(currentGoal);
         return true;
     }
 }

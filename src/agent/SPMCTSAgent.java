@@ -10,12 +10,18 @@ import mcts.SPNode;
 import world.Cell;
 import world.SimEnvironment;
 
+import java.util.List;
 import java.util.Set;
 
 public class SPMCTSAgent extends MCTSAgent {
 
-    public SPMCTSAgent(Cell currentPosition, Set<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+
+    public SPMCTSAgent(Cell currentPosition, List<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
         super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
+    }
+
+    public SPMCTSAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
+        super(currentPosition, rechargePosition, maxCapacity, actionFuelConsumption);
     }
 
     @Override

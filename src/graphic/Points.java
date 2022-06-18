@@ -7,6 +7,8 @@ import world.Environment;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JPanel;
@@ -30,12 +32,12 @@ public class Points extends JPanel {
 
         // draw targets
         g2d.setColor(Color.red);
-        Set<Cell> targetPositions = agent.getTargetPositions();
+        List<Cell> targetPositions = agent.getGoals();
         drawCellTo2D(g2d, targetPositions);
 
         //draw current target
         g2d.setColor(Color.MAGENTA);
-        drawCellTo2D(g2d, agent.getCurrentTarget());
+        drawCellTo2D(g2d, agent.getCurrentGoal());
 
         //draw agent
         g2d.setColor(Color.BLUE);
@@ -69,6 +71,10 @@ public class Points extends JPanel {
         for (Cell cell : cells) {
             drawCellTo2D(graphic, cell);
         }
+    }
+
+    private void drawCellTo2D(Graphics2D graphic, List<Cell> cells) {
+        drawCellTo2D(graphic, new HashSet<>(cells));
     }
 
     /**

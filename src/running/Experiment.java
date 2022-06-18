@@ -9,21 +9,29 @@ import static running.Default.*;
 import static running.Utils.*;
 
 public class Experiment {
-    public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MS_results";
+    public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MR_results";
     @Test
-    void mgResultProduce() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15);
-        resultProducer.expAgent("fifo", "fifo.txt");
-        resultProducer.expAgent("profifo", "profifo.txt");
-        resultProducer.expAgent("mcts", "mcts.txt");
+    void mgVaryGoalNumberCapacity() {
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
+//        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
+//        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("mcts", "mcts.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
+    }
+
+    @Test
+    void mgVaryTimeGapCapacity() {
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
+//        resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
+//        resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("mcts", "timeGap_capacity_mcts.txt");
     }
 
     @Test
     public void normVaryNumberResultProduce() {
         NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50);
-        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_number_vbdi.txt");
         normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_number_fifo.txt");
+        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_number_vbdi.txt");
         normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_number_mcts.txt");
 //        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
     }

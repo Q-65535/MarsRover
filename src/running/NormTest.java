@@ -11,7 +11,7 @@ import world.Environment;
 import world.Norm;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
 
 import static running.Default.*;
 
@@ -19,8 +19,8 @@ public class NormTest {
     @Test
     public double normAgentTest() {
 
-        HashMap<Cell, Norm> norms = randomGenerateNorms(def_map_size, 47, 3, def_initial_Position, rm);
-        Set<Cell> goals = randomGenerateTargetPositions(def_map_size, 8, def_initial_Position, rm);
+        HashMap<Cell, Norm> norms = genNorms(def_map_size, 47, 3, def_initial_Position, rm);
+        List<Cell> goals = Default.genGoals(def_map_size, 8, def_initial_Position, rm);
         AbstractAgent agent = new NFIFOAgent(def_initial_Position, goals, norms);
         agent = new VBDIAgent(def_initial_Position, goals, norms);
         agent = new NMCTSAgent(def_initial_Position, goals, norms);
