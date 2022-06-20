@@ -6,8 +6,8 @@ import agent.MoveAction;
 
 public class SimEnvironment extends Environment implements Cloneable {
 
-    public SimEnvironment(int mapSize, Cell rechargePosition, MCTSAgent agent, int actualActFuelConsumption) {
-        super(mapSize, rechargePosition, agent, actualActFuelConsumption);
+    public SimEnvironment(MCTSAgent agent) {
+        super(agent);
     }
 
     // TODO dangerous cast?
@@ -30,18 +30,21 @@ public class SimEnvironment extends Environment implements Cloneable {
         }
         // update internal state based on this new position
         agent.updateGoal();
-        agent.consumeFuel(actualActFuelConsumption);
+        agent.consumeFuel(realActFuelConsumption);
         agent.updateRecharge();
         agent.updatePunish();
     }
 
-    public void executeJump(Cell target) {
+    /**
+     * allow the agent to jump between loactions during the simulation for saving exection time.
+     */
+    public void executeJump(Cell goal) {
         Cell currentPosition = agent.getCurrentPosition();
-        int distance = Calculator.calculateDistance(currentPosition, target);
+        int distance = Calculator.calculateDistance(currentPosition, goal);
 
-        agent.updatePosition(target);
+        agent.updatePosition(goal);
         agent.updateGoal();
-        agent.consumeFuel(actualActFuelConsumption * distance);
+        agent.consumeFuel(realActFuelConsumption * distance);
         agent.updateRecharge();
     }
 
@@ -51,6 +54,6 @@ public class SimEnvironment extends Environment implements Cloneable {
         MCTSAgent mctsAgent = (MCTSAgent) agent;
         MCTSAgent cloneAgent = mctsAgent.clone();
         // clone the environment
-        return new SimEnvironment(mapSize, rechargePosition, cloneAgent, actualActFuelConsumption);
+        return new SimEnvironment(cloneAgent);
     }
 }

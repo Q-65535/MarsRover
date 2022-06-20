@@ -21,10 +21,10 @@ public class NormTest {
 
         HashMap<Cell, Norm> norms = genNorms(def_map_size, 47, 3, def_initial_Position, rm);
         List<Cell> goals = Default.genGoals(def_map_size, 8, def_initial_Position, rm);
-        AbstractAgent agent = new NFIFOAgent(def_initial_Position, goals, norms);
-        agent = new VBDIAgent(def_initial_Position, goals, norms);
-        agent = new NMCTSAgent(def_initial_Position, goals, norms);
-        Environment environment = new Environment(def_map_size, def_recharge_position, agent, def_act_consumption);
+        AbstractAgent agent = new NFIFOAgent(goals, norms);
+        agent = new VBDIAgent(goals, norms);
+        agent = new NMCTSAgent(goals, norms);
+        Environment environment = new Environment(agent);
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
 
         boolean running = true;

@@ -23,10 +23,6 @@ public class Default {
 
     /**
      * given the map size and number of goals to generate, randomly generate a specific number of goal cells
-     * @param mapSize the map size
-     * @param numOfGoals the number of goals to generate
-     * @param except the excepted cell position
-     * @return a set of target cells
      */
     public static List<Cell> genGoals(int mapSize, int numOfGoals, Cell except) {
         List<Cell> res = new ArrayList<>();
@@ -46,11 +42,6 @@ public class Default {
 
     /**
      * Randomly generate a set of goal positions with an except location
-     * @param mapSize the length of the map
-     * @param numOfGoals number of goals to generate
-     * @param except the excluded location, this is usually the initial location of agent
-     * @param rm random object
-     * @return a set of location cells
      */
     public static List<Cell> genGoals(int mapSize, int numOfGoals, Cell except, Random rm) {
         List<Cell> res = new ArrayList<>();
@@ -106,7 +97,6 @@ public class Default {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
             Cell cell = new Cell(x, y);
-
             if (cell.equals(except)) {
                 continue;
             }

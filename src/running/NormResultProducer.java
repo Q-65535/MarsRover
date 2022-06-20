@@ -41,9 +41,9 @@ public class NormResultProducer extends MGResultProducer {
                 Random normRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
                     HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
-                    List<Cell> targets = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
-                    AbstractAgent agent = genNewAgent(agentType, targets, norms);
-                    Environment environment = new Environment(def_map_size, def_recharge_position, agent, def_act_consumption);
+                    List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
+                    AbstractAgent agent = genNewAgent(agentType, goals, norms);
+                    Environment environment = new Environment(agent);
 
                     boolean running = true;
                     while (running) {
@@ -83,9 +83,9 @@ public class NormResultProducer extends MGResultProducer {
                 Random normRandomObj = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
                     HashMap<Cell, Norm> norms = genNorms(def_map_size, def_num_norms, normPenalty, def_recharge_position, normRandomObj);
-                    List<Cell> targets = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
-                    AbstractAgent agent = genNewAgent(agentType, targets, norms);
-                    Environment environment = new Environment(def_map_size, def_recharge_position, agent, def_act_consumption);
+                    List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
+                    AbstractAgent agent = genNewAgent(agentType, goals, norms);
+                    Environment environment = new Environment(agent);
 
                     boolean running = true;
                     while (running) {
@@ -116,16 +116,16 @@ public class NormResultProducer extends MGResultProducer {
         AbstractAgent agent;
         switch (agentType) {
             case "mcts":
-                agent = new NMCTSAgent(def_initial_Position, goals, norms);
+                agent = new NMCTSAgent(norms);
                 break;
             case "spmcts":
-                agent = new NSPMCTSAgent(def_initial_Position, goals, norms);
+                agent = new NSPMCTSAgent(goals, norms);
                 break;
             case "vbdi":
-                agent = new VBDIAgent(def_initial_Position, goals, norms);
+                agent = new VBDIAgent(goals, norms);
                 break;
             case "fifo":
-                agent = new NFIFOAgent(def_initial_Position, goals, norms);
+                agent = new NFIFOAgent(goals, norms);
                 break;
             default:
                 throw new RuntimeException("agent type name is not valid: " + agentType);

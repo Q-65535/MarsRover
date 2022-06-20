@@ -38,29 +38,26 @@ public class MarsRoverState extends AbstractState {
 
     @Override
     public double evaluateState() {
-
         double consumptionEval = 100.0 / (simAgent.getTotalFuelConsumption() + 100);
-        return simAgent.getNumOfAchieved() + consumptionEval;
+        return simAgent.getAchievedGoalCount() + consumptionEval;
     }
-
 
     @Override
     public AbstractState randomSim(List<MoveAction> actContainer) {
         MarsRoverState cloneState = this.clone();
         MCTSAgent cloneAgent = cloneState.simAgent;
-        List<Cell> targetPositions = cloneAgent.getGoals();
-        while (!targetPositions.isEmpty()) {
-            // get the nearest target
-            Cell nearestTarget = cloneAgent.getNearestGoal();
-            // get a random target
-            ArrayList<Cell> targetList = new ArrayList<>(targetPositions);
-            Cell randomTarget = targetList.get(rm.nextInt(targetList.size()));
+        List<Cell> goals = cloneAgent.getGoals();
+        while (!goals.isEmpty()) {
+            // get the nearest goal
+            Cell nearestGoal = cloneAgent.getNearestGoal();
+            // get a random goal
+            Cell randomGoal = goals.get(rm.nextInt(goals.size()));
 
             // stochastically choose a goal to jump
-            Cell selectedTarget = rm.nextDouble() < 0.8 ? nearestTarget : randomTarget;
+            Cell selectedGoal = rm.nextDouble() < 0.8 ? nearestGoal : randomGoal;
 
             // evaluate resource consumption
-            int totalConsumption = cloneAgent.estimateFuelConsumption(selectedTarget) + cloneAgent.estimateFuelConsumption(selectedTarget, cloneState.rechargePosition);
+            int totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
 
             while (totalConsumption > cloneAgent.getCurrentFuel()) {
                 // go to recharge action
@@ -68,16 +65,15 @@ public class MarsRoverState extends AbstractState {
                 cloneState.exeAct(act);
                 actContainer.add(act);
                 // refresh the consumption amount
-                totalConsumption = cloneAgent.estimateFuelConsumption(selectedTarget) + cloneAgent.estimateFuelConsumption(selectedTarget, cloneState.rechargePosition);
+                totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
             }
 
-            while (!cloneAgent.getCurrentPosition().equals(selectedTarget)) {
-                MoveAction act = cloneAgent.getActMoveTo(selectedTarget);
+            while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
+                MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
                 cloneState.exeAct(act);
                 actContainer.add(act);
             }
         }
-
         return cloneState;
     }
 
@@ -101,8 +97,8 @@ public class MarsRoverState extends AbstractState {
 
         Set<MoveAction> moveActions = new HashSet<>();
         // add all possible choices
-        for (Cell targetPosition : simAgent.getGoals()) {
-            moveActions.addAll(simAgent.getAllActMoveTo(targetPosition));
+        for (Cell goal : simAgent.getGoals()) {
+            moveActions.addAll(simAgent.getAllActMoveTo(goal));
             // if all 4 directions are included, immediately return
             if (moveActions.size() == 4) {
                 return new ArrayList<>(moveActions);

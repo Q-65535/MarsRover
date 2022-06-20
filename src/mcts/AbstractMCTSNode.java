@@ -10,8 +10,6 @@ import java.util.Random;
 public abstract class AbstractMCTSNode {
     static final double epsilon = 1e-6;
     Random rm = new Random(Default.SEED);
-
-    AbstractState rootState;
     /**
      * The choice that leads the parent node to this node
      */
@@ -19,14 +17,10 @@ public abstract class AbstractMCTSNode {
 
     Statistic statistic = new Statistic();
 
+    public AbstractMCTSNode() {}
 
-    public AbstractMCTSNode(MoveAction act, AbstractState rootState) {
-        this.rootState = rootState;
+    public AbstractMCTSNode(MoveAction act) {
         this.act = act;
-    }
-
-    public AbstractMCTSNode(AbstractState rootState) {
-        this.rootState = rootState;
     }
 
     public abstract boolean isLeaf();
@@ -39,10 +33,11 @@ public abstract class AbstractMCTSNode {
         return isNotLeaf();
     }
 
+    /** expand current node based on what choices the agent has in the given state.
+     *  This method has side effects, it creates new node and set them as children of current node. */
     public abstract void expand(AbstractState sState);
 
     protected abstract AbstractMCTSNode select();
-
 
     public abstract AbstractMCTSNode randomChild();
 

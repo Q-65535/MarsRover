@@ -4,6 +4,7 @@ import running.Default;
 import world.Calculator;
 import world.Cell;
 import world.Norm;
+import static running.Default.*;
 
 import java.util.*;
 
@@ -22,7 +23,7 @@ public abstract class AbstractAgent implements Cloneable {
     Cell currentGoal;
     List<Cell> achievedGoals;
     Cell rechargePosition;
-    int mapSize;
+    final int mapSize = def_map_size;
     int maxCapacity;
     int currentFuel;
     int totalFuelConsumption;
@@ -36,26 +37,23 @@ public abstract class AbstractAgent implements Cloneable {
      */
     int actFuelConsumption;
 
-    public AbstractAgent(Cell initialPosition, List<Cell> goals, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+    public AbstractAgent(List<Cell> goals, int maxCapacity) {
         init();
-        this.currentPosition = initialPosition;
         this.goals = new ArrayList<>(goals);
-        this.rechargePosition = rechargePosition;
         this.maxCapacity = maxCapacity;
         this.currentFuel = maxCapacity;
-        this.actFuelConsumption = actFuelConsumption;
     }
 
-    public AbstractAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
+    public AbstractAgent(int maxCapacity) {
         init();
-        this.currentPosition = currentPosition;
-        this.rechargePosition = rechargePosition;
         this.maxCapacity = maxCapacity;
         this.currentFuel = maxCapacity;
-        this.actFuelConsumption = actFuelConsumption;
     }
 
     private void init() {
+        this.currentPosition = def_initial_Position;
+        this.actFuelConsumption = def_act_consumption;
+        this.rechargePosition = def_initial_Position;
         goals = new ArrayList<>();
         achievedGoals = new ArrayList<>();
         totalFuelConsumption = 0;
@@ -63,12 +61,9 @@ public abstract class AbstractAgent implements Cloneable {
         penalty = 0;
     }
 
-    public void setGoals(List<Cell> goals) {
-        this.goals = goals;
-    }
 
-    public void adoptGoal(Cell target) {
-        goals.add(target);
+    public void adoptGoal(Cell goal) {
+        goals.add(goal);
     }
 
     public Cell getCurrentGoal() {
@@ -87,7 +82,7 @@ public abstract class AbstractAgent implements Cloneable {
         return currentPosition;
     }
 
-    public int getNumOfAchieved() {
+    public int getAchievedGoalCount() {
         return achievedGoals.size();
     }
 
@@ -106,19 +101,19 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     /**
-     * Generate an action based on the target position and agent current position
+     * Generate an action based on the goal position and agent current position
      */
-    public MoveAction getActMoveTo(Cell target) {
-        ArrayList<MoveAction> acts = getAllActMoveTo(target);
+    public MoveAction getActMoveTo(Cell goal) {
+        ArrayList<MoveAction> acts = getAllActMoveTo(goal);
         // randomly pick a possible action
         return acts.get(rm.nextInt(acts.size()));
     }
 
-    public ArrayList<MoveAction> getAllActMoveTo(Cell target) {
+    public ArrayList<MoveAction> getAllActMoveTo(Cell goal) {
 
         ArrayList<MoveAction> acts = new ArrayList<>();
-        int tx = target.getX();
-        int ty = target.getY();
+        int tx = goal.getX();
+        int ty = goal.getY();
 
         if (tx > currentPosition.getX()) {
             acts.add(MoveAction.RIGHT);
@@ -159,32 +154,32 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public Cell getNearestGoal() {
-        Cell nearestTarget = null;
+        Cell nearestGoal = null;
         int minConsumption = Integer.MAX_VALUE;
-        for (Cell targetPosition : goals) {
-            int consumption = this.estimateFuelConsumption(targetPosition);
+        for (Cell goal : goals) {
+            int consumption = this.estimateFuelConsumption(goal);
             if (consumption < minConsumption) {
-                nearestTarget = targetPosition;
+                nearestGoal = goal;
                 minConsumption = consumption;
             }
         }
-        return nearestTarget;
+        return nearestGoal;
     }
 
     /**
-     * Calculate the distance between current position and target position
+     * Calculate the distance between current position and goal position
      *
-     * @param target the target position
+     * @param goal the goal position
      */
-    int calculateDistance(Cell target) {
-        return Calculator.calculateDistance(currentPosition, target);
+    int calculateDistance(Cell goal) {
+        return Calculator.calculateDistance(currentPosition, goal);
     }
 
     /**
-     * Estimate how much fuel will be consumed if travel to target position
+     * Estimate how much fuel will be consumed if travel to goal position
      */
-    public int estimateFuelConsumption(Cell target) {
-        int distance = calculateDistance(target);
+    public int estimateFuelConsumption(Cell goal) {
+        int distance = calculateDistance(goal);
         return distance * actFuelConsumption;
     }
 
@@ -244,9 +239,9 @@ public abstract class AbstractAgent implements Cloneable {
             return;
         }
 
-        if (norms.containsKey(currentPosition)) {
-            Norm relatedNorm = norms.get(currentPosition);
-            this.penalty += relatedNorm.getPenalty();
+        if (norms.containskey(currentposition)) {
+            norm relatednorm = norms.get(currentposition);
+            this.penalty += relatednorm.getpenalty();
         }
     }
 

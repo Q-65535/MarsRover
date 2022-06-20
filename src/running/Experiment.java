@@ -13,8 +13,8 @@ public class Experiment {
     @Test
     void mgVaryGoalNumberCapacity() {
         MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
-//        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
-//        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
         resultProducer.expAgentVaryGoalCapacity("mcts", "mcts.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
     }
@@ -22,8 +22,8 @@ public class Experiment {
     @Test
     void mgVaryTimeGapCapacity() {
         MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
-//        resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
-//        resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
         resultProducer.expAgentVaryTimeGapCapacity("mcts", "timeGap_capacity_mcts.txt");
     }
 

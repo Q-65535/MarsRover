@@ -30,12 +30,12 @@ public class Points extends JPanel {
 
         AbstractAgent agent = env.getAgent();
 
-        // draw targets
+        // draw goals
         g2d.setColor(Color.red);
-        List<Cell> targetPositions = agent.getGoals();
-        drawCellTo2D(g2d, targetPositions);
+        List<Cell> goalPositions = agent.getGoals();
+        drawCellTo2D(g2d, goalPositions);
 
-        //draw current target
+        //draw current goal
         g2d.setColor(Color.MAGENTA);
         drawCellTo2D(g2d, agent.getCurrentGoal());
 
@@ -54,7 +54,7 @@ public class Points extends JPanel {
         //draw info
         g2d.setColor(Color.BLACK);
         g2d.scale(0.1, 0.1);
-        String recordStr = recordToStr(agent.getCurrentFuel(), agent.getNumOfAchieved(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
+        String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
         g2d.drawString(recordStr, 300, 800);
     }
 
@@ -78,14 +78,14 @@ public class Points extends JPanel {
     }
 
     /**
-     * Ugly code to transform environment information to string
+     * TODO This method will be refactored
      */
-    private String recordToStr(int currentFuel, int numOfAchievedGoals, int totalFuelConsumption, int rechargeConsumption) {
+    private String recordToStr(int currentFuel, int achievedGoalCount, int totalFuelConsumption, int rechargeConsumption) {
         StringBuilder sb = new StringBuilder();
-        sb.append("goals: ").append(numOfAchievedGoals).append("\n");
-        sb.append(" cur fuel: ").append(currentFuel).append("\n");
-        sb.append(" total consumption: ").append(totalFuelConsumption).append("\n");
-        sb.append(" recharge consumption: ").append(rechargeConsumption).append("\n");
+        sb.append("goals: ").append(achievedGoalCount).append(" ");
+        sb.append(" cur fuel: ").append(currentFuel).append(" ");
+        sb.append(" total consumption: ").append(totalFuelConsumption).append(" ");
+        sb.append(" recharge consumption: ").append(rechargeConsumption).append(" ");
         return sb.toString();
     }
 }

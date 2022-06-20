@@ -8,21 +8,21 @@ import java.util.*;
 public class VBDIAgent extends NFIFOAgent {
 
 
-    public VBDIAgent(Cell initPosition, List<Cell> targetPositions, HashMap<Cell, Norm> norms) {
-        super(initPosition, targetPositions, norms);
+    public VBDIAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
+        super(goals, norms);
     }
 
-    public VBDIAgent(Cell initialPosition, HashMap<Cell, Norm> norms) {
-        super(initialPosition, norms);
+    public VBDIAgent(HashMap<Cell, Norm> norms) {
+        super(norms);
     }
 
     /**
      * get the movement action result in minimum norm penalty
      */
     @Override
-    public MoveAction getActMoveTo(Cell target) {
+    public MoveAction getActMoveTo(Cell goal) {
         HashMap<MoveAction, Double> actsPenalty = new HashMap<>();
-        ArrayList<MoveAction> allActs = getAllActMoveTo(target);
+        ArrayList<MoveAction> allActs = getAllActMoveTo(goal);
         // record all norm information to actions
         for (MoveAction act : allActs) {
             actsPenalty.put(act, normPenalty(act));

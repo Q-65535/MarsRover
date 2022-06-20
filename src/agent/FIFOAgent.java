@@ -6,12 +6,12 @@ import java.util.List;
 
 public class FIFOAgent extends AbstractAgent {
 
-    public FIFOAgent(Cell currentPosition, List<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
-        super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
+    public FIFOAgent(List<Cell> goals, int maxCapacity) {
+        super(goals, maxCapacity);
     }
 
-    public FIFOAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
-        super(currentPosition, rechargePosition, maxCapacity, actionFuelConsumption);
+    public FIFOAgent(int maxCapacity) {
+        super(maxCapacity);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class FIFOAgent extends AbstractAgent {
         }
         // deal with current goal
         if (currentGoal.equals(currentPosition)) {
-            // add to achieved and remove from targets
+            // add to achieved and remove from goals
             achievedGoals.add(currentGoal);
             goals.remove(currentGoal);
             currentGoal = null;

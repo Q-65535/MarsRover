@@ -9,7 +9,7 @@ public class Norm {
         this.penalty = penalty;
     }
 
-    public Cell getTargetCell() {
+    public Cell getGoalCell() {
         return cell;
     }
 

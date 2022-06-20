@@ -8,12 +8,13 @@ import java.util.ArrayList;
 public class NaiveNode extends AbstractMCTSNode {
     ArrayList<NaiveNode> children = new ArrayList<>();
 
-    public NaiveNode(AbstractState rootState) {
-        super(rootState);
+
+    public NaiveNode(MoveAction act) {
+        super(act);
     }
 
-    public NaiveNode(MoveAction act, AbstractState rootState) {
-        super(act, rootState);
+    public NaiveNode() {
+
     }
 
     @Override
@@ -29,8 +30,7 @@ public class NaiveNode extends AbstractMCTSNode {
         }
         // each possible choice corresponds to one MCTS node
         for (MoveAction possibleNext : possibleNexts) {
-            // TODO here, we always store the root state?
-            NaiveNode child = new NaiveNode(possibleNext, rootState);
+            NaiveNode child = new NaiveNode(possibleNext);
             children.add(child);
         }
     }

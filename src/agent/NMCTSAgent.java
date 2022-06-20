@@ -16,13 +16,14 @@ import static running.Default.*;
 
 public class NMCTSAgent extends MCTSAgent {
 
-    public NMCTSAgent(Cell initialPosition, List<Cell> targetPositions, HashMap<Cell, Norm> norms) {
-        super(initialPosition, targetPositions, def_recharge_position, infinite_capacity, def_act_consumption);
+    public NMCTSAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
+        super(goals, infinite_capacity);
         this.norms = norms;
     }
 
-    public NMCTSAgent(Cell initialPosition, HashMap<Cell, Norm> norms) {
-        this(initialPosition, null,  norms);
+    public NMCTSAgent(HashMap<Cell, Norm> norms) {
+        super(infinite_capacity);
+        this.norms = norms;
     }
 
     @Override

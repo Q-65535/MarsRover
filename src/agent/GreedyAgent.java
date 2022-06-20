@@ -7,12 +7,12 @@ import java.util.Set;
 
 public class GreedyAgent extends ProactiveFIFOAgent {
 
-    public GreedyAgent(Cell currentPosition, List<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
-        super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
+    public GreedyAgent(List<Cell> goals, int maxCapacity) {
+        super(goals, maxCapacity);
     }
 
-    public GreedyAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
-        super(currentPosition, rechargePosition, maxCapacity, actionFuelConsumption);
+    public GreedyAgent(int maxCapacity) {
+        super(maxCapacity);
     }
 
     @Override

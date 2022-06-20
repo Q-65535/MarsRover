@@ -112,17 +112,17 @@ public class MCTSWorkSpace {
     }
 
     /**
-     * Do the MCTS process
+     * Do the MCTS process, alpha times selection and beta times simulation
      */
     public void run(int alpha, int beta) {
         for (int i = 0; i < alpha; i++) {
             // current list of actions during selection and simulation
-            List<MoveAction> currentSelectionPhaseActs = new ArrayList<>();
+            List<MoveAction> selectionPhaseActs = new ArrayList<>();
             List<AbstractMCTSNode> visited = new LinkedList<>();
             // this copied state will be iteratively updated
             AbstractState sState = rootState.clone();
             // selection
-            AbstractMCTSNode curNode = doSelectionPhase(sState, visited, currentSelectionPhaseActs);
+            AbstractMCTSNode curNode = doSelectionPhase(sState, visited, selectionPhaseActs);
             // expansion
             curNode.expand(sState);
             // random selection and rollout
@@ -130,22 +130,22 @@ public class MCTSWorkSpace {
                 AbstractMCTSNode rollOutNode = randomSelectChildAndUpdateState(curNode, sState);
                 // record and update according to the randomly selected node
                 visited.add(rollOutNode);
-                currentSelectionPhaseActs.add(rollOutNode.act);
+                selectionPhaseActs.add(rollOutNode.act);
 
                 // beta times simulation
                 for (int j = 0; j < beta; j++) {
                     // record the actions executed during simulation
-                    List<MoveAction> currentSimulationPhaseActs = new ArrayList<>();
-                    double simulationVal = rollOut(sState, currentSimulationPhaseActs);
+                    List<MoveAction> simulationPhaseActs = new ArrayList<>();
+                    double simulationVal = rollOut(sState, simulationPhaseActs);
                     // update the best simulation result and action list
                     if (bestSimulationResult < simulationVal) {
                         bestSimulationResult = simulationVal;
                         // update action list
-                        ArrayList<MoveAction> currentActs = new ArrayList<>();
+                        ArrayList<MoveAction> allActs = new ArrayList<>();
                         // combine two action lists in selection and simulation phases
-                        currentActs.addAll(currentSelectionPhaseActs);
-                        currentActs.addAll(currentSimulationPhaseActs);
-                        bestActs = currentActs;
+                        allActs.addAll(selectionPhaseActs);
+                        allActs.addAll(simulationPhaseActs);
+                        bestActs = allActs;
                     }
                     // back propagation
                     for (AbstractMCTSNode node : visited) {
@@ -162,6 +162,10 @@ public class MCTSWorkSpace {
         }
     }
 
+    /**
+     * simulate the progression from the given state to an end state and add all the actions with greatest simulation
+     * result to the given container.
+     */
     private double rollOut(AbstractState sState, List<MoveAction> actContainer) {
         return sState.randomSim(actContainer).evaluateState();
     }

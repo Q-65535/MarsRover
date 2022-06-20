@@ -9,14 +9,16 @@ public class SPNode extends NaiveNode {
     static final double constC = 0.1;
     static final double constD = 32;
 
-    public SPNode(AbstractState rootState) {
-        super(rootState);
+
+    public SPNode(MoveAction act) {
+        super(act);
     }
 
-    public SPNode(MoveAction act, AbstractState rootState) {
-        super(act, rootState);
+    public SPNode() {
+
     }
 
+    // we override this method because we want the expanded nodes to be SPnodes instead of naive nodes.
     @Override
     public void expand(AbstractState sState) {
         ArrayList<MoveAction> possibleNexts = sState.getPossibleNextCs();
@@ -25,8 +27,7 @@ public class SPNode extends NaiveNode {
         }
         // each possible choice corresponds to one MCTS node
         for (MoveAction possibleNext : possibleNexts) {
-            // TODO here, we always store the root state?
-            SPNode child = new SPNode(possibleNext, rootState);
+            SPNode child = new SPNode(possibleNext);
             children.add(child);
         }
     }

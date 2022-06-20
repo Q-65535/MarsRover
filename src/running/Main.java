@@ -12,8 +12,8 @@ public class Main {
     public static void main(String[] args) {
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
         Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 8);
-        Environment defEnv = new Environment(def_map_size, def_recharge_position, def_act_consumption,  def_goals);
-        AbstractAgent mctsAgent = new MCTSAgent(def_initial_Position, def_recharge_position, def_max_capacity, def_act_consumption);
+        Environment defEnv = new Environment(def_goals);
+        AbstractAgent mctsAgent = new MCTSAgent(def_max_capacity);
 
         boolean running = true;
         defEnv.setAgent(mctsAgent);
@@ -22,8 +22,8 @@ public class Main {
             displayer.display(defEnv);
         }
 
-        defEnv = new Environment(def_map_size, def_recharge_position, def_act_consumption,  def_goals);
-        AbstractAgent testAgent = new ProactiveFIFOAgent(def_initial_Position, def_recharge_position, def_max_capacity, def_act_consumption);
+        defEnv = new Environment(def_goals);
+        AbstractAgent testAgent = new ProactiveFIFOAgent(def_max_capacity);
         running = true;
         defEnv.setAgent(testAgent);
         while (running) {
@@ -34,6 +34,6 @@ public class Main {
         naiveTotal += testAgent.getTotalFuelConsumption();
         mctsTotal += mctsAgent.getTotalFuelConsumption();
         System.out.println("default env resource consumption: " + testAgent.getTotalFuelConsumption());
-        System.out.println("mcts env resource consumption: " + mctsAgent.getTotalFuelConsumption());
+        System.out.println("MCTS env resource consumption: " + mctsAgent.getTotalFuelConsumption());
     }
 }

@@ -10,12 +10,13 @@ import static running.Default.*;
 
 public class NFIFOAgent extends FIFOAgent {
 
-    public NFIFOAgent(Cell initPosition, List<Cell> targetPositions, HashMap<Cell, Norm> norms) {
-        super(initPosition, targetPositions, Default.def_recharge_position, infinite_capacity, def_act_consumption);
+    public NFIFOAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
+        super(goals, infinite_capacity);
         this.norms = norms;
     }
 
-    public NFIFOAgent(Cell initialPosition, HashMap<Cell, Norm> norms) {
-        this(initialPosition, null,  norms);
+    public NFIFOAgent(HashMap<Cell, Norm> norms) {
+        super(infinite_capacity);
+        this.norms = norms;
     }
 }

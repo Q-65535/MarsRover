@@ -5,12 +5,12 @@ import agent.MoveAction;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import static running.Default.*;
 public class Environment {
 
     Cell[][] map;
-    int mapSize;
-    Cell rechargePosition;
+    final int mapSize = def_map_size;
+    final Cell rechargePosition = def_recharge_position;
     AbstractAgent agent;
     /**
      * All the goals the agent has to achieve
@@ -20,39 +20,44 @@ public class Environment {
      * Record how many times this environment has run
      */
     int runningCount;
-    int actualActFuelConsumption;
+    int realActFuelConsumption;
     /**
-     * set the default value to be 1, that is, post all goals at the beginning
+     * set the default value to be 0, that is, post all goals at the beginning
      */
-    int timeGapForPostGoal = 0;
+    int postInterval = 0;
 
-    public Environment(int mapSize, Cell rechargePosition, AbstractAgent agent, int actualActFuelConsumption) {
-        this.mapSize = mapSize;
+    public Environment(AbstractAgent agent) {
+        init();
+        this.agent = agent;
+    }
+
+    public Environment(AbstractAgent agent, List<Cell> goals, int postInterval) {
+        this(agent);
+        this.goals = new ArrayList<>(goals);
+        this.postInterval = postInterval;
+    }
+
+    public Environment(AbstractAgent agent, List<Cell> goals) {
+        this(agent);
+        this.goals = new ArrayList<>(goals);
+    }
+
+    public Environment(List<Cell> goals) {
+        init();
+        this.goals = new ArrayList<>(goals);
+    }
+
+    /**
+     * Initialize the default settings
+     */
+    private void init() {
         map = new Cell[mapSize][mapSize];
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
                 map[i][j] = new Cell(i, j);
             }
         }
-        this.rechargePosition = rechargePosition;
-        this.agent = agent;
-        this.actualActFuelConsumption = actualActFuelConsumption;
-    }
-
-    public Environment(int mapSize, Cell rechargePosition, int actualActFuelConsumption, List<Cell> goals) {
-        this(mapSize, rechargePosition, null, actualActFuelConsumption);
-        this.goals = new ArrayList<>(goals);
-    }
-
-    public Environment(int mapSize, Cell rechargePosition, AbstractAgent agent, int actualActFuelConsumption, List<Cell> goals, int timeGapForPostGoal) {
-        this(mapSize, rechargePosition, agent, actualActFuelConsumption);
-        this.goals = new ArrayList<>(goals);
-        this.timeGapForPostGoal = timeGapForPostGoal;
-    }
-
-    public Environment(int mapSize, Cell rechargePosition, AbstractAgent agent, int actualActFuelConsumption, List<Cell> goals) {
-        this(mapSize, rechargePosition, agent, actualActFuelConsumption);
-        this.goals = new ArrayList<>(goals);
+        this.realActFuelConsumption = def_act_consumption;
     }
 
     public Cell get(int x, int y) {
@@ -71,15 +76,22 @@ public class Environment {
         this.agent = agent;
     }
 
+    /**
+     * Set the real fuel consumption in this environment
+    */
+    public void setRealFuelConsumption(int consumption) {
+        this.realActFuelConsumption = consumption;
+    }
+
     public boolean run() {
         // special condition: if the gap is set to be 0, post all goals at once
-        if (timeGapForPostGoal == 0 && goals != null && !goals.isEmpty()) {
+        if (isPostAllGoalsAtOnce() && haveGoal()) {
             postGoals(goals.size());
         }
         // at the beginning of the running, post 2 goals
-        else if (isBeginning() && goals != null && !goals.isEmpty()) {
+        else if (isBeginning() && haveGoal()) {
             postGoals(2);
-        } else if (timeGapForPostGoal != 0 && runningCount % timeGapForPostGoal == 0 && goals != null && !goals.isEmpty()) {
+        } else if (!isPostAllGoalsAtOnce() && isTimeToPost() && haveGoal()) {
             postGoals(1);
         }
 
@@ -94,10 +106,24 @@ public class Environment {
                 throw new RuntimeException("no action to execute after reasoning");
             }
             executeAct(act);
-        } else if (goals != null && !goals.isEmpty()) {
+        } else if (haveGoal()) {
             runnable = true;
         }
         return runnable;
+    }
+
+    /**
+     * Evaluate whether there is goal available to post
+     */
+    private boolean haveGoal() {
+        return (goals != null && !goals.isEmpty());
+    }
+
+    /**
+     * Evaluate whether post all goals at once is set
+     */
+    private boolean isPostAllGoalsAtOnce() {
+        return postInterval == 0;
     }
 
     /**
@@ -107,6 +133,10 @@ public class Environment {
         return runningCount == 0;
     }
 
+    private boolean isTimeToPost() {
+        return runningCount % postInterval == 0;
+    }
+
     /**
      * Post specific number of goals to the agent
      *
@@ -114,7 +144,7 @@ public class Environment {
      */
     private void postGoals(int num) {
         if (num > goals.size()) {
-            throw new RuntimeException("can't post" + num + "goals from" + goals.size() + "goals");
+            throw new RuntimeException("can't post " + num + " goals from " + goals.size() + " goals");
         }
         for (int i = 0; i < num; i++) {
             agent.adoptGoal(goals.remove(0));
@@ -134,7 +164,7 @@ public class Environment {
         }
         // then, update internal state based on this new position
         agent.updateGoal();
-        agent.consumeFuel(actualActFuelConsumption);
+        agent.consumeFuel(realActFuelConsumption);
         agent.updateRecharge();
         agent.updatePunish();
     }

@@ -12,14 +12,14 @@ import world.SimEnvironment;
 import java.util.List;
 
 public class MCTSAgent extends AbstractAgent {
-    MCTSWorkSpace ws;
+    MCTSWorkSpace ws = new MCTSWorkSpace();
 
-    public MCTSAgent(Cell currentPosition, List<Cell> targetPositions, Cell rechargePosition, int maxCapacity, int actFuelConsumption) {
-        super(currentPosition, targetPositions, rechargePosition, maxCapacity, actFuelConsumption);
+    public MCTSAgent(List<Cell> goals, int maxCapacity) {
+        super(goals, maxCapacity);
     }
 
-    public MCTSAgent(Cell currentPosition, Cell rechargePosition, int maxCapacity, int actionFuelConsumption) {
-        super(currentPosition, rechargePosition, maxCapacity, actionFuelConsumption);
+    public MCTSAgent(int maxCapacity) {
+        super(maxCapacity);
     }
 
     @Override
@@ -27,22 +27,11 @@ public class MCTSAgent extends AbstractAgent {
         SimEnvironment simEnv = constructSimEnvironment();
         AbstractState rootState = constructState(simEnv);
         AbstractMCTSNode rootNode = constructNode(rootState);
-        // if it is the first time to run mcts
-        if (ws == null) {
-            ws = new MCTSWorkSpace(rootState, rootNode);
-        } else {
-            ws.setRootState(rootState);
-            ws.setRootMCTSNode(rootNode);
-        }
+        ws.setRootState(rootState);
+        ws.setRootMCTSNode(rootNode);
+
+        // run the MCTS process
         ws.run(100, 10);
-
-//        MoveAction act = ws.bestActBasedOnChildren();
-//        if (act == null) {
-//            return false;
-//        }
-//        this.currentAct = act;
-//        return true;
-
         if (ws.hasNextBestAct()) {
             this.currentAct = ws.nextBestAct();
             return true;
@@ -51,7 +40,7 @@ public class MCTSAgent extends AbstractAgent {
     }
 
     SimEnvironment constructSimEnvironment() {
-        return new SimEnvironment(mapSize, rechargePosition, this, actFuelConsumption);
+        return new SimEnvironment(this);
     }
 
     AbstractState constructState(SimEnvironment simEnv) {
@@ -85,12 +74,13 @@ public class MCTSAgent extends AbstractAgent {
     @Override
     public MCTSAgent clone() {
         // clone new goal set and achieved list
-        List<Cell> cloneTargets = Default.cloneCells(goals);
+        List<Cell> cloneGoals = Default.cloneCells(goals);
         List<Cell> cloneAchieved = Default.cloneCells(achievedGoals);
 
-        MCTSAgent cloneAgent = new MCTSAgent(currentPosition, cloneTargets, rechargePosition, maxCapacity, actFuelConsumption);
+        MCTSAgent cloneAgent = new MCTSAgent(cloneGoals, maxCapacity);
 
         // important: clone all the records
+        cloneAgent.currentPosition = this.currentPosition;
         cloneAgent.currentFuel = this.currentFuel;
         cloneAgent.totalFuelConsumption = this.totalFuelConsumption;
         cloneAgent.rechargeFuelConsumption = this.rechargeFuelConsumption;
