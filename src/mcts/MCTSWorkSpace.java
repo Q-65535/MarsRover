@@ -25,9 +25,7 @@ public class MCTSWorkSpace {
      */
      double bestSimulationResult = 0;
 
-    public MCTSWorkSpace(AbstractState rootState, AbstractMCTSNode rootMCTSNode) {
-        this.rootState = rootState;
-        this.rootMCTSNode = rootMCTSNode;
+    public MCTSWorkSpace() {
         bestActs = new ArrayList<>();
     }
 

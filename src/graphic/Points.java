@@ -21,7 +21,7 @@ public class Points extends JPanel {
     }
 
     /**
-     * this strange function do all the things to draw environment
+     * This strange function do all the things to draw environment
      */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -51,20 +51,11 @@ public class Points extends JPanel {
         g2d.setColor(Color.DARK_GRAY);
         drawCellTo2D(g2d, agent.getNormPositions());
 
-        //draw info
+        //draw status string
         g2d.setColor(Color.BLACK);
         g2d.scale(0.1, 0.1);
         String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
         g2d.drawString(recordStr, 300, 800);
-    }
-
-    private void drawCellTo2D(Graphics2D graphic, Cell cell) {
-        if (cell == null) {
-            return;
-        }
-        int x = cell.getX();
-        int y = cell.getY();
-        graphic.drawLine(x, y, x, y);
     }
 
     private void drawCellTo2D(Graphics2D graphic, Set<Cell> cells) {
@@ -75,6 +66,15 @@ public class Points extends JPanel {
 
     private void drawCellTo2D(Graphics2D graphic, List<Cell> cells) {
         drawCellTo2D(graphic, new HashSet<>(cells));
+    }
+
+    private void drawCellTo2D(Graphics2D graphic, Cell cell) {
+        if (cell == null) {
+            return;
+        }
+        int x = cell.getX();
+        int y = cell.getY();
+        graphic.drawLine(x, y, x, y);
     }
 
     /**

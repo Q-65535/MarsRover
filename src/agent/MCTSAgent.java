@@ -26,7 +26,7 @@ public class MCTSAgent extends AbstractAgent {
     public boolean reason() {
         SimEnvironment simEnv = constructSimEnvironment();
         AbstractState rootState = constructState(simEnv);
-        AbstractMCTSNode rootNode = constructNode(rootState);
+        AbstractMCTSNode rootNode = constructNode();
         ws.setRootState(rootState);
         ws.setRootMCTSNode(rootNode);
 
@@ -47,8 +47,8 @@ public class MCTSAgent extends AbstractAgent {
         return new MarsRoverState(simEnv);
     }
 
-    AbstractMCTSNode constructNode(AbstractState rootState) {
-        return new NaiveNode(rootState);
+    AbstractMCTSNode constructNode() {
+        return new NaiveNode();
     }
 
 

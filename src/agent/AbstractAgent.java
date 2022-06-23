@@ -61,7 +61,6 @@ public abstract class AbstractAgent implements Cloneable {
         penalty = 0;
     }
 
-
     public void adoptGoal(Cell goal) {
         goals.add(goal);
     }
@@ -239,9 +238,9 @@ public abstract class AbstractAgent implements Cloneable {
             return;
         }
 
-        if (norms.containskey(currentposition)) {
-            norm relatednorm = norms.get(currentposition);
-            this.penalty += relatednorm.getpenalty();
+        if (norms.containsKey(currentPosition)) {
+            Norm relatedNorm = norms.get(currentPosition);
+            this.penalty += relatedNorm.getPenalty();
         }
     }
 

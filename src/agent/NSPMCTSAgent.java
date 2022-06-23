@@ -26,7 +26,7 @@ public class NSPMCTSAgent extends NMCTSAgent {
     }
 
     @Override
-    AbstractMCTSNode constructNode(AbstractState rootState) {
+    AbstractMCTSNode constructNode() {
         return new SPNode();
     }
 }

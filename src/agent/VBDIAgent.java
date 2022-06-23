@@ -7,7 +7,6 @@ import java.util.*;
 
 public class VBDIAgent extends NFIFOAgent {
 
-
     public VBDIAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
         super(goals, norms);
     }
@@ -33,6 +32,7 @@ public class VBDIAgent extends NFIFOAgent {
         for (Map.Entry<MoveAction, Double> actPenaltyPair : actsPenalty.entrySet()) {
             MoveAction act = actPenaltyPair.getKey();
             Double penalty = actPenaltyPair.getValue();
+            // @remind in Mars rover scenario, the penalty is always a positive number
             if (penalty < smallestPenalty) {
                 smallestPenalty = penalty;
                 smallestPenaltyAct = act;
