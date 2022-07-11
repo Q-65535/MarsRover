@@ -95,6 +95,10 @@ public class Environment {
             postGoals(1);
         }
 
+
+        // Here, we update the goal, considering the case when the poseted goal is just at agent's position!
+        // @Smell: Maybe we can do this in a uniformed way.
+        agent.updateGoal();
         boolean runnable = false;
         boolean executable = agent.reason();
         // each time after the agent reasons, increment the running count

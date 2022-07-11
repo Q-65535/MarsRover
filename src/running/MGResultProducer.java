@@ -59,7 +59,7 @@ public class MGResultProducer {
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-                        displayer.display(environment);
+//                        displayer.display(environment);
                     }
                     // add consumption value to record
                     consumptionRecords[goalNum][multiplier] += agent.getTotalFuelConsumption();
@@ -73,7 +73,7 @@ public class MGResultProducer {
                 consumptionRecords[i][j] /= repetitionCount;
             }
         }
-//        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
     }
 
     /**
@@ -95,7 +95,7 @@ public class MGResultProducer {
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-                        displayer.display(environment);
+//                        displayer.display(environment);
                     }
                     // add consumption value to record
                     consumptionRecords[timeGap][multiplier] += agent.getTotalFuelConsumption();
@@ -109,7 +109,7 @@ public class MGResultProducer {
                 consumptionRecords[i][j] /= repetitionCount;
             }
         }
-//        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
     }
 
     /**

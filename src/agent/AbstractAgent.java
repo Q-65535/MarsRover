@@ -126,9 +126,8 @@ public abstract class AbstractAgent implements Cloneable {
         if (ty < currentPosition.getY()) {
             acts.add(MoveAction.DOWN);
         }
-        //TODO properly deal with the case when the goal is just at the agent's position
         if (acts.size() == 0) {
-            acts.add(MoveAction.RIGHT);
+            throw  new RuntimeException("There is no action for going to " + goal + ". My current position is " + currentPosition);
         }
         return acts;
 
