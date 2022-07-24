@@ -43,6 +43,11 @@ public class VBDIAgent extends NFIFOAgent {
 
     private double normPenalty(MoveAction act) {
         Cell nextPosition = getNextPosition(act);
+        // If the agent is in norm position, and next position is also a norm position,
+        // no penalty imposed (We simulate the slope scenario).
+        if (norms.containsKey(currentPosition) && norms.containsKey(nextPosition)) {
+            return 0;
+        }
         return normPenalty(nextPosition);
     }
 

@@ -38,7 +38,7 @@ public class MarsRoverState extends AbstractState {
 
     @Override
     public double evaluateState() {
-        double consumptionEval = 100.0 / (simAgent.getTotalFuelConsumption() + 100);
+        double consumptionEval = 1.0 / (simAgent.getTotalFuelConsumption() + 1.0);
         return simAgent.getAchievedGoalCount() + consumptionEval;
     }
 
@@ -104,6 +104,10 @@ public class MarsRoverState extends AbstractState {
                 return new ArrayList<>(moveActions);
             }
         }
+        // Add the action to recharge
+//        if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
+//            moveActions.add(simAgent.getActMoveTo(rechargePosition));
+//        }
 
         return new ArrayList<>(moveActions);
     }

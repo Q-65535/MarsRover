@@ -2,6 +2,7 @@ package running;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -23,17 +24,17 @@ public class Experiment {
     @Test
     void mgVaryTimeGapCapacity() {
         MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
-//        resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
-//        resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
-//        resultProducer.expAgentVaryTimeGapCapacity("mcts", "timeGap_capacity_mcts.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("mcts", "timeGap_capacity_mcts.txt");
         resultProducer.expAgentVaryTimeGapCapacity("greedy", "timeGap_capacity_greedy.txt");
     }
 
     @Test
     public void normVaryNumberResultProduce() {
         NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50);
-        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_number_fifo.txt");
-        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_number_vbdi.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_number_fifo.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_number_vbdi.txt");
         normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_number_mcts.txt");
 //        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
     }
@@ -70,5 +71,55 @@ public class Experiment {
             System.out.println(r1.nextInt());
             System.out.println(r2.nextInt());
         }
+    }
+    @Test
+    public void cacheSpeedTest() {
+        int len = 69999999;
+        class ListNode {
+            public ListNode next;
+            public int val;
+            public ListNode(int val, ListNode next) {
+                this.val = val;
+                this.next = next;
+            }
+            public ListNode(int val) {
+                this.val = val;
+            }
+        }
+        // Construct linked list
+        int count = 0;
+        ListNode head = new ListNode(count++);
+        ListNode cur = head;
+        while (count < len) {
+            cur.next = new ListNode(count++);
+            cur = cur.next;
+        }
+
+        // Construct array list
+        ListNode[] arr = new ListNode[len];
+        for (int i = 0; i < len; i++) {
+            arr[i] = new ListNode(i);
+        }
+
+        long linkSum = 0;
+        cur = head;
+        // Record time
+        long linkBegin = System.currentTimeMillis();
+        while (cur != null) {
+            linkSum += cur.val;
+            cur = cur.next;
+        }
+        long linkEnd = System.currentTimeMillis();
+        System.out.println("linked list sum: " + linkSum);
+        System.out.println("linked list time consumed " + (linkEnd - linkBegin));
+        long arrSum = 0;
+        // record time
+        long arrBegin = System.currentTimeMillis();
+        for (int i = 0; i < len; i++) {
+            arrSum += arr[i].val;
+        }
+        long arrEnd = System.currentTimeMillis();
+        System.out.println("array sum: " + arrSum);
+        System.out.println("array time consumed " + (arrEnd - arrBegin));
     }
 }

@@ -11,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
-        Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 8);
+        Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 0);
         Environment defEnv = new Environment(def_goals);
         AbstractAgent mctsAgent = new MCTSAgent(def_max_capacity);
 
@@ -19,7 +19,7 @@ public class Main {
         defEnv.setAgent(mctsAgent);
         while (running) {
             running = defEnv.run();
-            displayer.display(defEnv);
+//            displayer.display(defEnv);
         }
 
         defEnv = new Environment(def_goals);
@@ -28,7 +28,7 @@ public class Main {
         defEnv.setAgent(testAgent);
         while (running) {
             running = defEnv.run();
-            displayer.display(defEnv);
+//            displayer.display(defEnv);
         }
 
         naiveTotal += testAgent.getTotalFuelConsumption();

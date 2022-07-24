@@ -45,4 +45,21 @@ public class NormTest {
         }
         System.out.println(penaltySum);
     }
+    @Test
+    public void speedTest() {
+        int i = 0;
+        long flipCount = 0;
+        long beginTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - beginTime < 20000) {
+            i++;
+            System.out.println(i);
+            if (i - 1 < 0 && i > 0) {
+                flipCount++;
+            } else if (i - 1 > 0 && i < 0) {
+                flipCount++;
+            }
+        }
+        System.out.println("flip count: " + flipCount);
+        System.out.println(i);
+    }
 }

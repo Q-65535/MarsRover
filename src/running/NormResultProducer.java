@@ -33,8 +33,8 @@ public class NormResultProducer extends MGResultProducer {
         double[][] penaltyRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
 
-        for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
-            for (int normNum = 0; normNum <= maxNumOfNorms; normNum++) {
+        for (int goalNum = 10; goalNum <= maxGoalNum; goalNum++) {
+            for (int normNum = 10; normNum <= maxNumOfNorms; normNum++) {
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
                 // important: make sure that the random seeds for generating goals and goals are different
@@ -42,8 +42,8 @@ public class NormResultProducer extends MGResultProducer {
                 for (int i = 0; i < repetitionCount; i++) {
                     HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
                     List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
-                    AbstractAgent agent = genNewAgent(agentType, goals, norms);
-                    Environment environment = new Environment(agent);
+                    AbstractAgent agent = genNewAgent(agentType, norms);
+                    Environment environment = new Environment(agent, goals);
 
                     boolean running = true;
                     while (running) {
@@ -84,7 +84,7 @@ public class NormResultProducer extends MGResultProducer {
                 for (int i = 0; i < repetitionCount; i++) {
                     HashMap<Cell, Norm> norms = genNorms(def_map_size, def_num_norms, normPenalty, def_recharge_position, normRandomObj);
                     List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
-                    AbstractAgent agent = genNewAgent(agentType, goals, norms);
+                    AbstractAgent agent = genNewAgent(agentType, norms);
                     Environment environment = new Environment(agent);
 
                     boolean running = true;
@@ -112,20 +112,20 @@ public class NormResultProducer extends MGResultProducer {
     }
 
 
-    AbstractAgent genNewAgent(String agentType, List<Cell> goals, HashMap<Cell, Norm> norms) {
+    AbstractAgent genNewAgent(String agentType, HashMap<Cell, Norm> norms) {
         AbstractAgent agent;
         switch (agentType) {
             case "mcts":
                 agent = new NMCTSAgent(norms);
                 break;
             case "spmcts":
-                agent = new NSPMCTSAgent(goals, norms);
+                agent = new NSPMCTSAgent(norms);
                 break;
             case "vbdi":
-                agent = new VBDIAgent(goals, norms);
+                agent = new VBDIAgent(norms);
                 break;
             case "fifo":
-                agent = new NFIFOAgent(goals, norms);
+                agent = new NFIFOAgent(norms);
                 break;
             default:
                 throw new RuntimeException("agent type name is not valid: " + agentType);
