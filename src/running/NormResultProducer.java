@@ -33,8 +33,8 @@ public class NormResultProducer extends MGResultProducer {
         double[][] penaltyRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
 
-        for (int goalNum = 10; goalNum <= maxGoalNum; goalNum++) {
-            for (int normNum = 10; normNum <= maxNumOfNorms; normNum++) {
+        for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
+            for (int normNum = 1; normNum <= maxNumOfNorms; normNum++) {
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
                 // important: make sure that the random seeds for generating goals and goals are different
@@ -66,8 +66,8 @@ public class NormResultProducer extends MGResultProducer {
                 consumptionRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
-        matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
+//        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
+//        matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
     }
 
     /**
