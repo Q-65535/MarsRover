@@ -105,9 +105,9 @@ public class MarsRoverState extends AbstractState {
             }
         }
         // Add the action to recharge
-//        if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
-//            moveActions.add(simAgent.getActMoveTo(rechargePosition));
-//        }
+        if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
+            moveActions.add(simAgent.getActMoveTo(rechargePosition));
+        }
 
         return new ArrayList<>(moveActions);
     }

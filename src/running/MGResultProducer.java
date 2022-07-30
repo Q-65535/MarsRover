@@ -31,18 +31,20 @@ public class MGResultProducer {
     public final int maxMultiplier;
     public final int maxGoalNum;
     public final int maxPostGoalTimeGap;
+    public final int defPostGoalTimeGap;
     // TODO refactor: properly set the parameters
     public final int maxDispersionDegree = 8;
 
-    public MGResultProducer(String RESULT_DIR, int maxMultiplier, int maxGoalNum, int maxPostGoalTimeGap) {
+    public MGResultProducer(String RESULT_DIR, int maxMultiplier, int maxGoalNum, int maxPostGoalTimeGap, int defPostGoalTimeGap) {
         this.RESULT_DIR = RESULT_DIR;
         this.maxMultiplier = maxMultiplier;
         this.maxGoalNum = maxGoalNum;
         this.maxPostGoalTimeGap = maxPostGoalTimeGap;
+        this.defPostGoalTimeGap = defPostGoalTimeGap;
     }
 
     /**
-     * experiment a type of agent with differnet number of goals and different capacity, then write the result to a file
+     * experiment a type of agent with different number of goals and different capacity, then write the result to a file
      */
     public void expAgentVaryGoalCapacity(String agentType, String fileName) {
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxMultiplier + 1];
@@ -54,8 +56,7 @@ public class MGResultProducer {
                 for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_recharge_position, random);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    Environment environment = new Environment(agent, goals);
-
+                    Environment environment = new Environment(agent, goals, defPostGoalTimeGap);
                     boolean running = true;
                     while (running) {
                         running = environment.run();

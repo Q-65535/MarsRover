@@ -13,17 +13,17 @@ public class Experiment {
     public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MR_results";
     @Test
     void mgVaryGoalNumberCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
-//        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
-//        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
-//        resultProducer.expAgentVaryGoalCapacity("mcts", "mcts.txt");
-        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15, 5);
+        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("mcts", "mcts.txt");
+//        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
     }
 
     @Test
     void mgVaryTimeGapCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15);
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15, 5);
         resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
         resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
         resultProducer.expAgentVaryTimeGapCapacity("mcts", "timeGap_capacity_mcts.txt");
@@ -32,10 +32,10 @@ public class Experiment {
 
     @Test
     public void normVaryNumberResultProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50);
-//        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_number_fifo.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_number_vbdi.txt");
-        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_number_mcts.txt");
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50, 5);
+        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
+        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
+        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
 //        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
     }
 
@@ -44,14 +44,14 @@ public class Experiment {
 
 
     // this experiment is currently not considered
-    @Test
-    void normVaryPenaltyResultProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50);
-        normResultProducer.expAgentVaryNormPenalty("vbdi", "vary_penalty_vbdi.txt");
-        normResultProducer.expAgentVaryNormPenalty("fifo", "vary_penalty_fifo.txt");
-        normResultProducer.expAgentVaryNormPenalty("mcts", "vary_penalty_mcts.txt");
-//        normResultProducer.expAgentVaryNormPenalty("spmcts", "vary_penalty_spmcts.txt");
-    }
+//    @Test
+//    void normVaryPenaltyResultProduce() {
+//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50);
+//        normResultProducer.expAgentVaryNormPenalty("vbdi", "vary_penalty_vbdi.txt");
+//        normResultProducer.expAgentVaryNormPenalty("fifo", "vary_penalty_fifo.txt");
+//        normResultProducer.expAgentVaryNormPenalty("mcts", "vary_penalty_mcts.txt");
+////        normResultProducer.expAgentVaryNormPenalty("spmcts", "vary_penalty_spmcts.txt");
+//    }
 
 
 

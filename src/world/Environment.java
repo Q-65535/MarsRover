@@ -127,7 +127,8 @@ public class Environment {
      * Evaluate whether post all goals at once is set
      */
     private boolean isPostAllGoalsAtOnce() {
-        return postInterval == 0;
+        // If the number of goals is 1, just post it at the beginning.
+        return postInterval == 0 || goals.size() == 1;
     }
 
     /**

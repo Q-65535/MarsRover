@@ -21,8 +21,8 @@ public class NormResultProducer extends MGResultProducer {
     final int maxNormPenalty;
     final int maxNumOfNorms;
 
-    public NormResultProducer(String RESULT_DIR, int maxGoalNum, int maxNormPenalty, int maxNumOfNorms) {
-        super(RESULT_DIR, 0, maxGoalNum, 0);
+    public NormResultProducer(String RESULT_DIR, int maxGoalNum, int maxNormPenalty, int maxNumOfNorms, int defPostGoalTimeGap) {
+        super(RESULT_DIR, 0, maxGoalNum, 0, defPostGoalTimeGap);
         this.maxNormPenalty = maxNormPenalty;
         this.maxNumOfNorms = maxNumOfNorms;
     }
@@ -34,7 +34,8 @@ public class NormResultProducer extends MGResultProducer {
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxNumOfNorms + 1];
 
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
-            for (int normNum = 1; normNum <= maxNumOfNorms; normNum++) {
+            // Changed gap jump to 10
+            for (int normNum = 0; normNum <= maxNumOfNorms; normNum += 10) {
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
                 // important: make sure that the random seeds for generating goals and goals are different
@@ -43,7 +44,7 @@ public class NormResultProducer extends MGResultProducer {
                     HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
                     List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, norms);
-                    Environment environment = new Environment(agent, goals);
+                    Environment environment = new Environment(agent, goals, defPostGoalTimeGap);
 
                     boolean running = true;
                     while (running) {
@@ -54,7 +55,7 @@ public class NormResultProducer extends MGResultProducer {
                     penaltyRecords[goalNum][normNum] += agent.getTotalPenalty();
                     consumptionRecords[goalNum][normNum] += agent.getTotalFuelConsumption();
                 }
-                System.out.println("goalNum: " + goalNum +", normNum: " + normNum);
+                System.out.println("goalNum: " + goalNum + ", normNum: " + normNum);
                 System.out.println("avg penalty: " + penaltyRecords[goalNum][normNum] / repetitionCount);
                 System.out.println("avg consumption: " + consumptionRecords[goalNum][normNum] / repetitionCount);
             }
@@ -66,8 +67,8 @@ public class NormResultProducer extends MGResultProducer {
                 consumptionRecords[i][j] /= repetitionCount;
             }
         }
-//        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
-//        matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
+        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
     }
 
     /**
