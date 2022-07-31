@@ -48,6 +48,7 @@ public class MGResultProducer {
      */
     public void expAgentVaryGoalCapacity(String agentType, String fileName) {
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxMultiplier + 1];
+        long[][] timeRecords = new long[maxGoalNum + 1][maxMultiplier + 1];
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
             for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
                 int capacity = def_map_size * multiplier;
@@ -57,24 +58,32 @@ public class MGResultProducer {
                     List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_recharge_position, random);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     Environment environment = new Environment(agent, goals, defPostGoalTimeGap);
+                    // Record time
+                    long begin = System.currentTimeMillis();
                     boolean running = true;
                     while (running) {
                         running = environment.run();
 //                        displayer.display(environment);
                     }
-                    // add consumption value to record
+                    long end = System.currentTimeMillis();
+                    long timeTaken = end - begin;
+                    // add consumption value and time to record
                     consumptionRecords[goalNum][multiplier] += agent.getTotalFuelConsumption();
+                    timeRecords[goalNum][multiplier] += (timeTaken);
                 }
                 System.out.println("goal: " + goalNum +", tank: " + multiplier * def_map_size + ", avg consumption: " + consumptionRecords[goalNum][multiplier] / repetitionCount);
+                System.out.println("time taken: " + timeRecords[goalNum][multiplier] / repetitionCount);
             }
         }
         // get average value
         for (int i = 0; i < consumptionRecords.length; i++) {
             for (int j = 0; j < consumptionRecords[i].length; j++) {
                 consumptionRecords[i][j] /= repetitionCount;
+                timeRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR, "consumption_" + fileName));
+        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
     }
 
     /**
@@ -183,6 +192,26 @@ public class MGResultProducer {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length; j++) {
                     bufferedWriter.write(String.format(doubleFormatter, matrix[i][j]) + " ");
+                }
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * transform the result matrix to a text file
+     */
+    void matrixToFile(long[][] matrix, File resultFile) {
+        try {
+            FileWriter writer = new FileWriter(resultFile);
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length; j++) {
+                    bufferedWriter.write(matrix[i][j] + " ");
                 }
                 bufferedWriter.newLine();
             }
