@@ -14,9 +14,9 @@ public class Experiment {
     @Test
     void mgVaryGoalNumberCapacity() {
         MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg_time").getPath(), 10, 15, 15, 0);
-        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
-        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
-        resultProducer.expAgentVaryGoalCapacity("mcts", "mcts.txt");
+//        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
+//        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("mcts", "proactive_mcts.txt");
 //        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
     }
@@ -36,6 +36,15 @@ public class Experiment {
         normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
         normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
         normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
+    }
+
+    @Test
+    public void normVaryIntervalProduce() {
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50, 15, 0);
+        normResultProducer.expAgentVaryTimeGapCapacity("fifo", "vary_interval_fifo.txt");
+        normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_fifo_vbdi.txt");
+        normResultProducer.expAgentVaryTimeGapCapacity("mcts", "vary_interval_mcts.txt");
 //        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
     }
 

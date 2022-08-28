@@ -56,23 +56,58 @@ public class MarsRoverState extends AbstractState {
             // stochastically choose a goal to jump
             Cell selectedGoal = rm.nextDouble() < 0.8 ? nearestGoal : randomGoal;
 
+            /**
+             * reactive simulation
+             */
             // evaluate resource consumption
-            int totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
+//            int goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
+//
+//            while (goToRechargeConsumption >= cloneAgent.getCurrentFuel()) {
+//                // go to recharge action
+//                MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
+//                cloneState.exeAct(act);
+//                actContainer.add(act);
+//                // refresh the consumption amount
+//                goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
+//            }
+//
+//            while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
+//                goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
+//                // If the fuel is not enough, first go back to recharge.
+//                while (goToRechargeConsumption >= cloneAgent.getCurrentFuel()) {
+//                    // go to recharge action
+//                    MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
+//                    cloneState.exeAct(act);
+//                    actContainer.add(act);
+//                    // refresh the consumption amount
+//                    goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
+//                }
+//
+//                MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
+//                cloneState.exeAct(act);
+//                actContainer.add(act);
+//            }
 
-            while (totalConsumption > cloneAgent.getCurrentFuel()) {
-                // go to recharge action
-                MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
-                cloneState.exeAct(act);
-                actContainer.add(act);
-                // refresh the consumption amount
-                totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
-            }
+            /**
+             * Proactive simulation
+             */
+            // evaluate resource consumption
+           int totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
 
-            while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
-                MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
-                cloneState.exeAct(act);
-                actContainer.add(act);
-            }
+           while (totalConsumption > cloneAgent.getCurrentFuel()) {
+               // go to recharge action
+               MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
+               cloneState.exeAct(act);
+               actContainer.add(act);
+               // refresh the consumption amount
+               totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
+           }
+
+           while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
+               MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
+               cloneState.exeAct(act);
+               actContainer.add(act);
+           }
         }
         return cloneState;
     }
@@ -105,9 +140,9 @@ public class MarsRoverState extends AbstractState {
             }
         }
         // Add the action to recharge
-        if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
-            moveActions.add(simAgent.getActMoveTo(rechargePosition));
-        }
+//       if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
+//           moveActions.add(simAgent.getActMoveTo(rechargePosition));
+//       }
 
         return new ArrayList<>(moveActions);
     }

@@ -26,6 +26,12 @@ public class NormResultProducer extends MGResultProducer {
         this.maxNormPenalty = maxNormPenalty;
         this.maxNumOfNorms = maxNumOfNorms;
     }
+
+    public NormResultProducer(String RESULT_DIR, int maxGoalNum, int maxNormPenalty, int maxNumOfNorms, int maxPostGoalTimeGap, int defPostGoalTimeGap) {
+        super(RESULT_DIR, 0, maxGoalNum, maxPostGoalTimeGap, defPostGoalTimeGap);
+        this.maxNormPenalty = maxNormPenalty;
+        this.maxNumOfNorms = maxNumOfNorms;
+    }
     /**
      * experiment varying number of norms
      */
@@ -69,6 +75,48 @@ public class NormResultProducer extends MGResultProducer {
         }
         matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
         matrixToFile(consumptionRecords, join(RESULT_DIR, consumptionResultPrefix + fileName));
+    }
+
+    /**
+     * experiment a type of agent with differrent posting goal intervals and different capacity,
+     * then write the result to a file
+     */
+    public void expAgentVaryTimeGapCapacity(String agentType, String fileName) {
+        double[][] penaltyRecords = new double[maxPostGoalTimeGap + 1][maxNumOfNorms + 1];
+        double[][] consumptionRecords = new double[maxPostGoalTimeGap + 1][maxNumOfNorms + 1];
+        for (int timeGap = 1; timeGap <= maxPostGoalTimeGap; timeGap++) {
+            for (int normNum = 0; normNum <= maxNumOfNorms; normNum += 10) {
+                // always init the random object to make sure consistency
+                Random goalRandomObj = new Random(SEED);
+                // important: make sure that the random seeds for generating goals and goals are different
+                Random normRandomObj = new Random(SEED + 1);
+                for (int i = 0; i < repetitionCount; i++) {
+                    HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
+                    List<Cell> goals = Default.genGoals(def_map_size, def_goal_count, def_initial_Position, goalRandomObj);
+                    AbstractAgent agent = genNewAgent(agentType, norms);
+                    Environment environment = new Environment(agent, goals, timeGap);
+
+                    boolean running = true;
+                    while (running) {
+                        running = environment.run();
+//                        displayer.display(environment);
+                    }
+                    // add consumption value to record
+                    consumptionRecords[timeGap][normNum] += agent.getTotalFuelConsumption();
+                    penaltyRecords[timeGap][normNum] += agent.getTotalPenalty();
+                }
+                System.out.println("timeGap: " + timeGap +", norm number: " + normNum + ", avg consumption: " + consumptionRecords[timeGap][normNum] / repetitionCount);
+            }
+        }
+        // get average value
+        for (int i = 0; i < consumptionRecords.length; i++) {
+            for (int j = 0; j < consumptionRecords[i].length; j++) {
+                consumptionRecords[i][j] /= repetitionCount;
+                penaltyRecords[i][j] /= repetitionCount;
+            }
+        }
+        matrixToFile(consumptionRecords, join(RESULT_DIR, "consumption-" + fileName));
+        matrixToFile(penaltyRecords, join(RESULT_DIR, penaltyResultPrefix + fileName));
     }
 
     /**

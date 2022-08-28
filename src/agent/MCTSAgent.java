@@ -31,7 +31,7 @@ public class MCTSAgent extends AbstractAgent {
         ws.setRootMCTSNode(rootNode);
 
         // run the MCTS process
-        ws.run(100, 10);
+        ws.run(10, 100);
         if (ws.hasNextBestAct()) {
             this.currentAct = ws.nextBestAct();
             return true;
