@@ -1,6 +1,7 @@
 package mcts;
 
 import MCTSstate.AbstractState;
+import MCTSstate.MarsRoverState;
 import agent.MoveAction;
 
 import java.util.ArrayList;
@@ -20,10 +21,12 @@ public class MCTSWorkSpace {
      */
     public List<MoveAction> bestActs;
 
+    int curAchievedGoalCount = 0;
+
     /**
      * Best simulation result record
      */
-     double bestSimulationResult = 0;
+     double bestSimulationResult = Double.NEGATIVE_INFINITY;
 
     public MCTSWorkSpace() {
         bestActs = new ArrayList<>();
@@ -134,9 +137,13 @@ public class MCTSWorkSpace {
                 for (int j = 0; j < beta; j++) {
                     // record the actions executed during simulation
                     List<MoveAction> simulationPhaseActs = new ArrayList<>();
-                    double simulationVal = rollOut(sState, simulationPhaseActs);
+                    AbstractState endState = rollOut(sState, simulationPhaseActs);
+                    int achievedGoalCount = endState.getAchievedGoalCount();
+                    double simulationVal = endState.evaluateState();
                     // update the best simulation result and action list
-                    if (bestSimulationResult < simulationVal) {
+                    // If the simulation value is greater than the record, and if the #goals is greater than the record, update
+                    if (bestSimulationResult < simulationVal || curAchievedGoalCount < achievedGoalCount) {
+                        curAchievedGoalCount = achievedGoalCount;
                         bestSimulationResult = simulationVal;
                         // update action list
                         ArrayList<MoveAction> allActs = new ArrayList<>();
@@ -164,8 +171,8 @@ public class MCTSWorkSpace {
      * simulate the progression from the given state to an end state and add all the actions with greatest simulation
      * result to the given container.
      */
-    private double rollOut(AbstractState sState, List<MoveAction> actContainer) {
-        return sState.randomSim(actContainer).evaluateState();
+    private AbstractState rollOut(AbstractState sState, List<MoveAction> actContainer) {
+        return sState.randomSim(actContainer);
     }
 
     /**

@@ -91,7 +91,7 @@ public class Default {
         return false;
     }
 
-    public static HashMap<Cell, Norm> genNorms(int mapSize, int numOfNorms, int avgPenalty, Cell except, Random rm) {
+    public static HashMap<Cell, Norm> genNorms(int mapSize, int numOfNorms, double avgPenalty, Cell except, Random rm) {
         HashMap<Cell, Norm> norms = new HashMap<>();
         while (norms.size() < numOfNorms) {
             int x = rm.nextInt(mapSize);
@@ -100,7 +100,7 @@ public class Default {
             if (cell.equals(except)) {
                 continue;
             }
-            double penaltyValue = gaussian(avgPenalty, 0.2, 2, rm);
+            double penaltyValue = gaussian(avgPenalty, 0.01, 0.01, rm);
             norms.put(cell, new Norm(cell, penaltyValue));
         }
         return norms;
@@ -109,7 +109,7 @@ public class Default {
     /**
      * Generate a number according to normal distribution with specified mean, standard deviation and bounds
      */
-    private static double gaussian(int mean, double stdDeviation, int rangeRadius, Random rm) {
+    private static double gaussian(double mean, double stdDeviation, double rangeRadius, Random rm) {
         // the generated value
         double value = rm.nextGaussian() * stdDeviation + mean;
         // if the value is not in bounds, generate again and again

@@ -32,7 +32,7 @@ public class Experiment {
 
     @Test
     public void normVaryNumberResultProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50, 0);
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 5, 0);
         normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
         normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
         normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
@@ -40,10 +40,19 @@ public class Experiment {
     }
 
     @Test
+    public void dynamicNormVaryNumberResultProduce() {
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 5, 5);
+//        normResultProducer.expAgentVaryNumOfNorms("fifo", "dm_vary_norms_fifo.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "dm_vary_norms_vbdi.txt");
+        normResultProducer.expAgentVaryNumOfNorms("mcts", "dm_vary_norms_mcts.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
+    }
+
+    @Test
     public void normVaryIntervalProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50, 15, 0);
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 5, 15, 0);
         normResultProducer.expAgentVaryTimeGapCapacity("fifo", "vary_interval_fifo.txt");
-        normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_fifo_vbdi.txt");
+        normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_vbdi.txt");
         normResultProducer.expAgentVaryTimeGapCapacity("mcts", "vary_interval_mcts.txt");
 //        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
     }

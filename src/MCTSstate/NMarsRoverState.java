@@ -14,14 +14,14 @@ public class NMarsRoverState extends MarsRoverState {
 //        double goalEval = simAgent.getAchievedGoalCount();
 //        double consumptionEval = 50.0 / (simAgent.getTotalFuelConsumption() + 100);
 //        double penaltyEval = 0.5 / (simAgent.getTotalPenalty() + 1);
-//
 //        return goalEval + consumptionEval + penaltyEval;
 
         double goalEval = simAgent.getAchievedGoalCount();
         double consumptionEval = simAgent.getTotalFuelConsumption();
         double penaltyEval = simAgent.getTotalPenalty();
-
-        return goalEval + 1.0 / (consumptionEval + penaltyEval + 1.0);
+        double val = simAgent.getAggregateVal();
+//        double val = goalEval + 1.0 / (consumptionEval + penaltyEval + 1.0);
+        return val;
     }
 
     @Override

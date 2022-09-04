@@ -10,6 +10,7 @@ import java.util.*;
 
 public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
+    public static final double delta = 1e-6;
     Random rm = new Random(Default.SEED);
 
     /**
@@ -21,6 +22,7 @@ public abstract class AbstractAgent implements Cloneable {
     MoveAction currentAct;
     List<Cell> goals;
     Cell currentGoal;
+    Cell prePosition;
     List<Cell> achievedGoals;
     Cell rechargePosition;
     final int mapSize = def_map_size;
@@ -52,6 +54,7 @@ public abstract class AbstractAgent implements Cloneable {
 
     private void init() {
         this.currentPosition = def_initial_Position;
+        this.prePosition = currentPosition;
         this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
         goals = new ArrayList<>();
@@ -87,6 +90,10 @@ public abstract class AbstractAgent implements Cloneable {
 
     public int getTotalFuelConsumption() {
         return totalFuelConsumption;
+    }
+
+    public double getAggregateVal() {
+        return 100 * (achievedGoals.size() / (totalFuelConsumption + delta) - getTotalPenalty());
     }
 
     public int getRechargeFuelConsumption() {
@@ -191,6 +198,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public void updatePosition(int x, int y) {
+        this.prePosition = this.currentPosition;
         this.currentPosition = new Cell(x, y);
     }
 
@@ -237,7 +245,8 @@ public abstract class AbstractAgent implements Cloneable {
             return;
         }
 
-        if (norms.containsKey(currentPosition)) {
+        // If current position is norm and previous position is not norm, punish is invoked.
+        if (norms.containsKey(currentPosition) && !norms.containsKey(prePosition)) {
             Norm relatedNorm = norms.get(currentPosition);
             this.penalty += relatedNorm.getPenalty();
         }

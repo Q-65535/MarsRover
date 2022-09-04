@@ -146,4 +146,9 @@ public class MarsRoverState extends AbstractState {
 
         return new ArrayList<>(moveActions);
     }
+
+    @Override
+    public int getAchievedGoalCount() {
+        return simAgent.getAchievedGoalCount();
+    }
 }
