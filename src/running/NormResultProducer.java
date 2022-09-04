@@ -43,8 +43,8 @@ public class NormResultProducer extends MGResultProducer {
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
             // Changed gap jump to 10
             for (int normCountMultiplier = 0; normCountMultiplier <= maxNormCountMultiplier; normCountMultiplier++) {
-                // The actual number of norms is multiplier times 10.
-                int normNum = normCountMultiplier * 10;
+                // The actual number of norms is multiplier times 5.
+                int normNum = normCountMultiplier * 5;
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
                 // important: make sure that the random seeds for generating goals and goals are different
@@ -95,7 +95,7 @@ public class NormResultProducer extends MGResultProducer {
         double[][] aggregateRecords = new double[maxGoalNum + 1][maxNormCountMultiplier + 1];
         for (int timeGap = 1; timeGap <= maxPostGoalTimeGap; timeGap++) {
             for (int normCountMultiplier = 0; normCountMultiplier <= maxNormCountMultiplier; normCountMultiplier++) {
-                int normNum = normCountMultiplier * 10;
+                int normNum = normCountMultiplier * 5;
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
                 // important: make sure that the random seeds for generating goals and goals are different
