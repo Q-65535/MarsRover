@@ -31,7 +31,7 @@ public class MCTSAgent extends AbstractAgent {
         ws.setRootMCTSNode(rootNode);
 
         // run the MCTS process
-        ws.run(10, 100);
+        ws.run(100, 10);
         if (ws.hasNextBestAct()) {
             this.currentAct = ws.nextBestAct();
             return true;
@@ -68,6 +68,8 @@ public class MCTSAgent extends AbstractAgent {
         if (goals.contains(currentPosition)) {
             goals.remove(currentPosition);
             achievedGoals.add(currentGoal);
+            // A goal is achieved
+            isAchieved = true;
         }
     }
 
@@ -85,6 +87,7 @@ public class MCTSAgent extends AbstractAgent {
         cloneAgent.totalFuelConsumption = this.totalFuelConsumption;
         cloneAgent.rechargeFuelConsumption = this.rechargeFuelConsumption;
         cloneAgent.achievedGoals = cloneAchieved;
+        cloneAgent.isAchieved = this.isAchieved;
         // clone norm information
         cloneAgent.norms = this.norms;
         cloneAgent.penalty = this.penalty;

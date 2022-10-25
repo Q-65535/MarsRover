@@ -51,6 +51,7 @@ public class MGResultProducer {
         long[][] timeRecords = new long[maxGoalNum + 1][maxMultiplier + 1];
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
             for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
+//                int multiplier = 999;
                 int capacity = def_map_size * multiplier;
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
@@ -83,7 +84,7 @@ public class MGResultProducer {
             }
         }
         matrixToFile(consumptionRecords, join(RESULT_DIR, "consumption_" + fileName));
-        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
+//        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
     }
 
     /**

@@ -38,6 +38,13 @@ public abstract class AbstractAgent implements Cloneable {
      * how much fuel will be consumed for each action (agent's perspective)
      */
     int actFuelConsumption;
+    /**
+     * Whether a goal is achieved. If a goal is achieved, the value is true.
+     * The value is turned to false when the agent recharge (This prevents the agent from recharging again
+     * and again without achieving any goals.
+     * @Smell: init the value in the constructor!!!!!!!
+     */
+    public boolean isAchieved = false;
 
     public AbstractAgent(List<Cell> goals, int maxCapacity) {
         init();
@@ -226,6 +233,8 @@ public abstract class AbstractAgent implements Cloneable {
     public void updateRecharge() {
         if (currentPosition.equals(rechargePosition)) {
             currentFuel = maxCapacity;
+            // isAchieved turned to false when the agent recharge
+            isAchieved = false;
         }
     }
 

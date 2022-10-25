@@ -13,34 +13,25 @@ public class Experiment {
     public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MR_results";
     @Test
     void mgVaryGoalNumberCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg_time").getPath(), 10, 15, 15, 0);
-//        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
-//        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
-        resultProducer.expAgentVaryGoalCapacity("mcts", "proactive_mcts.txt");
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg_goalX_capY").getPath(), 10, 15, 15, 0);
+        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
+        resultProducer.expAgentVaryGoalCapacity("mcts", "promcts.txt");
 //        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
     }
 
     @Test
     void mgVaryTimeGapCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg").getPath(), 10, 15, 15, 0);
-        resultProducer.expAgentVaryTimeGapCapacity("fifo", "timeGap_capacity_fifo.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("profifo", "timeGap_capacity_profifo.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("mcts", "timeGap_capacity_mcts.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("greedy", "timeGap_capacity_greedy.txt");
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg_intervalX_capY").getPath(), 10, 15, 15, 0);
+        resultProducer.expAgentVaryTimeGapCapacity("fifo", "fifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("profifo", "profifo.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("mcts", "promcts.txt");
+//        resultProducer.expAgentVaryTimeGapCapacity("greedy", "timeGap_capacity_greedy.txt");
     }
 
     @Test
     public void normVaryNumberResultProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 5, 0);
-        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
-        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
-        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-    }
-
-    @Test
-    public void dynamicNormVaryNumberResultProduce() {
         NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 0);
         normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
         normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
@@ -49,8 +40,17 @@ public class Experiment {
     }
 
     @Test
+    public void dynamicNormVaryNumberResultProduce() {
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 5);
+        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
+        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
+        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
+    }
+
+    @Test
     public void normVaryIntervalProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 5, 15, 0);
+        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 15, 0);
         normResultProducer.expAgentVaryTimeGapCapacity("fifo", "vary_interval_fifo.txt");
         normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_vbdi.txt");
         normResultProducer.expAgentVaryTimeGapCapacity("mcts", "vary_interval_mcts.txt");

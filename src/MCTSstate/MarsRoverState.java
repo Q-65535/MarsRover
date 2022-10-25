@@ -54,7 +54,7 @@ public class MarsRoverState extends AbstractState {
             Cell randomGoal = goals.get(rm.nextInt(goals.size()));
 
             // stochastically choose a goal to jump
-            Cell selectedGoal = rm.nextDouble() < 0.8 ? nearestGoal : randomGoal;
+            Cell selectedGoal = rm.nextDouble() < 0 ? nearestGoal : randomGoal;
 
             /**
              * reactive simulation
@@ -139,10 +139,15 @@ public class MarsRoverState extends AbstractState {
                 return new ArrayList<>(moveActions);
             }
         }
-        // Add the action to recharge
+        // Add the action to recharge at EVERY step
 //       if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
 //           moveActions.add(simAgent.getActMoveTo(rechargePosition));
 //       }
+
+        // add goal in proactive manner
+       if (!simAgent.getCurrentPosition().equals(rechargePosition) && simAgent.isAchieved) {
+           moveActions.add(simAgent.getActMoveTo(rechargePosition));
+       }
 
         return new ArrayList<>(moveActions);
     }
