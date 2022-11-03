@@ -17,7 +17,7 @@ public class SPMCTSAgent extends MCTSAgent {
 
 
     public SPMCTSAgent(List<Cell> goals, int maxCapacity) {
-        super(goals, maxCapacity);
+        super(goals, maxCapacity, false);
     }
 
     public SPMCTSAgent(int maxCapacity) {

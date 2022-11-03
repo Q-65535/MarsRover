@@ -17,7 +17,7 @@ import static running.Default.*;
 public class NMCTSAgent extends MCTSAgent {
 
     public NMCTSAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
-        super(goals, infinite_capacity);
+        super(goals, infinite_capacity, false);
         this.norms = norms;
     }
 

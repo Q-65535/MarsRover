@@ -34,7 +34,7 @@ public class ProactiveFIFOAgent extends FIFOAgent {
      * proactive evaluation
      */
     @Override
-    boolean needRecharge() {
+    public boolean needRecharge() {
 
         int goToGoalFuelConsumption = estimateFuelConsumption(currentGoal);
         int goalToDepotFuelConsumption = estimateFuelConsumption(currentGoal, rechargePosition);

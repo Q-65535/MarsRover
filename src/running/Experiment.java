@@ -11,24 +11,56 @@ import static running.Utils.*;
 
 public class Experiment {
     public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MR_results";
+
+    @Test
+    void mgVaryGoalNumberCapacityConfigInterval() {
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY_fixInterval5").getPath(), 10, 15, 15, 5);
+//        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
+        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
+//        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
+//        resultProducer.expAgentVaryGoalCapacity("infmcts", "NMCTS.txt");
+        resultProducer.expAgentVaryGoalCapacity("reamcts", "RMCTS.txt");
+//        resultProducer.expAgentVaryGoalCapacity("promcts", "PMCTS.txt");
+
+//        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
+//        resultProducer.expAgent("spmcts", "spmcts.txt");
+    }
     @Test
     void mgVaryGoalNumberCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg_goalX_capY").getPath(), 10, 15, 15, 0);
-        resultProducer.expAgentVaryGoalCapacity("fifo", "fifo.txt");
-        resultProducer.expAgentVaryGoalCapacity("profifo", "profifo.txt");
-        resultProducer.expAgentVaryGoalCapacity("mcts", "promcts.txt");
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY").getPath(), 10, 15, 15, 0);
+//        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
+        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
+//        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
+//        resultProducer.expAgentVaryGoalCapacity("infmcts", "NMCTS.txt");
+        resultProducer.expAgentVaryGoalCapacity("reamcts", "RMCTS.txt");
+//        resultProducer.expAgentVaryGoalCapacity("promcts", "PMCTS.txt");
+
 //        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
     }
 
     @Test
     void mgVaryTimeGapCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "mg_intervalX_capY").getPath(), 10, 15, 15, 0);
-        resultProducer.expAgentVaryTimeGapCapacity("fifo", "fifo.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("profifo", "profifo.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("mcts", "promcts.txt");
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_intervalX_capY").getPath(), 10, 15, 15, 0);
+//        resultProducer.expAgentVaryTimeGapCapacity("inffifo", "NMG.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("fifo", "RMG.txt");
+//        resultProducer.expAgentVaryTimeGapCapacity("profifo", "PMG.txt");
+//        resultProducer.expAgentVaryTimeGapCapacity("infmcts", "NMCTS.txt");
+        resultProducer.expAgentVaryTimeGapCapacity("reamcts", "RMCTS.txt");
+//        resultProducer.expAgentVaryTimeGapCapacity("promcts", "PMCTS.txt");
+
 //        resultProducer.expAgentVaryTimeGapCapacity("greedy", "timeGap_capacity_greedy.txt");
     }
+
+
+
+
+
+
+
+
+
+
 
     @Test
     public void normVaryNumberResultProduce() {

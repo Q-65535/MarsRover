@@ -12,10 +12,18 @@ import world.SimEnvironment;
 import java.util.List;
 
 public class MCTSAgent extends AbstractAgent {
+    // Whether the agent uses proactive strategy
+    public boolean isProactive;
     MCTSWorkSpace ws = new MCTSWorkSpace();
 
-    public MCTSAgent(List<Cell> goals, int maxCapacity) {
+    public MCTSAgent(List<Cell> goals, int maxCapacity, boolean isProactive) {
         super(goals, maxCapacity);
+        this.isProactive = isProactive;
+    }
+
+    public MCTSAgent(int maxCapacity, boolean isProactive) {
+        super(maxCapacity);
+        this.isProactive = isProactive;
     }
 
     public MCTSAgent(int maxCapacity) {
@@ -56,10 +64,10 @@ public class MCTSAgent extends AbstractAgent {
     /**
      * reactive evaluation
      */
-    @Override
-    public boolean needRecharge() {
-        return currentFuel <= estimateFuelConsumption(rechargePosition);
-    }
+//    @Override
+//    public boolean needRecharge() {
+//        return currentFuel <= estimateFuelConsumption(rechargePosition);
+//    }
 
 
 
@@ -79,7 +87,7 @@ public class MCTSAgent extends AbstractAgent {
         List<Cell> cloneGoals = Default.cloneCells(goals);
         List<Cell> cloneAchieved = Default.cloneCells(achievedGoals);
 
-        MCTSAgent cloneAgent = new MCTSAgent(cloneGoals, maxCapacity);
+        MCTSAgent cloneAgent = new MCTSAgent(cloneGoals, maxCapacity, isProactive);
 
         // important: clone all the records
         cloneAgent.currentPosition = this.currentPosition;

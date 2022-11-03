@@ -45,6 +45,9 @@ public class FIFOAgent extends AbstractAgent {
     boolean needGiveup() {
         // if current fuel is less than 1, the agent can't do anything, give up
         if (currentFuel <= 0) {
+            while (this != null) {
+                System.out.println("This is crazy, no enough fuel, the agent just gave up!!!!");
+            }
             return true;
         }
         return false;

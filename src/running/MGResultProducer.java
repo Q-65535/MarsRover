@@ -18,7 +18,7 @@ import static running.Default.*;
 
 public class MGResultProducer {
     public static final String doubleFormatter = "%.3f";
-    public static final int repetitionCount = 50;
+    public static final int repetitionCount = 100;
     public static final int def_goal_count = 10;
     static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
     /**
@@ -41,6 +41,8 @@ public class MGResultProducer {
         this.maxGoalNum = maxGoalNum;
         this.maxPostGoalTimeGap = maxPostGoalTimeGap;
         this.defPostGoalTimeGap = defPostGoalTimeGap;
+        // create the new dir
+        new File(RESULT_DIR).mkdir();
     }
 
     /**
@@ -51,7 +53,6 @@ public class MGResultProducer {
         long[][] timeRecords = new long[maxGoalNum + 1][maxMultiplier + 1];
         for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
             for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
-//                int multiplier = 999;
                 int capacity = def_map_size * multiplier;
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
@@ -72,7 +73,7 @@ public class MGResultProducer {
                     consumptionRecords[goalNum][multiplier] += agent.getTotalFuelConsumption();
                     timeRecords[goalNum][multiplier] += (timeTaken);
                 }
-                System.out.println("goal: " + goalNum +", tank: " + multiplier * def_map_size + ", avg consumption: " + consumptionRecords[goalNum][multiplier] / repetitionCount);
+                System.out.println("goal: " + goalNum +", tank: " + capacity + ", avg consumption: " + consumptionRecords[goalNum][multiplier] / repetitionCount);
                 System.out.println("time taken: " + timeRecords[goalNum][multiplier] / repetitionCount);
             }
         }
@@ -83,7 +84,7 @@ public class MGResultProducer {
                 timeRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR, "consumption_" + fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR,  fileName));
 //        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
     }
 
@@ -111,7 +112,7 @@ public class MGResultProducer {
                     // add consumption value to record
                     consumptionRecords[timeGap][multiplier] += agent.getTotalFuelConsumption();
                 }
-                System.out.println("timeGap: " + timeGap +", tank: " + multiplier * def_map_size + ", avg consumption: " + consumptionRecords[timeGap][multiplier] / repetitionCount);
+                System.out.println("timeGap: " + timeGap +", tank: " + capacity + ", avg consumption: " + consumptionRecords[timeGap][multiplier] / repetitionCount);
             }
         }
         // get average value
@@ -161,17 +162,27 @@ public class MGResultProducer {
     AbstractAgent genNewAgent(String agentType, int capacity) {
         AbstractAgent agent;
         switch (agentType) {
-            case "mcts":
-                agent = new MCTSAgent(capacity);
+            case "promcts":
+                agent = new MCTSAgent(capacity, true);
                 break;
-            case "spmcts":
-                agent = new SPMCTSAgent(capacity);
+            case "reamcts":
+                agent = new MCTSAgent(capacity, false);
                 break;
+                // Infinite fuel mcts
+            case "infmcts":
+                agent = new MCTSAgent(99999, false);
+                break;
+//            case "spmcts":
+//                agent = new SPMCTSAgent(capacity);
+//                break;
             case "profifo":
                 agent = new ProactiveFIFOAgent(capacity);
                 break;
             case "fifo":
                 agent = new FIFOAgent(capacity);
+                break;
+            case "inffifo":
+                agent = new FIFOAgent(99999);
                 break;
             case "greedy":
                 agent = new GreedyAgent(capacity);
