@@ -20,6 +20,7 @@ public class MGResultProducer {
     public static final String doubleFormatter = "%.3f";
     public static final int repetitionCount = 100;
     public static final int def_goal_count = 10;
+    public static final int infCapacityAmount = 99999999;
     static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
     /**
      * The result directory
@@ -170,7 +171,7 @@ public class MGResultProducer {
                 break;
                 // Infinite fuel mcts
             case "infmcts":
-                agent = new MCTSAgent(99999, false);
+                agent = new MCTSAgent(infCapacityAmount, false);
                 break;
 //            case "spmcts":
 //                agent = new SPMCTSAgent(capacity);
@@ -181,8 +182,9 @@ public class MGResultProducer {
             case "fifo":
                 agent = new FIFOAgent(capacity);
                 break;
+                // Infinite fuel fifo
             case "inffifo":
-                agent = new FIFOAgent(99999);
+                agent = new FIFOAgent(infCapacityAmount);
                 break;
             case "greedy":
                 agent = new GreedyAgent(capacity);

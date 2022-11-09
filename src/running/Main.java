@@ -19,7 +19,7 @@ public class Main {
         defEnv.setAgent(mctsAgent);
         while (running) {
             running = defEnv.run();
-//            displayer.display(defEnv);
+            displayer.display(defEnv);
         }
 
         defEnv = new Environment(def_goals);
@@ -28,7 +28,7 @@ public class Main {
         defEnv.setAgent(testAgent);
         while (running) {
             running = defEnv.run();
-//            displayer.display(defEnv);
+            displayer.display(defEnv);
         }
 
         naiveTotal += testAgent.getTotalFuelConsumption();

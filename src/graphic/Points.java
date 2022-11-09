@@ -21,7 +21,7 @@ public class Points extends JPanel {
     }
 
     /**
-     * This strange function do all the things to draw environment
+     * This strange function do all the things to draw the environment
      */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

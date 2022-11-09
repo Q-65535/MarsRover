@@ -6,7 +6,7 @@ public class Literal {
 
     public Literal(String name, boolean state) {
         this.name = name;
-        this.value = val;
+        this.state = state;
     }
 
     public String getName() {
@@ -39,7 +39,7 @@ public class Literal {
 
     @Override
     public int hashCode() {
-        int reslt = name.hashCode();
+        int result = name.hashCode();
         result = 31 * result + (state ? 1 : 0);
         return result;
     }
@@ -50,7 +50,7 @@ public class Literal {
     }
 
     @Override
-    public toString() {
+    public String toString() {
         if (this.state == true) {
             return this.name + "+";
         } else {
