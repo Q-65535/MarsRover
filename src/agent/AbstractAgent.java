@@ -13,9 +13,14 @@ public abstract class AbstractAgent implements Cloneable {
     public static final double delta = 1e-6;
     Random rm = new Random(Default.SEED);
 
+    // @Incomplete: Haven't fully implemented yet.
+    List<Tree> activeIntentions;
+    List<Tree> monitoringMGTemplates;
+
     /**
      * The total penalty received
      */
+
     double penalty;
     HashMap<Cell, Norm> norms;
     Cell currentPosition;
@@ -46,6 +51,13 @@ public abstract class AbstractAgent implements Cloneable {
      */
     public boolean isAchieved = false;
 
+    public AbstractAgent(List<Tree> tlgs, List<Tree> mgs, int maxCapacity) {
+        init();
+        this.activeIntentions = tlgs;
+        this.monitoringMGTemplates = mgs;
+        this.currentFuel = maxCapacity;
+    }
+
     public AbstractAgent(List<Cell> goals, int maxCapacity) {
         init();
         this.goals = new ArrayList<>(goals);
@@ -71,6 +83,10 @@ public abstract class AbstractAgent implements Cloneable {
         penalty = 0;
     }
 
+    public void adoptGoal(GoalNode tlg) {
+	activeIntentions.add(new Tree(tlg);
+    }
+
     public void adoptGoal(Cell goal) {
         goals.add(goal);
     }
@@ -85,6 +101,10 @@ public abstract class AbstractAgent implements Cloneable {
 
     public List<Cell> getGoals() {
         return goals;
+    }
+
+    public List<Tree> getCurrentIntentions() {
+        return this.activeIntentions;
     }
 
     public Cell getCurrentPosition() {
@@ -107,6 +127,9 @@ public abstract class AbstractAgent implements Cloneable {
         return rechargeFuelConsumption;
     }
 
+    // Agent reasons about what to do. It returns true if it know what to do
+    // after reasoning. False if it has no idea about what to do next. This method
+    // also alter the agent's internal state (what to do next).
     public abstract boolean reason();
 
     public MoveAction execute() {

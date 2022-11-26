@@ -160,13 +160,9 @@ class Utils {
             }
         };
 
+
     /** Returns a list of the names of all plain files in the directory DIR, in
-     *  lexicographic order as Java Strings.  Returns null if DIR does
-     *  not denote a directory. */
-    static List<String> plainFilenamesIn(File dir) {
-        String[] files = dir.list(PLAIN_FILES);
-        if (files == null) {
-            return null;
+     *  lexicographic order as Java Strings.  ;
         } else {
             Arrays.sort(files);
             return Arrays.asList(files);

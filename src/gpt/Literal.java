@@ -1,16 +1,16 @@
 package gpt;
 
 public class Literal {
-    private String name;
+    private Formula formula;
     private boolean state;
 
-    public Literal(String name, boolean state) {
-        this.name = name;
+    public Literal(Formula formula, boolean state) {
+        this.formula = formula;
         this.state = state;
     }
 
-    public String getName() {
-        return this.name;
+    public Formula getFormula() {
+        return this.formula;
     }
 
     public boolean getState() {
@@ -32,29 +32,29 @@ public class Literal {
             return false;
         }
         Literal l = (Literal) o;
-        boolean isNameEqual = this.name.equals(l.name);
+        boolean isFormulaEqual = this.formula.equals(l.formula);
         boolean isStateEqual = this.state == l.state;
-        return isNameEqual && isStateEqual;
+        return isFormulaEqual && isStateEqual;
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
+        int result = formula.hashCode();
         result = 31 * result + (state ? 1 : 0);
         return result;
     }
 
     @Override
     public Literal clone() {
-        return new Literal(this.name, this.state);
+        return new Literal(this.formula, this.state);
     }
 
     @Override
     public String toString() {
         if (this.state == true) {
-            return this.name + "+";
+            return this.formula + "+";
         } else {
-            return this.name + "-";
+            return this.formula + "-";
         }
     }
 }

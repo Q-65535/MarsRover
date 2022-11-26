@@ -60,7 +60,6 @@ public class MCTSAgent extends AbstractAgent {
     }
 
 
-
     /**
      * reactive evaluation
      */
@@ -80,6 +79,7 @@ public class MCTSAgent extends AbstractAgent {
             isAchieved = true;
         }
     }
+
 
     @Override
     public MCTSAgent clone() {

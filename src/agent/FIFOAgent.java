@@ -28,6 +28,7 @@ public class FIFOAgent extends AbstractAgent {
         if (needGiveup()) {
             return false;
         }
+	
 
         if (needRecharge()) {
             isGoToRecharge = true;
@@ -55,7 +56,7 @@ public class FIFOAgent extends AbstractAgent {
 
     @Override
     public void updateGoal() {
-        if (currentGoal == null) {
+       if (currentGoal == null) {
             return;
         }
         // deal with current goal
@@ -86,7 +87,4 @@ public class FIFOAgent extends AbstractAgent {
     void setNearestAsCurrentGoal() {
         currentGoal = getNearestGoal();
     }
-
-
-
 }

@@ -1,16 +1,18 @@
 package gpt;
 
+import java.util.*;
+
 public class PlanNode extends TreeNode {
-    final private Literal[] prec;
-    private final TreeNode[] body;
+    final private List<Literal> prec;
+    private final List<TreeNode> body;
 
     public PlanNode(String name) {
         super(name);
-        this.prec = new Literal[0];
-        this.body = new TreeNode[0];
+        this.prec = new ArrayList<>();
+        this.body = new ArrayList<>();
     }
 
-    public PlanNode(String name, Literal[] prec, TreeNode[] body) {
+    public PlanNode(String name, List<Literal> prec, List<TreeNode> body) {
         super(name);
         if (prec == null) {
             throw new RuntimeException("precondition is null!");
@@ -26,23 +28,23 @@ public class PlanNode extends TreeNode {
 
     // Connect each step in the plan body to this plan node.
     private void connectParent() {
-        for (int i = 0; i < body.length; i++) {
-            body[i].setParent(this);
+        for (int i = 0; i < body.size(); i++) {
+            body.get(i).setParent(this);
         }
     }
 
     // Connect steps in the plan body sequentially.
     private void connectNext() {
-        for (int i = 0; i < body.length - 1; i++) {
-            body[i].next = body[i + 1];
+        for (int i = 0; i < body.size() - 1; i++) {
+            body.get(i).next = body.get(i + 1);
         }
     }
 
-    public Literal[] getPrec() {
+    public List<Literal> getPrec() {
         return this.prec;
     }
 
-    public TreeNode[] getBody() {
+    public List<TreeNode> getBody() {
         return this.body;
     }
 }
