@@ -2,7 +2,7 @@ package gpt;
 
 import world.*;
 
-public class At implements Formula {
+public class At implements AppliableFormula {
     private final PositionTerm term;
 
     public At(int x, int y) {
@@ -26,4 +26,9 @@ public class At implements Formula {
         return term.ins(marsRoverModel);
     }
 
+    @Override
+    public void apply(MarsRoverModel marsRoverModel) {
+	Position targetPosition = insTerm1(marsRoverModel);
+	marsRoverModel.setAgentPosition(targetPosition);
+    }
 }

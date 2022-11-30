@@ -10,7 +10,7 @@ import static agent.Direction.*;
 public class MarsRoverGenerator {
 
 
-    public Tree generate(int a, int b) {
+    public GoalNode generate(int a, int b) {
         // create a new goal node.
         Position targetPosition = new Position(a, b);
         Formula at = new At(targetPosition);
@@ -28,7 +28,7 @@ public class MarsRoverGenerator {
         goal.addPlan(leftPlan);
         goal.addPlan(rightPlan);
 
-        return new Tree(goal);
+        return goal;
     }
 
 
@@ -65,7 +65,8 @@ public class MarsRoverGenerator {
         prec.add(l);
 
         // Plan body
-        GoalNode subgoal = new AGoalNode("at", goal);
+        // @Note: the subgoal is recursive.
+        GoalNode subgoal = goal;
         List<TreeNode> body = new ArrayList<>();
         body.add(act);
         body.add(subgoal);

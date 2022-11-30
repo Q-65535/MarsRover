@@ -17,7 +17,7 @@ public abstract class AbstractAgent implements Cloneable {
     final int mapSize = def_map_size;
     // The agent's belief base.
     MarsRoverModel bb;
-//    List<Automaton> automata;
+    List<Automaton> automata;
     // The goals represented by automata.
     // @Idea: Maybe we can add norms into this? We can call them temporal objects.
     // @Incomplete: Currently, we don't use this field, since we consider automata.
@@ -108,17 +108,14 @@ public abstract class AbstractAgent implements Cloneable {
     public void adoptGoal(GoalNode goal) {
         // Achievement goals are immediately transformed to intentions.
         if (goal instanceof AGoalNode) {
-	    System.out.println("this is an achievement goal");
             AGoalNode ag = (AGoalNode) goal;
             intentions.add(new Tree(ag));
-	    System.out.println("intention size: " + intentions.size());
         } else if (goal instanceof MGoalNode) {
-	    System.out.println("this is a maintenance goal");
             MGoalNode mg = (MGoalNode) goal;
             maitGoals.add(mg);
         } else {
-	    System.out.println("this goal is not recognized!");
-	}
+            throw new RuntimeException("this goal is not recognized!");
+        }
     }
 
     public int getCurrentFuel() {
@@ -172,7 +169,8 @@ public abstract class AbstractAgent implements Cloneable {
             GoalNode tlg = gpt.getTlg();
             // If the tlg of current intention is already achieved, drop the intention.
             if (bb.eval(tlg.getGoalConds())) {
-                // We only add achievement goals.
+                System.out.println("a goal has just achieved by accident!");
+                // We only add achievement goals to the achievedGoals list.
                 // @? Maybe maintenance goal should be considered?
                 if (tlg instanceof AGoalNode) {
                     AGoalNode ag = (AGoalNode) tlg;
@@ -197,6 +195,7 @@ public abstract class AbstractAgent implements Cloneable {
             if (curIntention.getCurrentStep() instanceof GoalNode) {
                 GoalNode goal = (GoalNode) curIntention.getCurrentStep();
                 if (!goal.hasApplicablePlan(bb)) {
+                    System.out.println("this goal has no applicable plan");
                     curIntention.fail(bb);
                 }
             }
@@ -204,6 +203,7 @@ public abstract class AbstractAgent implements Cloneable {
                 break;
                 // If this intention is not progressible after preprocessing, remove it.
             } else {
+                System.out.println("not progressiable");
                 iterator.remove();
             }
         }
@@ -279,6 +279,18 @@ public abstract class AbstractAgent implements Cloneable {
         ActionNode act = (ActionNode) gpt.getCurrentStep();
         bb.apply(act.getPostc());
         gpt.success();
+        // If the tlg is regarded as achieved based on the updated belief base, drop it.
+        GoalNode tlg = gpt.getTlg();
+        if (bb.eval(tlg.getGoalConds())) {
+            // We add achievement goal to the achievedGoals list.
+            if (tlg instanceof AGoalNode) {
+                AGoalNode ag = (AGoalNode) tlg;
+                achievedGoals.add(ag);
+            }
+            // drop the intention.
+            intentions.remove(choice.intentionChoice);
+
+        }
 
         // After bb is update, when then record the total fuel consumption and recharge info.
         int currentFuel = bb.getAgentFuel();
@@ -320,7 +332,7 @@ public abstract class AbstractAgent implements Cloneable {
      * if current position is recharge position, recharge the fuel
      */
     public void updateRecharge() {
-        if (currentPosition.equals(rechargePosition)) {
+        if (bb.getAgentPosition().equals(rechargePosition)) {
             bb.setAgentFuel(maxCapacity);
             // isAchieved turned to false when the agent recharge
             isAchieved = false;

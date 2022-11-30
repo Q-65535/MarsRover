@@ -111,7 +111,6 @@ public class Environment {
         // each time after the agent reasons, increment the running count
         runningCount++;
         if (executable) {
-	    System.out.println("running...");
             runnable = true;
             ActionNode act = agent.execute();
             if (act == null) {
@@ -119,7 +118,6 @@ public class Environment {
             }
             boolean success = executeAct(act);
             if (success) {
-                // @Note: Remember implementing postcondition appling in this method.
                 this.agent.exeSuccess();
             } else {
                 this.agent.exeFail(envMarsRoverModel);
@@ -175,7 +173,7 @@ public class Environment {
         if (!envMarsRoverModel.eval(act.getPrec())) return false;
         envMarsRoverModel.apply(act.getPostc());
         //@Note: Seperate norm appling and postcondition appling.
-        applyNorm(act);
+//        applyNorm(act);
         return true;
 
         // @Incomplete: These should be implemented in success().
@@ -185,12 +183,12 @@ public class Environment {
         // agent.updatePunish();
     }
 
-    private void applyNorm(ActionNode act) {
-        for (Norm norm : norms) {
-            if (norm.isViolation(act)) {
-                // Environment doesn't tell which norm the agent violates; the agent just receive punishment.
-                agent.receivePunish(norm.getPenalty());
-            }
-        }
-    }
+//    private void applyNorm(ActionNode act) {
+//        for (Norm norm : norms) {
+//            if (norm.isViolation(act)) {
+//                // Environment doesn't tell which norm the agent violates; the agent just receive punishment.
+//                agent.receivePunish(norm.getPenalty());
+//            }
+//        }
+//    }
 }

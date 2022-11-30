@@ -1,6 +1,7 @@
 package gpt;
 
 import java.util.*;
+
 import world.*;
 
 public class Tree {
@@ -37,22 +38,22 @@ public class Tree {
     }
 
     public List<GoalNode> getBackTrackList() {
-	return this.backtrackList;
+        return this.backtrackList;
     }
 
     // Estimate whether this intention is progressible based on the given model.
     public boolean isProgressible(MarsRoverModel model) {
-	if (currentStep instanceof ActionNode) {
-	    return true;
-	}
+        if (currentStep instanceof ActionNode) {
+            return true;
+        }
 
-	// If current step is tlg.
-	if (currentStep instanceof GoalNode && backtrackList.isEmpty()) {
-	    GoalNode goal = (GoalNode) currentStep;
-	    return goal.hasApplicablePlan(model);
-	}
-	// Other cases, return true.
-	return true;
+        // If current step is tlg.
+        if (currentStep instanceof GoalNode && backtrackList.isEmpty()) {
+            GoalNode goal = (GoalNode) currentStep;
+            return goal.hasApplicablePlan(model);
+        }
+        // Other cases, return true.
+        return true;
     }
 
 
@@ -76,17 +77,15 @@ public class Tree {
         }
 
         GoalNode goal = (GoalNode) currentStep;
-	// For recursive goal, we need to test whether the backtrackList contains the goal, if it already contains, we
-	// don't add the goal to the list.
-	backtrackList.add(goal);
+        backtrackList.add(goal);
         PlanNode selectedPlan = goal.getPlans().get(index);
-	// Set currentStep to the first step in the selected plan body.
-	setCurrentStep(selectedPlan.getBody().get(0));
+        // Set currentStep to the first step in the selected plan body.
+        setCurrentStep(selectedPlan.getBody().get(0));
         return selectedPlan;
     }
 
     public void resetVirtualCurrentStep() {
-	virtualCurrentStep = currentStep;
+        virtualCurrentStep = currentStep;
     }
 
     public ActionNode virtualProgress() {
@@ -109,21 +108,16 @@ public class Tree {
         }
 
         GoalNode goal = (GoalNode) virtualCurrentStep;
-	// For recursive goal, we need to test whether the backtrackList contains the goal, if it already contains, we
-	// don't add the goal to the list.
-	// @Incomplete: equals method should be implemented in GoalNode class!
-	if (!backtrackList.contains(goal)) {
-	    backtrackList.add(goal);
-	}
+        backtrackList.add(goal);
 
         PlanNode selectedPlan = goal.getPlans().get(index);
-	// Set currentStep to the first step in the selected plan body.
-	virtualCurrentStep = selectedPlan.getBody().get(0);
+        // Set currentStep to the first step in the selected plan body.
+        virtualCurrentStep = selectedPlan.getBody().get(0);
         return selectedPlan;
     }
 
     public void success() {
-	    if (currentStep instanceof ActionNode) {
+        if (currentStep instanceof ActionNode) {
             // cast it to an action
             ActionNode act = (ActionNode) currentStep;
             // get the next step of this goal-plan tree
@@ -135,7 +129,7 @@ public class Tree {
                 GoalNode g = backtrackList.remove(backtrackList.size() - 1);
                 // if g is the top-level goal
                 if (backtrackList.size() == 0) {
-		    isAchieved = true;
+                    isAchieved = true;
                 }
                 // otherwise, if it is the last action in a plan that is not used to achieve the top-level goal
                 else {

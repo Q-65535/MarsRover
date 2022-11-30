@@ -42,9 +42,6 @@ public class MarsRoverState extends AbstractState {
         return simAgent.getAchievedGoalCount() + consumptionEval;
     }
 
-    x
-
-    @Override
     public AbstractState randomSim(List<MoveAction> actContainer) {
         MarsRoverState cloneState = this.clone();
         MCTSAgent cloneAgent = cloneState.simAgent;

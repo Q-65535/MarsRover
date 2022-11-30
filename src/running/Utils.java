@@ -172,9 +172,9 @@ class Utils {
     /** Returns a list of the names of all plain files in the directory DIR, in
      *  lexicographic order as Java Strings.  Returns null if DIR does
      *  not denote a directory. */
-    static List<String> plainFilenamesIn(String dir) {
-        return plainFilenamesIn(new File(dir));
-    }
+//    static List<String> plainFilenamesIn(String dir) {
+//        return plainFilenamesIn(new File(dir));
+//    }
 
     /* OTHER FILE UTILITIES */
 

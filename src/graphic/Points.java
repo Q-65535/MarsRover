@@ -44,8 +44,6 @@ public class Points extends JPanel {
                 goalPositions.add(at.insTerm1(agent.getBB()));
             }
         }
-
-        drawCellTo2D(g2d, new Position(2, 2));
         drawCellTo2D(g2d, goalPositions);
 
         //draw current goal

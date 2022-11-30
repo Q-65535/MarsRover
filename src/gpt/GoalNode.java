@@ -7,7 +7,7 @@ import java.util.*;
 public class GoalNode extends TreeNode {
 
     private List<Literal> goalConds;
-    private List<PlanNode> plans;
+    List<PlanNode> plans;
     private GoalNode recursiveGoalPtr;
 
     public GoalNode(String name, List<Literal> goalConds) {

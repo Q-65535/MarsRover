@@ -24,12 +24,9 @@ public class Main {
         MarsRoverGenerator gen = new MarsRoverGenerator();
 
         // Construct Goals.
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
             ArrayList<Literal> ls = new ArrayList<>();
-            Formula atFormula = new At(rm.nextInt(20), rm.nextInt(20));
-            Literal l = new Literal(atFormula, true);
-            ls.add(l);
-            fifoagent.adoptGoal(new AGoalNode("At", ls));
+            fifoagent.adoptGoal(gen.generate(rm.nextInt(20), rm.nextInt(20)));
         }
 
         Environment defEnv = new Environment(fifoagent);
@@ -40,6 +37,8 @@ public class Main {
             running = defEnv.run();
             displayer.display(defEnv);
         }
+
+        displayer.close();
 
         naiveTotal += fifoagent.getTotalFuelConsumption();
         mctsTotal += fifoagent.getTotalFuelConsumption();

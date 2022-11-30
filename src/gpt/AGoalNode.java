@@ -3,7 +3,6 @@ package gpt;
 import java.util.*;
 
 public class AGoalNode extends GoalNode {
-    private List<PlanNode> plans;
 
     public AGoalNode(String name, List<Literal> goalConds) {
         super(name, goalConds);
