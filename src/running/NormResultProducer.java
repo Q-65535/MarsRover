@@ -1,7 +1,7 @@
 package running;
 
 import agent.*;
-import world.Cell;
+import gpt.Position;
 import world.Environment;
 import world.Norm;
 
@@ -50,8 +50,8 @@ public class NormResultProducer extends MGResultProducer {
                 // important: make sure that the random seeds for generating goals and goals are different
                 Random normRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
-                    HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
-                    List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
+                    HashMap<Position, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
+                    List<Position> goals = Default.genGoals(def_map_size, goalNum, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, norms);
                     Environment environment = new Environment(agent, goals, defPostGoalTimeGap);
 
@@ -101,8 +101,8 @@ public class NormResultProducer extends MGResultProducer {
                 // important: make sure that the random seeds for generating goals and goals are different
                 Random normRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
-                    HashMap<Cell, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
-                    List<Cell> goals = Default.genGoals(def_map_size, def_goal_count, def_initial_Position, goalRandomObj);
+                    HashMap<Position, Norm> norms = genNorms(def_map_size, normNum, def_penalty, def_recharge_position, normRandomObj);
+                    List<Position> goals = Default.genGoals(def_map_size, def_goal_count, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, norms);
                     Environment environment = new Environment(agent, goals, timeGap);
 
@@ -175,7 +175,7 @@ public class NormResultProducer extends MGResultProducer {
 //    }
 
 
-    AbstractAgent genNewAgent(String agentType, HashMap<Cell, Norm> norms) {
+    AbstractAgent genNewAgent(String agentType, HashMap<Position, Norm> norms) {
         AbstractAgent agent;
         switch (agentType) {
             case "mcts":

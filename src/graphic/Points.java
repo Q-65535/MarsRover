@@ -1,12 +1,16 @@
 package graphic;
 
 import agent.AbstractAgent;
-import world.Cell;
+import gpt.At;
+import gpt.Formula;
+import gpt.Position;
+import gpt.Tree;
 import world.Environment;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,18 +30,27 @@ public class Points extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.scale(8, 8);
+        g2d.scale(18, 18);
 
         AbstractAgent agent = env.getAgent();
 
         // draw goals
         g2d.setColor(Color.red);
-        List<Cell> goalPositions = agent.getGoals();
+        List<Position> goalPositions = new ArrayList<>();
+        for (Tree intention : agent.getIntentions()) {
+            Formula positionFormula = intention.getTlg().getGoalConds().get(0).getFormula();
+            if (positionFormula instanceof At) {
+                At at = (At) positionFormula;
+                goalPositions.add(at.insTerm1(agent.getBB()));
+            }
+        }
+
+        drawCellTo2D(g2d, new Position(2, 2));
         drawCellTo2D(g2d, goalPositions);
 
         //draw current goal
         g2d.setColor(Color.MAGENTA);
-        drawCellTo2D(g2d, agent.getCurrentGoal());
+//        drawCellTo2D(g2d, agent.getCurrentGoal());
 
         //draw agent
         g2d.setColor(Color.BLUE);
@@ -58,22 +71,22 @@ public class Points extends JPanel {
         g2d.drawString(recordStr, 300, 800);
     }
 
-    private void drawCellTo2D(Graphics2D graphic, Set<Cell> cells) {
-        for (Cell cell : cells) {
-            drawCellTo2D(graphic, cell);
+    private void drawCellTo2D(Graphics2D graphic, Set<Position> positions) {
+        for (Position position : positions) {
+            drawCellTo2D(graphic, position);
         }
     }
 
-    private void drawCellTo2D(Graphics2D graphic, List<Cell> cells) {
-        drawCellTo2D(graphic, new HashSet<>(cells));
+    private void drawCellTo2D(Graphics2D graphic, List<Position> positions) {
+        drawCellTo2D(graphic, new HashSet<>(positions));
     }
 
-    private void drawCellTo2D(Graphics2D graphic, Cell cell) {
-        if (cell == null) {
+    private void drawCellTo2D(Graphics2D graphic, Position position) {
+        if (position == null) {
             return;
         }
-        int x = cell.getX();
-        int y = cell.getY();
+        int x = position.getX();
+        int y = position.getY();
         graphic.drawLine(x, y, x, y);
     }
 

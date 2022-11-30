@@ -1,12 +1,12 @@
 package agent;
 
-import world.Cell;
+import gpt.*;
 
-import java.util.List;
+import java.util.*;
 
 public class FIFOAgent extends AbstractAgent {
 
-    public FIFOAgent(List<Cell> goals, int maxCapacity) {
+    public FIFOAgent(List<GoalNode> goals, int maxCapacity) {
         super(goals, maxCapacity);
     }
 
@@ -16,75 +16,44 @@ public class FIFOAgent extends AbstractAgent {
 
     @Override
     public boolean reason() {
-        if (currentGoal == null) {
-            // if no goal to pursuit, return false
-            if (goals.isEmpty()) {
-                return false;
-            }
-            // if no current goal, adopt one
-            setFirstAsCurrentGoal();
-        }
+        intentionUpdate();
+        if (intentions.size() == 0){
+	    System.out.println("has no intention");
+	    return false;
+	}
+        // @Incomplete: We should also check maintenance goals (it may add some intentions).
 
-        if (needGiveup()) {
-            return false;
-        }
-	
-
-        if (needRecharge()) {
-            isGoToRecharge = true;
-            currentAct = getActMoveTo(rechargePosition);
-            return true;
-        } else {
-            isGoToRecharge = false;
-        }
-
-        // finally set current action
-        currentAct = getActMoveTo(currentGoal);
-        return true;
-    }
-
-    boolean needGiveup() {
-        // if current fuel is less than 1, the agent can't do anything, give up
-        if (currentFuel <= 0) {
-            while (this != null) {
-                System.out.println("This is crazy, no enough fuel, the agent just gave up!!!!");
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void updateGoal() {
-       if (currentGoal == null) {
-            return;
-        }
-        // deal with current goal
-        if (currentGoal.equals(currentPosition)) {
-            // add to achieved and remove from goals
-            achievedGoals.add(currentGoal);
-            goals.remove(currentGoal);
-            currentGoal = null;
-        }
-        // if the agent pass by a goal position, also achieve it
-        if (goals.contains(currentPosition)) {
-            achievedGoals.add(currentPosition);
-            goals.remove(currentPosition);
-        }
+        // Select the first intention to progress.
+        Tree firstIntention = intentions.get(0);
+        choices = getChoices(0, firstIntention.getCurrentStep());
+	return true;
     }
 
     /**
-     * set the first goal in the list of goals as current goal (FIFO)
+     * For FIFO, just get a single sequence of choices that can be applied given the current
+     * step (and intentionIndex).
      */
-    void setFirstAsCurrentGoal() {
-        // get the first element in the set
-        currentGoal = goals.iterator().next();
-    }
-
-    /**
-     * set the nearest goals in the list of goals as current goal (greedy)
-     */
-    void setNearestAsCurrentGoal() {
-        currentGoal = getNearestGoal();
+    private List<Choice> getChoices(int intentionIndex, TreeNode currentStep) {
+        List<Choice> choices = new ArrayList<>();
+        if (currentStep instanceof ActionNode) {
+            choices.add(new Choice(intentionIndex));
+        } else if (currentStep instanceof GoalNode) {
+            GoalNode goal = (GoalNode) currentStep;
+            int planChoice;
+            for (int i = 0; i < goal.getPlans().size(); i++) {
+                PlanNode plan = goal.getPlans().get(i);
+                List<Literal> context = plan.getPrec();
+				// If we found an applicable plan, choose it.
+                if (bb.eval(context)) {
+                    planChoice = i;
+                    choices.add(new Choice(intentionIndex, planChoice));
+                    currentStep = plan.getBody().get(0);
+                    choices.addAll(getChoices(intentionIndex, currentStep));
+					// @Note: remember to break once we found an applicable plan.
+                    break;
+                }
+            }
+        }
+        return choices;
     }
 }

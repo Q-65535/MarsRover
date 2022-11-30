@@ -1,7 +1,6 @@
 package gpt;
 
 import world.*;
-import agent.*;
 
 public class BatteryEquals implements Formula {
     // @Incomplete: For each term in a formula, we need to provide a function to get its instantiated value.
@@ -17,12 +16,11 @@ public class BatteryEquals implements Formula {
     }
 
     @Override
-    public boolean eval(Environment model) {
+    public boolean eval(MarsRoverModel marsRoverModel) {
 
-        Num num = this.testNum.ins(model);
+        Num num = this.testNum.ins(marsRoverModel);
 
-        AbstractAgent agent = model.getAgent();
-        return agent.getCurrentFuel() == num.getInt();
+        return marsRoverModel.getAgentFuel() == num.getInt();
     }
 
     public Num insTerm1(Environment model) {

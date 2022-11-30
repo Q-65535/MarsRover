@@ -1,7 +1,6 @@
 package gpt;
 
 import world.*;
-import agent.*;
 
 public class At implements Formula {
     private final PositionTerm term;
@@ -14,18 +13,17 @@ public class At implements Formula {
         this.term = p;
     }
 
-    public boolean eval(Environment model) {
-        AbstractAgent agent = model.getAgent();
-        Cell cell = agent.getCurrentPosition();
-        Position agentPosition = new Position(cell.getX(), cell.getY());
-        Position targetPosition = insTerm1(model);
+    @Override
+    public boolean eval(MarsRoverModel marsRoverModel) {
+        Position agentPosition = marsRoverModel.getAgentPosition();
+        Position targetPosition = insTerm1(marsRoverModel);
 
         // @TODO: implement the equals function.
         return targetPosition.equals(agentPosition);
     }
 
-    public Position insTerm1(Environment model) {
-        return term.ins(model);
+    public Position insTerm1(MarsRoverModel marsRoverModel) {
+        return term.ins(marsRoverModel);
     }
 
 }

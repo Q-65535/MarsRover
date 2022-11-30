@@ -4,9 +4,9 @@ import agent.AbstractAgent;
 import agent.NFIFOAgent;
 import agent.NMCTSAgent;
 import agent.VBDIAgent;
+import gpt.Position;
 import graphic.EnvironmentDisplayer;
 import org.junit.jupiter.api.Test;
-import world.Cell;
 import world.Environment;
 import world.Norm;
 
@@ -19,8 +19,8 @@ public class NormTest {
     @Test
     public double normAgentTest() {
 
-        HashMap<Cell, Norm> norms = genNorms(def_map_size, 47, 3, def_initial_Position, rm);
-        List<Cell> goals = Default.genGoals(def_map_size, 8, def_initial_Position, rm);
+        HashMap<Position, Norm> norms = genNorms(def_map_size, 47, 3, def_initial_Position, rm);
+        List<Position> goals = Default.genGoals(def_map_size, 8, def_initial_Position, rm);
         AbstractAgent agent = new NFIFOAgent(goals, norms);
         agent = new VBDIAgent(goals, norms);
         agent = new NMCTSAgent(goals, norms);

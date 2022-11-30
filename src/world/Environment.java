@@ -2,22 +2,27 @@ package world;
 
 import agent.AbstractAgent;
 import agent.MoveAction;
+import gpt.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import static running.Default.*;
+
 public class Environment {
 
-    Cell[][] map;
+    Position[][] map;
     final int mapSize = def_map_size;
-    final Cell rechargePosition = def_recharge_position;
+    final Position rechargePosition = def_recharge_position;
     AbstractAgent agent;
+    MarsRoverModel envMarsRoverModel;
+    List<Norm> norms;
     /**
      * All the goals the agent has to achieve
      */
-    ArrayList<Cell> goals;
+    ArrayList<AGoalNode> goals;
     /**
-     * Record how many times this environment has run
+     * Record how many cycles this environment has run.
      */
     int runningCount;
     int realActFuelConsumption;
@@ -29,20 +34,22 @@ public class Environment {
     public Environment(AbstractAgent agent) {
         init();
         this.agent = agent;
+        // Sync the agent beliefbase.
+        envMarsRoverModel.sync(agent.getBB());
     }
 
-    public Environment(AbstractAgent agent, List<Cell> goals, int postInterval) {
+    public Environment(AbstractAgent agent, List<AGoalNode> goals, int postInterval) {
         this(agent);
         this.goals = new ArrayList<>(goals);
         this.postInterval = postInterval;
     }
 
-    public Environment(AbstractAgent agent, List<Cell> goals) {
+    public Environment(AbstractAgent agent, List<AGoalNode> goals) {
         this(agent);
         this.goals = new ArrayList<>(goals);
     }
 
-    public Environment(List<Cell> goals) {
+    public Environment(List<AGoalNode> goals) {
         init();
         this.goals = new ArrayList<>(goals);
     }
@@ -51,20 +58,21 @@ public class Environment {
      * Initialize the default settings
      */
     private void init() {
-        map = new Cell[mapSize][mapSize];
+        map = new Position[mapSize][mapSize];
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[i].length; j++) {
-                map[i][j] = new Cell(i, j);
+                map[i][j] = new Position(i, j);
             }
         }
+        envMarsRoverModel = new MarsRoverModel();
         this.realActFuelConsumption = def_act_consumption;
     }
 
-    public Cell get(int x, int y) {
+    public Position get(int x, int y) {
         return map[x][y];
     }
 
-    public Cell getRechargePosition() {
+    public Position getRechargePosition() {
         return rechargePosition;
     }
 
@@ -78,7 +86,7 @@ public class Environment {
 
     /**
      * Set the real fuel consumption in this environment
-    */
+     */
     public void setRealFuelConsumption(int consumption) {
         this.realActFuelConsumption = consumption;
     }
@@ -96,20 +104,26 @@ public class Environment {
         }
 
 
-        // Here, we update the goal, considering the case when the poseted goal is just at agent's position!
-        // @Smell: Maybe we can do this in a uniformed way.
-        agent.updateGoal();
         boolean runnable = false;
+        // @Incomplete: the agent senses the environment (and status of itself).
+        agent.sense(this);
         boolean executable = agent.reason();
         // each time after the agent reasons, increment the running count
         runningCount++;
         if (executable) {
+	    System.out.println("running...");
             runnable = true;
-            MoveAction act = agent.execute();
+            ActionNode act = agent.execute();
             if (act == null) {
                 throw new RuntimeException("no action to execute after reasoning");
             }
-            executeAct(act);
+            boolean success = executeAct(act);
+            if (success) {
+                // @Note: Remember implementing postcondition appling in this method.
+                this.agent.exeSuccess();
+            } else {
+                this.agent.exeFail(envMarsRoverModel);
+            }
         } else if (haveGoal()) {
             runnable = true;
         }
@@ -156,23 +170,27 @@ public class Environment {
         }
     }
 
-    void executeAct(MoveAction act) {
-        Cell currentPosition = agent.getCurrentPosition();
-        int curX = currentPosition.getX();
-        int curY = currentPosition.getY();
-        // first update new position
-        switch (act) {
-            case UP -> agent.updatePosition(curX, curY + 1);
-            case DOWN -> agent.updatePosition(curX, curY - 1);
-            case LEFT -> agent.updatePosition(curX - 1, curY);
-            case RIGHT -> agent.updatePosition(curX + 1, curY);
-        }
-        // then, update internal state based on this new position
-        agent.updateGoal();
-        agent.consumeFuel(realActFuelConsumption);
-        agent.updateRecharge();
-        agent.updatePunish();
+    // This function applies the postcondition
+    boolean executeAct(ActionNode act) {
+        if (!envMarsRoverModel.eval(act.getPrec())) return false;
+        envMarsRoverModel.apply(act.getPostc());
+        //@Note: Seperate norm appling and postcondition appling.
+        applyNorm(act);
+        return true;
+
+        // @Incomplete: These should be implemented in success().
+        // agent.updateGoal();
+        // agent.consumeFuel(realActFuelConsumption);
+        // agent.updateRecharge();
+        // agent.updatePunish();
     }
 
-
+    private void applyNorm(ActionNode act) {
+        for (Norm norm : norms) {
+            if (norm.isViolation(act)) {
+                // Environment doesn't tell which norm the agent violates; the agent just receive punishment.
+                agent.receivePunish(norm.getPenalty());
+            }
+        }
+    }
 }

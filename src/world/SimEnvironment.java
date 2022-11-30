@@ -1,8 +1,8 @@
 package world;
 
-import agent.AbstractAgent;
 import agent.MCTSAgent;
 import agent.MoveAction;
+import gpt.Position;
 
 public class SimEnvironment extends Environment implements Cloneable {
 
@@ -19,7 +19,7 @@ public class SimEnvironment extends Environment implements Cloneable {
 
     @Override
     public void executeAct(MoveAction act) {
-        Cell currentPosition = agent.getCurrentPosition();
+        Position currentPosition = agent.getCurrentPosition();
         int curX = currentPosition.getX();
         int curY = currentPosition.getY();
         switch (act) {
@@ -38,8 +38,8 @@ public class SimEnvironment extends Environment implements Cloneable {
     /**
      * allow the agent to jump between loactions during the simulation for saving exection time.
      */
-    public void executeJump(Cell goal) {
-        Cell currentPosition = agent.getCurrentPosition();
+    public void executeJump(Position goal) {
+        Position currentPosition = agent.getCurrentPosition();
         int distance = Calculator.calculateDistance(currentPosition, goal);
 
         agent.updatePosition(goal);

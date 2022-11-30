@@ -1,7 +1,6 @@
 package gpt;
 
 import world.*;
-import agent.*;
 
 public class BatteryAbove implements Formula {
     // @Robutness: implement this as a term, so it can be instantiated according to a given model.
@@ -11,9 +10,8 @@ public class BatteryAbove implements Formula {
         this.testNum = testNum;
     }
 
-    public boolean eval(Environment model) {
-        AbstractAgent agent = model.getAgent();
-        int currentBattery = agent.getCurrentFuel();
+    public boolean eval(MarsRoverModel marsRoverModel) {
+        int currentBattery = marsRoverModel.getAgentFuel();
         return currentBattery > testNum;
     }
 }

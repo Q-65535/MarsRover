@@ -10,9 +10,9 @@ public class IsRight extends DirectionCompare {
     }
 
     @Override
-    public boolean eval(Environment model) {
-        Position p1 = insTerm1(model);
-        Position p2 = insTerm2(model);
+    public boolean eval(MarsRoverModel marsRoverModel) {
+        Position p1 = insTerm1(marsRoverModel);
+        Position p2 = insTerm2(marsRoverModel);
 
         return p1.getX() > p2.getX();
     }

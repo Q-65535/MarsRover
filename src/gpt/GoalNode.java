@@ -1,5 +1,7 @@
 package gpt;
 
+import world.MarsRoverModel;
+
 import java.util.*;
 
 public class GoalNode extends TreeNode {
@@ -39,6 +41,21 @@ public class GoalNode extends TreeNode {
                 return null;
             }
         }
+    }
+
+    /**
+     * Estimate whether a given goal has applicable plans in the given
+     * model.
+     */
+    public boolean hasApplicablePlan(MarsRoverModel model) {
+        for (PlanNode p : getPlans()) {
+            // Found one applicable plan.
+            if (model.eval(p.getPrec())) {
+                return true;
+            }
+        }
+        // No applicable plans.
+        return false;
     }
 
     public List<PlanNode> getPlans() {

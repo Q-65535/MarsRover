@@ -11,7 +11,7 @@ public class Num implements NumTerm {
 
     @Override
     // @Smell: the input argument model is not used.
-    public Num ins(Environment model) {
+    public Num ins(MarsRoverModel marsRoverModel) {
         return this;
     }
 

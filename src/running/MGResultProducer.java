@@ -1,8 +1,8 @@
 package running;
 
 import agent.*;
+import gpt.Position;
 import graphic.EnvironmentDisplayer;
-import world.Cell;
 import world.Environment;
 
 import java.io.BufferedWriter;
@@ -58,7 +58,7 @@ public class MGResultProducer {
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_recharge_position, random);
+                    List<Position> goals = Default.genGoals(def_map_size, goalNum, def_recharge_position, random);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     Environment environment = new Environment(agent, goals, defPostGoalTimeGap);
                     // Record time
@@ -101,7 +101,7 @@ public class MGResultProducer {
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = Default.genGoals(def_map_size, def_goal_count, def_recharge_position, random);
+                    List<Position> goals = Default.genGoals(def_map_size, def_goal_count, def_recharge_position, random);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     Environment environment = new Environment(agent, goals, timeGap);
 
@@ -136,7 +136,7 @@ public class MGResultProducer {
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = Default.genGoals(def_map_size, def_goal_count, def_recharge_position, random, degree);
+                    List<Position> goals = Default.genGoals(def_map_size, def_goal_count, def_recharge_position, random, degree);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     Environment environment = new Environment(agent, goals);
 

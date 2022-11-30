@@ -1,13 +1,11 @@
 package gpt;
 
 import world.*;
-import agent.*;
 
 public class GetBattery extends NumFunc {
     @Override
-    public Num ins(Environment model) {
-        AbstractAgent agent = model.getAgent();
-        int battery = agent.getCurrentFuel();
+    public Num ins(MarsRoverModel marsRoverModel) {
+        int battery = marsRoverModel.getAgentFuel();
         return new Num(battery);
     }
 }

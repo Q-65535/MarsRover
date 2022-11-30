@@ -15,13 +15,13 @@ public abstract class DirectionCompare implements Formula {
     }
 
     // The instantiation doesn't affect this object because the terms are final.
-    public Position insTerm1(Environment model) {
-        return term1.ins(model);
+    public Position insTerm1(MarsRoverModel marsRoverModel) {
+        return term1.ins(marsRoverModel);
     }
 
-    public Position insTerm2(Environment model) {
-        return term2.ins(model);
+    public Position insTerm2(MarsRoverModel marsRoverModel) {
+        return term2.ins(marsRoverModel);
     }
 
-    public abstract boolean eval(Environment model);
+    public abstract boolean eval(MarsRoverModel marsRoverModel);
 }

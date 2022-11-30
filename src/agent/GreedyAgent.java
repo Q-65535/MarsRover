@@ -1,14 +1,13 @@
 package agent;
 
-import world.Cell;
+import gpt.Position;
 
 import java.util.List;
-import java.util.Set;
 
 // Currently, greedy agent is not used.
 public class GreedyAgent extends ProactiveFIFOAgent {
 
-    public GreedyAgent(List<Cell> goals, int maxCapacity) {
+    public GreedyAgent(List<Position> goals, int maxCapacity) {
         super(goals, maxCapacity);
     }
 

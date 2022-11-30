@@ -1,7 +1,6 @@
 package gpt;
 
 import world.*;
-import agent.*;
 
 public class GetDiffPosition extends PositionFunction {
     PositionTerm basePosition;
@@ -15,9 +14,8 @@ public class GetDiffPosition extends PositionFunction {
     }
 
     @Override
-    public Position ins(Environment model) {
-        AbstractAgent agent = model.getAgent();
-        Cell c = agent.getCurrentPosition();
+    public Position ins(MarsRoverModel marsRoverModel) {
+        Position c = marsRoverModel.getAgentPosition();
         int baseX = c.getX();
         int baseY = c.getY();
 

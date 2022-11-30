@@ -1,21 +1,19 @@
 package agent;
 
-import running.Default;
-import world.Cell;
+import gpt.Position;
 import world.Norm;
 
 import java.util.HashMap;
 import java.util.List;
-import static running.Default.*;
 
 public class NFIFOAgent extends FIFOAgent {
 
-    public NFIFOAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
+    public NFIFOAgent(List<Position> goals, HashMap<Position, Norm> norms) {
         super(goals, infinite_capacity);
         this.norms = norms;
     }
 
-    public NFIFOAgent(HashMap<Cell, Norm> norms) {
+    public NFIFOAgent(HashMap<Position, Norm> norms) {
         super(infinite_capacity);
         this.norms = norms;
     }

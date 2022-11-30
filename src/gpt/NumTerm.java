@@ -3,5 +3,5 @@ package gpt;
 import world.*;
 
 public interface NumTerm {
-    public abstract Num ins(Environment model);
+    public abstract Num ins(MarsRoverModel marsRoverModel);
 }

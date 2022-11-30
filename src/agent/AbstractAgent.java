@@ -1,10 +1,11 @@
 package agent;
 
-import running.Default;
-import world.Calculator;
-import world.Cell;
-import world.Norm;
+import running.*;
+import world.*;
+
 import static running.Default.*;
+
+import gpt.*;
 
 import java.util.*;
 
@@ -12,27 +13,33 @@ public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
     public static final double delta = 1e-6;
     Random rm = new Random(Default.SEED);
-
-    // @Incomplete: Haven't fully implemented yet.
-    List<Tree> activeIntentions;
-    List<Tree> monitoringMGTemplates;
+    // The map size from agent perspective.
+    final int mapSize = def_map_size;
+    // The agent's belief base.
+    MarsRoverModel bb;
+//    List<Automaton> automata;
+    // The goals represented by automata.
+    // @Idea: Maybe we can add norms into this? We can call them temporal objects.
+    // @Incomplete: Currently, we don't use this field, since we consider automata.
+    List<GoalNode> temporalGoals;
+    List<MGoalNode> maitGoals;
+    List<Tree> intentions;
+    // choices in current cycle.
+    List<Choice> choices;
+    List<AGoalNode> achievedGoals;
 
     /**
      * The total penalty received
      */
-
+    // @Idea: Maybe we need implement an overall value that is the sum of penalty and reward.
     double penalty;
-    HashMap<Cell, Norm> norms;
-    Cell currentPosition;
-    MoveAction currentAct;
-    List<Cell> goals;
-    Cell currentGoal;
-    Cell prePosition;
-    List<Cell> achievedGoals;
-    Cell rechargePosition;
-    final int mapSize = def_map_size;
+    HashMap<Position, Norm> norms;
+    Position currentPosition;
+    // @Refactor: This should be implemented by choices.
+    ActionNode currentAct;
+    Position prePosition;
+    Position rechargePosition;
     int maxCapacity;
-    int currentFuel;
     int totalFuelConsumption;
     int rechargeFuelConsumption;
     /**
@@ -47,68 +54,87 @@ public abstract class AbstractAgent implements Cloneable {
      * Whether a goal is achieved. If a goal is achieved, the value is true.
      * The value is turned to false when the agent recharge (This prevents the agent from recharging again
      * and again without achieving any goals.
+     *
      * @Smell: init the value in the constructor!!!!!!!
      */
     public boolean isAchieved = false;
 
-    public AbstractAgent(List<Tree> tlgs, List<Tree> mgs, int maxCapacity) {
+    public AbstractAgent(List<GoalNode> goals, int maxCapacity) {
         init();
-        this.activeIntentions = tlgs;
-        this.monitoringMGTemplates = mgs;
-        this.currentFuel = maxCapacity;
-    }
-
-    public AbstractAgent(List<Cell> goals, int maxCapacity) {
-        init();
-        this.goals = new ArrayList<>(goals);
         this.maxCapacity = maxCapacity;
-        this.currentFuel = maxCapacity;
+        this.bb.setAgentFuel(maxCapacity);
+        adoptGoals(goals);
     }
 
     public AbstractAgent(int maxCapacity) {
         init();
         this.maxCapacity = maxCapacity;
-        this.currentFuel = maxCapacity;
+        this.bb.setAgentFuel(maxCapacity);
     }
 
     private void init() {
-        this.currentPosition = def_initial_Position;
+        // init belief base.
+        this.bb = new MarsRoverModel();
+        bb.setAgentPosition(def_initial_Position);
         this.prePosition = currentPosition;
         this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
-        goals = new ArrayList<>();
+
+        intentions = new ArrayList<>();
+        maitGoals = new ArrayList<>();
+        choices = new ArrayList<>();
         achievedGoals = new ArrayList<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
         penalty = 0;
     }
 
-    public void adoptGoal(GoalNode tlg) {
-	activeIntentions.add(new Tree(tlg);
+    public MarsRoverModel getBB() {
+        return this.bb;
     }
 
-    public void adoptGoal(Cell goal) {
-        goals.add(goal);
+    // @Incomplete: implement sense method.
+    public void sense(Environment env) {
+        return;
     }
 
-    public Cell getCurrentGoal() {
-        return currentGoal;
+    public void adoptGoals(List<GoalNode> goals) {
+        for (GoalNode goal : goals) {
+            adoptGoal(goal);
+        }
+    }
+
+    // Adopt a new achievement goal.
+    public void adoptGoal(GoalNode goal) {
+        // Achievement goals are immediately transformed to intentions.
+        if (goal instanceof AGoalNode) {
+	    System.out.println("this is an achievement goal");
+            AGoalNode ag = (AGoalNode) goal;
+            intentions.add(new Tree(ag));
+	    System.out.println("intention size: " + intentions.size());
+        } else if (goal instanceof MGoalNode) {
+	    System.out.println("this is a maintenance goal");
+            MGoalNode mg = (MGoalNode) goal;
+            maitGoals.add(mg);
+        } else {
+	    System.out.println("this goal is not recognized!");
+	}
     }
 
     public int getCurrentFuel() {
-        return currentFuel;
+        return bb.getAgentFuel();
     }
 
-    public List<Cell> getGoals() {
-        return goals;
+    public List<Tree> getIntentions() {
+        return this.intentions;
     }
 
-    public List<Tree> getCurrentIntentions() {
-        return this.activeIntentions;
+    public List<GoalNode> getTemporalGoals() {
+        return this.temporalGoals;
     }
 
-    public Cell getCurrentPosition() {
-        return currentPosition;
+    public Position getCurrentPosition() {
+        return bb.getAgentPosition();
     }
 
     public int getAchievedGoalCount() {
@@ -119,6 +145,7 @@ public abstract class AbstractAgent implements Cloneable {
         return totalFuelConsumption;
     }
 
+    // @? how to implement aggregate value function?
     public double getAggregateVal() {
         return 100 * (achievedGoals.size() / (totalFuelConsumption + delta) - getTotalPenalty());
     }
@@ -127,127 +154,166 @@ public abstract class AbstractAgent implements Cloneable {
         return rechargeFuelConsumption;
     }
 
+
+    /**
+     * Based on current belief base, we check whether current intentions is achieved or
+     * failed. If achieved, we just drop it; if failied (i.e., current goal has no plan choices or
+     * current action can't be executed), fail propogates to higher levels.
+     */
+    public void intentionUpdate() {
+        successIntentionUpdate();
+        failIntentionUpdate();
+    }
+
+    private void successIntentionUpdate() {
+        Iterator<Tree> it = intentions.iterator();
+        while (it.hasNext()) {
+            Tree gpt = it.next();
+            GoalNode tlg = gpt.getTlg();
+            // If the tlg of current intention is already achieved, drop the intention.
+            if (bb.eval(tlg.getGoalConds())) {
+                // We only add achievement goals.
+                // @? Maybe maintenance goal should be considered?
+                if (tlg instanceof AGoalNode) {
+                    AGoalNode ag = (AGoalNode) tlg;
+                    achievedGoals.add(ag);
+                }
+                // drop the intention.
+                it.remove();
+            }
+        }
+    }
+
+    private void failIntentionUpdate() {
+        Iterator<Tree> iterator = intentions.iterator();
+        while (iterator.hasNext()) {
+            Tree curIntention = iterator.next();
+            if (curIntention.getCurrentStep() instanceof ActionNode) {
+                ActionNode act = (ActionNode) curIntention.getCurrentStep();
+                if (!bb.eval(act.getPrec())) {
+                    curIntention.fail(bb);
+                }
+            }
+            if (curIntention.getCurrentStep() instanceof GoalNode) {
+                GoalNode goal = (GoalNode) curIntention.getCurrentStep();
+                if (!goal.hasApplicablePlan(bb)) {
+                    curIntention.fail(bb);
+                }
+            }
+            if (curIntention.isProgressible(bb)) {
+                break;
+                // If this intention is not progressible after preprocessing, remove it.
+            } else {
+                iterator.remove();
+            }
+        }
+    }
+
     // Agent reasons about what to do. It returns true if it know what to do
     // after reasoning. False if it has no idea about what to do next. This method
     // also alter the agent's internal state (what to do next).
     public abstract boolean reason();
 
-    public MoveAction execute() {
-        return currentAct;
-    }
 
     /**
-     * Generate an action based on the goal position and agent current position
+     * Progress intention and finally return the action ready to be executed.
      */
-    public MoveAction getActMoveTo(Cell goal) {
-        ArrayList<MoveAction> acts = getAllActMoveTo(goal);
-        // randomly pick a possible action
-        return acts.get(rm.nextInt(acts.size()));
-    }
-
-    public ArrayList<MoveAction> getAllActMoveTo(Cell goal) {
-
-        ArrayList<MoveAction> acts = new ArrayList<>();
-        int tx = goal.getX();
-        int ty = goal.getY();
-
-        if (tx > currentPosition.getX()) {
-            acts.add(MoveAction.RIGHT);
+    public ActionNode execute() {
+        // check if there is a decision has been made already. If there is, then execute it
+        while (this.choices.size() > 0) {
+            // get the immediate choice
+            Choice choice = this.choices.get(0);
+            // if it is a plan choice
+            if (choice.isPlanSelection()) {
+                choices.remove(0);
+                Tree gpt = this.intentions.get(choice.intentionChoice);
+                gpt.progress(choice.planChoice);
+            }
+            // if the choice is to execute an action
+            else if (choice.isActionExecution()) {
+                Tree gpt = this.intentions.get(choice.intentionChoice);
+                ActionNode act = gpt.progress();
+                return act;
+            }
         }
-        if (tx < currentPosition.getX()) {
-            acts.add(MoveAction.LEFT);
-        }
-        if (ty > currentPosition.getY()) {
-            acts.add(MoveAction.UP);
-        }
-        if (ty < currentPosition.getY()) {
-            acts.add(MoveAction.DOWN);
-        }
-        if (acts.size() == 0) {
-            throw  new RuntimeException("There is no action for going to " + goal + ". My current position is " + currentPosition);
-        }
-        return acts;
-
-    }
-
-    /**
-     * Get the next position if the given action is executed
-     */
-    public Cell getNextPosition(MoveAction act) {
-        Cell currentPosition = this.getCurrentPosition();
-        int curX = currentPosition.getX();
-        int curY = currentPosition.getY();
-
-        switch (act) {
-            case UP -> {return new Cell(curX, curY + 1);}
-            case DOWN -> {return new Cell(curX, curY - 1);}
-            case LEFT -> {return new Cell(curX - 1, curY);}
-            case RIGHT -> {return new Cell(curX + 1, curY);}
-        }
-        // error case
+        // If no action is returned, null is returned.
         return null;
     }
 
-    public Cell getNearestGoal() {
-        Cell nearestGoal = null;
-        int minConsumption = Integer.MAX_VALUE;
-        for (Cell goal : goals) {
-            int consumption = this.estimateFuelConsumption(goal);
-            if (consumption < minConsumption) {
-                nearestGoal = goal;
-                minConsumption = consumption;
+    /**
+     * NOT progress intention, just return the action ready to be executed.
+     */
+    public ActionNode virtualExecute() {
+        // Prepare to virtual progress
+        List<Choice> choicesCopy = new ArrayList<>(choices);
+        for (Tree intention : intentions) {
+            intention.resetVirtualCurrentStep();
+        }
+        while (choicesCopy.size() > 0) {
+            // get the immediate choice
+            Choice choice = choicesCopy.get(0);
+            // if it is a plan choice
+            if (choice.isPlanSelection()) {
+                choicesCopy.remove(0);
+                Tree gpt = this.intentions.get(choice.intentionChoice);
+                gpt.virtualProgress(choice.planChoice);
+            }
+            // if the choice is to execute an action
+            else if (choice.isActionExecution()) {
+                Tree gpt = this.intentions.get(choice.intentionChoice);
+                ActionNode act = gpt.virtualProgress();
+                return act;
             }
         }
-        return nearestGoal;
+        return null;
     }
+
+    // @Note: the last action choice is removed in success method.
+    public void exeSuccess() {
+        int previousFuel = bb.getAgentFuel();
+        if (choices.size() > 1) {
+            throw new RuntimeException("success error: current choice is not the last choice!");
+        }
+        Choice choice = choices.remove(0);
+        Tree gpt = intentions.get(choice.intentionChoice);
+        ActionNode act = (ActionNode) gpt.getCurrentStep();
+        bb.apply(act.getPostc());
+        gpt.success();
+
+        // After bb is update, when then record the total fuel consumption and recharge info.
+        int currentFuel = bb.getAgentFuel();
+        updateFuelRecord(previousFuel, currentFuel);
+        // @Note this must after updateFuelRecord(), consumption record first!!!
+        updateRecharge();
+    }
+
+    public void exeFail(MarsRoverModel model) {
+        int previousFuel = bb.getAgentFuel();
+        if (choices.size() > 1) {
+            throw new RuntimeException("fail error: current choice is not the last choice!");
+        }
+        Choice choice = choices.remove(0);
+        Tree gpt = intentions.get(choice.intentionChoice);
+        gpt.fail(model);
+        // If this intention is not progressible based on current belief base, drop it.
+        if (gpt.isProgressible(bb)) {
+            intentions.remove(choice.intentionChoice);
+        }
+    }
+
 
     /**
-     * Calculate the distance between current position and goal position
-     *
-     * @param goal the goal position
+     * Update the totoal fuel consumption according to the fuel level before and
+     * after an action execution.
      */
-    int calculateDistance(Cell goal) {
-        return Calculator.calculateDistance(currentPosition, goal);
+    public void updateFuelRecord(int before, int after) {
+        totalFuelConsumption += (before - after);
     }
 
-    /**
-     * Estimate how much fuel will be consumed if travel to goal position
-     */
-    public int estimateFuelConsumption(Cell goal) {
-        int distance = calculateDistance(goal);
-        return distance * actFuelConsumption;
-    }
 
-    public int estimateFuelConsumption(Cell from, Cell to) {
+    public int estimateFuelConsumption(Position from, Position to) {
         int distance = Calculator.calculateDistance(from, to);
         return distance * actFuelConsumption;
-    }
-
-    public void updatePosition(Cell newPosition) {
-        this.currentPosition = newPosition;
-    }
-
-    public void updatePosition(int x, int y) {
-        this.prePosition = this.currentPosition;
-        this.currentPosition = new Cell(x, y);
-    }
-
-    /**
-     * different types of agent have different update strategies
-     */
-    public abstract void updateGoal();
-
-    public void consumeFuel(int amount) {
-        if (amount > this.currentFuel) {
-            throw new RuntimeException("current fuel is not enough");
-        }
-        this.currentFuel -= amount;
-
-        // update the total fuel records
-        totalFuelConsumption += amount;
-        if (isGoToRecharge) {
-            rechargeFuelConsumption += amount;
-        }
     }
 
     /**
@@ -255,45 +321,28 @@ public abstract class AbstractAgent implements Cloneable {
      */
     public void updateRecharge() {
         if (currentPosition.equals(rechargePosition)) {
-            currentFuel = maxCapacity;
+            bb.setAgentFuel(maxCapacity);
             // isAchieved turned to false when the agent recharge
             isAchieved = false;
         }
     }
 
     /**
-     * Estimate whether the agent needs to do recharge operation
-     */
-    public boolean needRecharge() {
-        return currentFuel <= estimateFuelConsumption(rechargePosition);
-//        return currentFuel <= 20;
-    }
-
-    /**
      * update total penalty value according to current position and norms
      */
-    public void updatePunish() {
-        // if no norm, nothing happens
-        if (norms == null) {
-            return;
-        }
-
-        // If current position is norm and previous position is not norm, punish is invoked.
-        if (norms.containsKey(currentPosition) && !norms.containsKey(prePosition)) {
-            Norm relatedNorm = norms.get(currentPosition);
-            this.penalty += relatedNorm.getPenalty();
-        }
+    public void receivePunish(double penaltyValue) {
+        this.penalty += penaltyValue;
+        // @Incomplete: We need a learning mechanism in the future?
     }
 
     public double getTotalPenalty() {
         return penalty;
     }
 
-    public Set<Cell> getNormPositions() {
+    public Set<Position> getNormPositions() {
         if (norms == null) {
             return new HashSet<>();
         }
         return norms.keySet();
     }
 }
-

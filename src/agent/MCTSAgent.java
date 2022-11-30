@@ -2,11 +2,11 @@ package agent;
 
 import MCTSstate.AbstractState;
 import MCTSstate.MarsRoverState;
+import gpt.Position;
 import mcts.AbstractMCTSNode;
 import mcts.MCTSWorkSpace;
 import mcts.NaiveNode;
 import running.Default;
-import world.Cell;
 import world.SimEnvironment;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class MCTSAgent extends AbstractAgent {
     public boolean isProactive;
     MCTSWorkSpace ws = new MCTSWorkSpace();
 
-    public MCTSAgent(List<Cell> goals, int maxCapacity, boolean isProactive) {
+    public MCTSAgent(List<Position> goals, int maxCapacity, boolean isProactive) {
         super(goals, maxCapacity);
         this.isProactive = isProactive;
     }
@@ -84,8 +84,8 @@ public class MCTSAgent extends AbstractAgent {
     @Override
     public MCTSAgent clone() {
         // clone new goal set and achieved list
-        List<Cell> cloneGoals = Default.cloneCells(goals);
-        List<Cell> cloneAchieved = Default.cloneCells(achievedGoals);
+        List<Position> cloneGoals = Default.cloneCells(goals);
+        List<Position> cloneAchieved = Default.cloneCells(achievedGoals);
 
         MCTSAgent cloneAgent = new MCTSAgent(cloneGoals, maxCapacity, isProactive);
 

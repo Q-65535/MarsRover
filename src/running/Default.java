@@ -1,6 +1,6 @@
 package running;
 
-import world.Cell;
+import gpt.Position;
 import world.Norm;
 import static world.Calculator.*;
 
@@ -14,28 +14,28 @@ public class Default {
     public static final int def_num_goals = 10;
     public static final int def_max_capacity = def_map_size * 2;
     public static final int def_act_consumption = 1;
-    public static final Cell middle_Position = new Cell(def_map_size / 2, def_map_size / 2);
-    public static final Cell def_initial_Position = middle_Position;
-    public static final Cell def_recharge_position = middle_Position;
+    public static final Position middle_Position = new Position(def_map_size / 2, def_map_size / 2);
+    public static final Position def_initial_Position = middle_Position;
+    public static final Position def_recharge_position = middle_Position;
 
-    public static List<Cell> def_goals;
+    public static List<Position> def_goals;
 
 
     /**
      * given the map size and number of goals to generate, randomly generate a specific number of goal cells
      */
-    public static List<Cell> genGoals(int mapSize, int numOfGoals, Cell except) {
-        List<Cell> res = new ArrayList<>();
+    public static List<Position> genGoals(int mapSize, int numOfGoals, Position except) {
+        List<Position> res = new ArrayList<>();
         while (res.size() < numOfGoals) {
             int x = goalGenerateRM.nextInt(mapSize);
             int y = goalGenerateRM.nextInt(mapSize);
-            Cell cell = new Cell(x, y);
+            Position position = new Position(x, y);
 
             // if the newly generated goal is at the forbidden position or already added to the list, continue
-            if (except.equals(cell) || res.contains(cell)) {
+            if (except.equals(position) || res.contains(position)) {
                 continue;
             }
-            res.add(cell);
+            res.add(position);
         }
         return res;
     }
@@ -43,17 +43,17 @@ public class Default {
     /**
      * Randomly generate a set of goal positions with an except location
      */
-    public static List<Cell> genGoals(int mapSize, int numOfGoals, Cell except, Random rm) {
-        List<Cell> res = new ArrayList<>();
+    public static List<Position> genGoals(int mapSize, int numOfGoals, Position except, Random rm) {
+        List<Position> res = new ArrayList<>();
         while (res.size() < numOfGoals) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
-            Cell cell = new Cell(x, y);
+            Position position = new Position(x, y);
 
-            if (cell.equals(except) || res.contains(cell)) {
+            if (position.equals(except) || res.contains(position)) {
                 continue;
             }
-            res.add(cell);
+            res.add(position);
         }
         return res;
     }
@@ -61,12 +61,12 @@ public class Default {
     /**
      * Generate a list of goals. The distance between any two goals must be equal or greater than the minimum distance
     */
-    public static List<Cell> genGoals(int mapSize, int goalCount, Cell except, Random rm, int minDistance) {
-        List<Cell> goals = new ArrayList<>();
+    public static List<Position> genGoals(int mapSize, int goalCount, Position except, Random rm, int minDistance) {
+        List<Position> goals = new ArrayList<>();
         while (goals.size() < goalCount) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
-            Cell newGoal = new Cell(x, y);
+            Position newGoal = new Position(x, y);
 
             // make sure no duplicate locations
             if (newGoal.equals(except) || goals.contains(newGoal)) {
@@ -81,8 +81,8 @@ public class Default {
         return goals;
     }
 
-    private static boolean exceedMinDistance(Cell newGoal, List<Cell> goals, int minDistance) {
-        for (Cell goal : goals) {
+    private static boolean exceedMinDistance(Position newGoal, List<Position> goals, int minDistance) {
+        for (Position goal : goals) {
             int curDistance = calculateDistance(newGoal, goal);
             if (curDistance < minDistance) {
                 return true;
@@ -91,17 +91,17 @@ public class Default {
         return false;
     }
 
-    public static HashMap<Cell, Norm> genNorms(int mapSize, int numOfNorms, double avgPenalty, Cell except, Random rm) {
-        HashMap<Cell, Norm> norms = new HashMap<>();
+    public static HashMap<Position, Norm> genNorms(int mapSize, int numOfNorms, double avgPenalty, Position except, Random rm) {
+        HashMap<Position, Norm> norms = new HashMap<>();
         while (norms.size() < numOfNorms) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
-            Cell cell = new Cell(x, y);
-            if (cell.equals(except)) {
+            Position position = new Position(x, y);
+            if (position.equals(except)) {
                 continue;
             }
             double penaltyValue = gaussian(avgPenalty, 0.01, 0.01, rm);
-            norms.put(cell, new Norm(cell, penaltyValue));
+            norms.put(position, new Norm(position, penaltyValue));
         }
         return norms;
     }
@@ -119,10 +119,10 @@ public class Default {
         return value;
     }
 
-    public static List<Cell> cloneCells(List<Cell> cells) {
-        List<Cell> cloneSet = new ArrayList<>();
-        for (Cell cell : cells) {
-            cloneSet.add(cell);
+    public static List<Position> cloneCells(List<Position> positions) {
+        List<Position> cloneSet = new ArrayList<>();
+        for (Position position : positions) {
+            cloneSet.add(position);
         }
         return cloneSet;
     }

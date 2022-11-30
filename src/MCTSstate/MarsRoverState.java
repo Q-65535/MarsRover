@@ -2,7 +2,7 @@ package MCTSstate;
 
 import agent.MCTSAgent;
 import agent.MoveAction;
-import world.Cell;
+import gpt.Position;
 import world.SimEnvironment;
 
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import java.util.Set;
 public class MarsRoverState extends AbstractState {
     SimEnvironment simEnv;
     MCTSAgent simAgent;
-    Cell rechargePosition;
+    Position rechargePosition;
 
     public MarsRoverState(SimEnvironment simEnv) {
         this.simEnv = simEnv.clone();
@@ -48,15 +48,15 @@ public class MarsRoverState extends AbstractState {
     public AbstractState randomSim(List<MoveAction> actContainer) {
         MarsRoverState cloneState = this.clone();
         MCTSAgent cloneAgent = cloneState.simAgent;
-        List<Cell> goals = cloneAgent.getGoals();
+        List<Position> goals = cloneAgent.getGoals();
         while (!goals.isEmpty()) {
             // get the nearest goal
-            Cell nearestGoal = cloneAgent.getNearestGoal();
+            Position nearestGoal = cloneAgent.getNearestGoal();
             // get a random goal
-            Cell randomGoal = goals.get(rm.nextInt(goals.size()));
+            Position randomGoal = goals.get(rm.nextInt(goals.size()));
 
             // stochastically choose a goal to jump
-            Cell selectedGoal = rm.nextDouble() < 0 ? nearestGoal : randomGoal;
+            Position selectedGoal = rm.nextDouble() < 0 ? nearestGoal : randomGoal;
 
             /**
              * reactive simulation
@@ -140,7 +140,7 @@ public class MarsRoverState extends AbstractState {
 
         Set<MoveAction> moveActions = new HashSet<>();
         // add all possible choices
-        for (Cell goal : simAgent.getGoals()) {
+        for (Position goal : simAgent.getGoals()) {
             moveActions.addAll(simAgent.getAllActMoveTo(goal));
             // if all 4 directions are included, immediately return
             if (moveActions.size() == 4) {

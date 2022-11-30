@@ -1,17 +1,17 @@
 package agent;
 
-import world.Cell;
+import gpt.Position;
 import world.Norm;
 
 import java.util.*;
 
 public class VBDIAgent extends NFIFOAgent {
 
-    public VBDIAgent(List<Cell> goals, HashMap<Cell, Norm> norms) {
+    public VBDIAgent(List<Position> goals, HashMap<Position, Norm> norms) {
         super(goals, norms);
     }
 
-    public VBDIAgent(HashMap<Cell, Norm> norms) {
+    public VBDIAgent(HashMap<Position, Norm> norms) {
         super(norms);
     }
 
@@ -19,7 +19,7 @@ public class VBDIAgent extends NFIFOAgent {
      * get the movement action result in minimum norm penalty
      */
     @Override
-    public MoveAction getActMoveTo(Cell goal) {
+    public MoveAction getActMoveTo(Position goal) {
         HashMap<MoveAction, Double> actsPenalty = new HashMap<>();
         ArrayList<MoveAction> allActs = getAllActMoveTo(goal);
         // record all norm information to actions
@@ -42,7 +42,7 @@ public class VBDIAgent extends NFIFOAgent {
     }
 
     private double normPenalty(MoveAction act) {
-        Cell nextPosition = getNextPosition(act);
+        Position nextPosition = getNextPosition(act);
         // If the agent is in norm position, and next position is also a norm position,
         // no penalty imposed (We simulate the slope scenario).
         if (norms.containsKey(currentPosition) && norms.containsKey(nextPosition)) {
@@ -51,7 +51,7 @@ public class VBDIAgent extends NFIFOAgent {
         return normPenalty(nextPosition);
     }
 
-    private double normPenalty(Cell position) {
+    private double normPenalty(Position position) {
         if (!norms.containsKey(position)) {
             return 0;
         }

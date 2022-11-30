@@ -1,14 +1,13 @@
 package agent;
 
-import world.Cell;
+import gpt.Position;
 
 import java.util.List;
-import java.util.Set;
 
 public class ProactiveFIFOAgent extends FIFOAgent {
 
 
-    public ProactiveFIFOAgent(List<Cell> goals, int maxCapacity) {
+    public ProactiveFIFOAgent(List<Position> goals, int maxCapacity) {
         super(goals, maxCapacity);
     }
 

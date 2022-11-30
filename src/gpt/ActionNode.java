@@ -24,4 +24,12 @@ public class ActionNode extends TreeNode {
         this.prec = prec;
         this.postc = postc;
     }
+
+    public List<Literal> getPrec() {
+	return prec;
+    }
+
+    public List<Literal> getPostc() {
+	return postc;
+    }
 }

@@ -1,16 +1,23 @@
 package world;
 
+import gpt.*;
+
 public class Norm {
-    private final Cell cell;
+    private final Position position;
     private final double penalty;
 
-    public Norm(Cell cell, double penalty) {
-        this.cell = cell;
+    public Norm(Position position, double penalty) {
+        this.position = position;
         this.penalty = penalty;
     }
 
-    public Cell getGoalCell() {
-        return cell;
+    // @Incomplete: waiting to be implemented.
+    public boolean isViolation(ActionNode act) {
+        return false;
+    }
+
+    public Position getGoalCell() {
+        return position;
     }
 
     public double getPenalty() {
