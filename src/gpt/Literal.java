@@ -1,5 +1,7 @@
 package gpt;
 
+import world.MarsRoverModel;
+
 public class Literal {
     private Formula formula;
     private boolean state;

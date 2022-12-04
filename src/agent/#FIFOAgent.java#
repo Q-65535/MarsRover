@@ -12,8 +12,7 @@ public class FIFOAgent extends AbstractAgent {
         super(goals, maxCapacity);
     }
 
-    public FIFOAgent(int maxCapacity) {
-        super(maxCapacity);
+    public FIFOAgent(int maxCapacity) {super(maxCapacity);
     }
 
     @Override

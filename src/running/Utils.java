@@ -18,7 +18,7 @@ import java.util.List;
  *
  *  @author P. N. Hilfinger
  */
-class Utils {
+public class Utils {
 
     /** The length of a complete SHA-1 UID as a hexadecimal numeral. */
     static final int UID_LENGTH = 40;
@@ -181,14 +181,14 @@ class Utils {
     /** Return the concatentation of FIRST and OTHERS into a File designator,
      *  analogous to the {java.nio.file.Paths.#get(String, String[])}
      *  method. */
-    static File join(String first, String... others) {
+    public static File join(String first, String... others) {
         return Paths.get(first, others).toFile();
     }
 
     /** Return the concatentation of FIRST and OTHERS into a File designator,
      *  analogous to the {java.nio.file.Paths.#get(String, String[])}
      *  method. */
-    static File join(File first, String... others) {
+    public static File join(File first, String... others) {
         return Paths.get(first.getPath(), others).toFile();
     }
 

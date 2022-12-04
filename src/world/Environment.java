@@ -80,6 +80,10 @@ public class Environment {
         return agent;
     }
 
+    public MarsRoverModel getModel() {
+        return envMarsRoverModel;
+    }
+
     public void setAgent(AbstractAgent agent) {
         this.agent = agent;
     }
@@ -105,8 +109,6 @@ public class Environment {
 
 
         boolean runnable = false;
-        // @Incomplete: the agent senses the environment (and status of itself).
-        agent.sense(this);
         boolean executable = agent.reason();
         // each time after the agent reasons, increment the running count
         runningCount++;
@@ -125,6 +127,8 @@ public class Environment {
         } else if (haveGoal()) {
             runnable = true;
         }
+	// The agent senses the environment before next reasoning.
+        agent.sense(this);
         return runnable;
     }
 
@@ -171,16 +175,16 @@ public class Environment {
     // This function applies the postcondition
     boolean executeAct(ActionNode act) {
         if (!envMarsRoverModel.eval(act.getPrec())) return false;
+        // 1. update position and fuel level.
         envMarsRoverModel.apply(act.getPostc());
+        // Then, lets check whether it is in recharge position.
+        if (envMarsRoverModel.getAgentPosition().equals(rechargePosition)) {
+            envMarsRoverModel.setAgentFuel(agent.getMaxCapacity());
+        }
+
         //@Note: Seperate norm appling and postcondition appling.
 //        applyNorm(act);
         return true;
-
-        // @Incomplete: These should be implemented in success().
-        // agent.updateGoal();
-        // agent.consumeFuel(realActFuelConsumption);
-        // agent.updateRecharge();
-        // agent.updatePunish();
     }
 
 //    private void applyNorm(ActionNode act) {

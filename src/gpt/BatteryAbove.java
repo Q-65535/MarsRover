@@ -14,4 +14,9 @@ public class BatteryAbove implements Formula {
         int currentBattery = marsRoverModel.getAgentFuel();
         return currentBattery > testNum;
     }
+
+    @Override
+    public String toString() {
+	return "BatteryAbove(" + testNum + ")";
+    }
 }

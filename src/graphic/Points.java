@@ -64,9 +64,9 @@ public class Points extends JPanel {
 
         //draw status string
         g2d.setColor(Color.BLACK);
-        g2d.scale(0.1, 0.1);
-        String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
-        g2d.drawString(recordStr, 300, 800);
+        g2d.scale(0.07, 0.07);
+        String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption(), agent.getCurrentPosition());
+        g2d.drawString(recordStr, 10, 430);
     }
 
     private void drawCellTo2D(Graphics2D graphic, Set<Position> positions) {
@@ -91,12 +91,13 @@ public class Points extends JPanel {
     /**
      * TODO This method will be refactored
      */
-    private String recordToStr(int currentFuel, int achievedGoalCount, int totalFuelConsumption, int rechargeConsumption) {
+    private String recordToStr(int currentFuel, int achievedGoalCount, int totalFuelConsumption, int rechargeConsumption, Position position) {
         StringBuilder sb = new StringBuilder();
-        sb.append("goals: ").append(achievedGoalCount).append(" ");
-        sb.append(" cur fuel: ").append(currentFuel).append(" ");
-        sb.append(" total consumption: ").append(totalFuelConsumption).append(" ");
-        sb.append(" recharge consumption: ").append(rechargeConsumption).append(" ");
+        sb.append("goals: ").append(achievedGoalCount).append("\n");
+        sb.append(" cur battery: ").append(currentFuel).append("\n");
+        sb.append(" total consumption: ").append(totalFuelConsumption).append("\n");
+        // sb.append(" recharge consumption: ").append(rechargeConsumption).append("\n");
+        sb.append("cur position: ").append(position).append("\n");
         return sb.toString();
     }
 }

@@ -31,4 +31,13 @@ public class At implements AppliableFormula {
 	Position targetPosition = insTerm1(marsRoverModel);
 	marsRoverModel.setAgentPosition(targetPosition);
     }
+
+    public String toString() {
+	if (term instanceof Position) {
+	    Position p = (Position) term;
+	    return "At" + p;
+	} else {
+	    return term.toString();
+	}
+    }
 }

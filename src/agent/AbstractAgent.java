@@ -1,11 +1,13 @@
 package agent;
 
+import generator.StateMachineGenerator;
 import running.*;
 import world.*;
 
 import static running.Default.*;
 
 import gpt.*;
+import machine.*;
 
 import java.util.*;
 
@@ -84,6 +86,7 @@ public abstract class AbstractAgent implements Cloneable {
         maitGoals = new ArrayList<>();
         choices = new ArrayList<>();
         achievedGoals = new ArrayList<>();
+        automata = new ArrayList<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
         penalty = 0;
@@ -93,9 +96,17 @@ public abstract class AbstractAgent implements Cloneable {
         return this.bb;
     }
 
+    public List<Automaton> getAutomata() {
+        return automata;
+    }
+
     // @Incomplete: implement sense method.
     public void sense(Environment env) {
-        return;
+        bb.sync(env.getModel());
+        // Given the model transit each automaton.
+        for (Automaton auto : automata) {
+            auto.transit(bb);
+        }
     }
 
     public void adoptGoals(List<GoalNode> goals) {
@@ -106,20 +117,38 @@ public abstract class AbstractAgent implements Cloneable {
 
     // Adopt a new achievement goal.
     public void adoptGoal(GoalNode goal) {
+        StateMachineGenerator gen = new StateMachineGenerator();
         // Achievement goals are immediately transformed to intentions.
         if (goal instanceof AGoalNode) {
             AGoalNode ag = (AGoalNode) goal;
-            intentions.add(new Tree(ag));
+            // Add to the first of the queue.
+            intentions.add(0, new Tree(ag));
+            // Add automaton corresponding to the achievement goal.
+            // @Test: This way of adding automaton is just for testing.
+            Automaton auto = gen.genBasicAchievementAuto(getGoalLiteral(ag));
+            automata.add(auto);
         } else if (goal instanceof MGoalNode) {
             MGoalNode mg = (MGoalNode) goal;
             maitGoals.add(mg);
+            // Add automaton corresponding to the maintenance goal.
+            Automaton auto = gen.genBasicMaitAuto(getGoalLiteral(mg));
+            automata.add(auto);
         } else {
             throw new RuntimeException("this goal is not recognized!");
         }
     }
 
+    private Literal getGoalLiteral(GoalNode goal) {
+        // Assuming the goal condition only contains one literal.
+        return goal.getGoalConds().get(0);
+    }
+
     public int getCurrentFuel() {
         return bb.getAgentFuel();
+    }
+
+    public int getMaxCapacity() {
+        return maxCapacity;
     }
 
     public List<Tree> getIntentions() {
@@ -295,8 +324,11 @@ public abstract class AbstractAgent implements Cloneable {
         // After bb is update, when then record the total fuel consumption and recharge info.
         int currentFuel = bb.getAgentFuel();
         updateFuelRecord(previousFuel, currentFuel);
-        // @Note this must after updateFuelRecord(), consumption record first!!!
-        updateRecharge();
+
+        // Then, recharge.
+        if (rechargePosition.equals(bb.getAgentPosition())) {
+            bb.setAgentFuel(maxCapacity);
+        }
     }
 
     public void exeFail(MarsRoverModel model) {
