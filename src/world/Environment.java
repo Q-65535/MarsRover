@@ -116,7 +116,7 @@ public class Environment {
             runnable = true;
             ActionNode act = agent.execute();
             if (act == null) {
-                throw new RuntimeException("no action to execute after reasoning");
+                throw new RuntimeException("The agent says it is executable, but has no action to execute after reasoning");
             }
             boolean success = executeAct(act);
             if (success) {

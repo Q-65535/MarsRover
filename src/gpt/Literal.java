@@ -25,6 +25,15 @@ public class Literal {
         this.state = !this.state;
     }
 
+    /**
+     * Generate a new literal that is the negation of this litearl.
+     */
+    public Literal genNegation() {
+	Literal l = this.clone();
+	l.flip();
+	return l;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

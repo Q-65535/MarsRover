@@ -11,7 +11,6 @@ public class Tree {
     GoalNode tlg;
     ArrayList<GoalNode> backtrackList;
     TreeNode currentStep;
-    TreeNode virtualCurrentStep;
     boolean isAchieved;
 
     // How do we consider a top-level goal is achieved? It is determinded by the agent itself: if
@@ -42,18 +41,14 @@ public class Tree {
     }
 
     // Estimate whether this intention is progressible based on the given model.
-    public boolean isProgressible(MarsRoverModel model) {
-        if (currentStep instanceof ActionNode) {
-            return true;
-        }
-
+    public boolean isNotProgressible(MarsRoverModel model) {
         // If current step is tlg.
         if (currentStep instanceof GoalNode && backtrackList.isEmpty()) {
             GoalNode goal = (GoalNode) currentStep;
-            return goal.hasApplicablePlan(model);
+            return !goal.hasApplicablePlan(model);
         }
-        // Other cases, return true.
-        return true;
+        // Other cases, it is still possible to progress (but not definite).
+        return false;
     }
 
 
@@ -81,38 +76,6 @@ public class Tree {
         PlanNode selectedPlan = goal.getPlans().get(index);
         // Set currentStep to the first step in the selected plan body.
         setCurrentStep(selectedPlan.getBody().get(0));
-        return selectedPlan;
-    }
-
-    public void resetVirtualCurrentStep() {
-        virtualCurrentStep = currentStep;
-    }
-
-    public ActionNode virtualProgress() {
-        if (virtualCurrentStep == null) {
-            throw new RuntimeException("Warning: unable to progress, because current step is null!");
-        }
-        if (!(virtualCurrentStep instanceof ActionNode)) {
-            throw new RuntimeException("Current step is not an action, cannot be progressed in this function!");
-        }
-        ActionNode act = (ActionNode) virtualCurrentStep;
-        return act;
-    }
-
-    public PlanNode virtualProgress(int index) {
-        if (virtualCurrentStep == null) {
-            throw new RuntimeException("Unable to progress, because current step is null");
-        }
-        if (!(virtualCurrentStep instanceof GoalNode)) {
-            throw new RuntimeException("Current step is not a goal, cannot be progressed in this function!");
-        }
-
-        GoalNode goal = (GoalNode) virtualCurrentStep;
-        backtrackList.add(goal);
-
-        PlanNode selectedPlan = goal.getPlans().get(index);
-        // Set currentStep to the first step in the selected plan body.
-        virtualCurrentStep = selectedPlan.getBody().get(0);
         return selectedPlan;
     }
 
@@ -153,11 +116,11 @@ public class Tree {
     public void fail(MarsRoverModel model) {
         // if the current step is not the top-level goal
         if (backtrackList.size() > 0) {
-            System.out.println("goal-plan tree progress failure.");
-            System.out.println(backtrackList.get(backtrackList.size() - 1).getName());
+            System.out.println("goal-plan tree progress failure (backtrack list size is " + backtrackList.size() + ")");
 
             // get the latest goal
             GoalNode goal = backtrackList.remove(backtrackList.size() - 1);
+            System.out.println("now, current step is set to goal: " + goal.getName());
             // a boolean value indicating if there are other plans to achieve this goal
             boolean available = goal.hasApplicablePlan(model);
             currentStep = goal;

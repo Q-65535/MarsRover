@@ -11,6 +11,7 @@ public class Automaton {
     private State initState;
     private State curState;
     private State preState;
+
     private Set<State> states;
     // Whether the last transition is succeed.
     // Initially, it is set to be true.
@@ -48,6 +49,12 @@ public class Automaton {
         return transitionSucceed;
     }
 
+    /**
+     * Get the next target literal.
+     */
+    public Literal getNextTargetLiteral() {
+	return curState.getTargetLiteral();
+    }
 
     public boolean transit(MarsRoverModel model) {
         preState = curState;
@@ -59,7 +66,7 @@ public class Automaton {
             return false;
         } else {
             Literal transitionLiteral = getTransitionLiteral(curState, nextState);
-            System.out.println(curState + arrowLiteral(transitionLiteral) + nextState);
+            // System.out.println(curState + arrowLiteral(transitionLiteral) + nextState);
             this.curState = nextState;
             transitionSucceed = true;
             return true;

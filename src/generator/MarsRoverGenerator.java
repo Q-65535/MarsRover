@@ -55,7 +55,6 @@ public class MarsRoverGenerator {
         PositionFunction agentPosition = new GetAgentPosition();
 
         Formula preFormula = null;
-        ActionNode act = null;
         String planName = "goto" + targetPosition;
         switch (direction) {
             case UP:
@@ -73,11 +72,14 @@ public class MarsRoverGenerator {
                 break;
         }
 
+        ActionNode act = genAction(direction);
 
-        act = genAction(direction);
         Literal l = new Literal(preFormula, true);
+	Literal l2 = new Literal(new BatteryAbove(0), true);
+
         List<Literal> prec = new ArrayList<>();
         prec.add(l);
+        prec.add(l2);
 
         // Plan body
         // @Note: the subgoal is recursive.

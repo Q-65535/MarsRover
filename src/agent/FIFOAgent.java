@@ -20,24 +20,36 @@ public class FIFOAgent extends AbstractAgent {
     public boolean reason() {
         // First update intentions.
         intentionUpdate();
+
         MarsRoverGenerator gen = new MarsRoverGenerator();
         // Then adopt new intentions according to last automata transition.
-        List<Automaton> tempAutos = new ArrayList<>(automata);
+        List<Automaton> tempAutomata = new ArrayList<>(automata);
         outer:
-        for (Automaton auto : tempAutos) {
-            if (!auto.isTransitionSucceed()) {
-                Literal targetLiteral = auto.getTransitionLiteral(auto.getCurState(), auto.getCurState());
-                // This is achievement goal type.
-                GoalNode newGoal = gen.generate(targetLiteral, bb);
-                inner:
-                for (Tree intention : intentions) {
-                    // @Incomplete: currently, we say two goals are equal when they have the same name.
-                    if (newGoal.getName().equals(intention.getTlg().getName())) {
-                        continue outer;
-                    }
-                }
-                adoptGoal(newGoal);
-            }
+        for (Automaton auto : tempAutomata) {
+
+	    Literal nextTargetLiteral = auto.getNextTargetLiteral();
+	    if (nextTargetLiteral == null) {
+		continue;
+	    }
+
+	    // Now, we consider the transitions that always success.
+	    Literal targetLiteral = auto.getNextTargetLiteral();
+	    // If the target literal is currently satisfied, just ignore.
+	    if (bb.eval(targetLiteral) == true) {
+		continue;
+	    }
+
+	    GoalNode newGoal = gen.generate(targetLiteral, bb);
+
+	    // This is achievement goal type.
+	    for (Tree intention : intentions) {
+		// @Incomplete: currently, we say two goals are equal when they have the same name.
+		if (newGoal.getName().equals(intention.getTlg().getName())) {
+		    continue outer;
+		}
+	    }
+	    // Here, the new goals is inserted at the first position.
+	    adoptGoal(newGoal);
         }
 
         if (intentions.size() == 0) {
@@ -69,6 +81,7 @@ public class FIFOAgent extends AbstractAgent {
                     planChoice = i;
                     choices.add(new Choice(intentionIndex, planChoice));
                     currentStep = plan.getBody().get(0);
+		    // If the current step is goal, recursion applies.
                     choices.addAll(getChoices(intentionIndex, currentStep));
                     // @Note: remember to break once we found an applicable plan.
                     break;

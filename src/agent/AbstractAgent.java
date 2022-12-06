@@ -20,11 +20,6 @@ public abstract class AbstractAgent implements Cloneable {
     // The agent's belief base.
     MarsRoverModel bb;
     List<Automaton> automata;
-    // The goals represented by automata.
-    // @Idea: Maybe we can add norms into this? We can call them temporal objects.
-    // @Incomplete: Currently, we don't use this field, since we consider automata.
-    List<GoalNode> temporalGoals;
-    List<MGoalNode> maitGoals;
     List<Tree> intentions;
     // choices in current cycle.
     List<Choice> choices;
@@ -83,7 +78,6 @@ public abstract class AbstractAgent implements Cloneable {
         this.rechargePosition = def_initial_Position;
 
         intentions = new ArrayList<>();
-        maitGoals = new ArrayList<>();
         choices = new ArrayList<>();
         achievedGoals = new ArrayList<>();
         automata = new ArrayList<>();
@@ -123,18 +117,9 @@ public abstract class AbstractAgent implements Cloneable {
             AGoalNode ag = (AGoalNode) goal;
             // Add to the first of the queue.
             intentions.add(0, new Tree(ag));
-            // Add automaton corresponding to the achievement goal.
-            // @Test: This way of adding automaton is just for testing.
-            Automaton auto = gen.genBasicAchievementAuto(getGoalLiteral(ag));
-            automata.add(auto);
-        } else if (goal instanceof MGoalNode) {
-            MGoalNode mg = (MGoalNode) goal;
-            maitGoals.add(mg);
-            // Add automaton corresponding to the maintenance goal.
-            Automaton auto = gen.genBasicMaitAuto(getGoalLiteral(mg));
-            automata.add(auto);
+	    // So now we don't consider any other types of goals.  
         } else {
-            throw new RuntimeException("this goal is not recognized!");
+            throw new RuntimeException("Error in adopting new goals: we only accept achievement goals, but you give other types!");
         }
     }
 
@@ -153,10 +138,6 @@ public abstract class AbstractAgent implements Cloneable {
 
     public List<Tree> getIntentions() {
         return this.intentions;
-    }
-
-    public List<GoalNode> getTemporalGoals() {
-        return this.temporalGoals;
     }
 
     public Position getCurrentPosition() {
@@ -211,6 +192,9 @@ public abstract class AbstractAgent implements Cloneable {
         }
     }
 
+    // @Logic: Do I really need fail intention update? Maybe the intentions are not
+    // progressible in current state, but are progressible in the future? We can't just
+    // drop the intentions whose preconditions are just currently not satisfied?
     private void failIntentionUpdate() {
         Iterator<Tree> iterator = intentions.iterator();
         while (iterator.hasNext()) {
@@ -224,21 +208,19 @@ public abstract class AbstractAgent implements Cloneable {
             if (curIntention.getCurrentStep() instanceof GoalNode) {
                 GoalNode goal = (GoalNode) curIntention.getCurrentStep();
                 if (!goal.hasApplicablePlan(bb)) {
-                    System.out.println("this goal has no applicable plan");
+                    System.out.println("the goal " + goal.getName() + " has no applicable plan");
                     curIntention.fail(bb);
                 }
             }
-            if (curIntention.isProgressible(bb)) {
-                break;
-                // If this intention is not progressible after preprocessing, remove it.
-            } else {
-                System.out.println("not progressiable");
+            // If this intention is not progressible after preprocessing, remove it.
+            if (curIntention.isNotProgressible(bb)) {
+                System.out.println("current intention is definitely not progressiable (tlg is " + curIntention.getTlg().getName() + ")!");
                 iterator.remove();
             }
         }
     }
 
-    // Agent reasons about what to do. It returns true if it know what to do
+    // Agent reasons about what to do. It returns true if it knows what to do
     // after reasoning. False if it has no idea about what to do next. This method
     // also alter the agent's internal state (what to do next).
     public abstract boolean reason();
@@ -266,34 +248,6 @@ public abstract class AbstractAgent implements Cloneable {
             }
         }
         // If no action is returned, null is returned.
-        return null;
-    }
-
-    /**
-     * NOT progress intention, just return the action ready to be executed.
-     */
-    public ActionNode virtualExecute() {
-        // Prepare to virtual progress
-        List<Choice> choicesCopy = new ArrayList<>(choices);
-        for (Tree intention : intentions) {
-            intention.resetVirtualCurrentStep();
-        }
-        while (choicesCopy.size() > 0) {
-            // get the immediate choice
-            Choice choice = choicesCopy.get(0);
-            // if it is a plan choice
-            if (choice.isPlanSelection()) {
-                choicesCopy.remove(0);
-                Tree gpt = this.intentions.get(choice.intentionChoice);
-                gpt.virtualProgress(choice.planChoice);
-            }
-            // if the choice is to execute an action
-            else if (choice.isActionExecution()) {
-                Tree gpt = this.intentions.get(choice.intentionChoice);
-                ActionNode act = gpt.virtualProgress();
-                return act;
-            }
-        }
         return null;
     }
 
@@ -340,7 +294,7 @@ public abstract class AbstractAgent implements Cloneable {
         Tree gpt = intentions.get(choice.intentionChoice);
         gpt.fail(model);
         // If this intention is not progressible based on current belief base, drop it.
-        if (gpt.isProgressible(bb)) {
+        if (gpt.isNotProgressible(bb)) {
             intentions.remove(choice.intentionChoice);
         }
     }

@@ -44,16 +44,19 @@ public class Main {
 
         // AbstractAgent fifoagent = new FIFOAgent(def_max_capacity);
         AbstractAgent fifoagent = new FIFOAgent(40);
-        MarsRoverGenerator gen = new MarsRoverGenerator();
+        MarsRoverGenerator genGPT = new MarsRoverGenerator();
+	StateMachineGenerator genAuto = new StateMachineGenerator();
 
-        // Construct achievement goals.
-        for (int i = 0; i < 5; i++) {
-            ArrayList<Literal> ls = new ArrayList<>();
-            fifoagent.adoptGoal(gen.generate(rm.nextInt(def_map_size), rm.nextInt(def_map_size)));
+        // Creating and adding achievement goals automata.
+        for (int i = 0; i < 20; i++) {
+	    Automaton auto = genAuto.genBasicAchievementAuto(rm.nextInt(def_map_size), rm.nextInt(def_map_size));
+	    fifoagent.getAutomata().add(auto);
+        //     ArrayList<Literal> ls = new ArrayList<>();
+        //     fifoagent.adoptGoal(gen.generate(rm.nextInt(def_map_size), rm.nextInt(def_map_size)));
         }
 
         // Add maintenance goal in the form of automaton.
-        fifoagent.getAutomata().add(new StateMachineGenerator().genBasicMaitAuto(20));
+        fifoagent.getAutomata().add(genAuto.genBasicMaitAuto(20));
 
         Environment defEnv = new Environment(fifoagent);
 
@@ -66,10 +69,11 @@ public class Main {
             AutoDotWriter autoDotWriter = new AutoDotWriter();
             List<Automaton> automata = fifoagent.getAutomata();
 
+            System.out.printf("Current number of intentions: %d%n", fifoagent.getIntentions().size());
             autoDotWriter.genTransDotFile(dotDir, automata);
-//            pause(500);
+           pause(500);
             autoDotWriter.genDotFile(dotDir, automata);
-//            pause(500);
+           pause(500);
         }
 
         displayer.close();

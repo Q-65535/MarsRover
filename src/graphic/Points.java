@@ -37,6 +37,8 @@ public class Points extends JPanel {
         // draw goals
         g2d.setColor(Color.red);
         List<Position> goalPositions = new ArrayList<>();
+	// @Incomplete: For now, we draw the goal position according to the agent's current
+	// intention.
         for (Tree intention : agent.getIntentions()) {
             Formula positionFormula = intention.getTlg().getGoalConds().get(0).getFormula();
             if (positionFormula instanceof At) {
