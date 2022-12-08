@@ -1,7 +1,6 @@
 package world;
 
 import agent.AbstractAgent;
-import agent.MoveAction;
 import gpt.*;
 
 import java.util.ArrayList;
@@ -168,7 +167,8 @@ public class Environment {
             throw new RuntimeException("can't post " + num + " goals from " + goals.size() + " goals");
         }
         for (int i = 0; i < num; i++) {
-            agent.adoptGoal(goals.remove(0));
+            // @Incomplete: consider the goals that is posted during execution (Maybe we post automata instead?).
+            agent.adoptGoal(goals.remove(0), 0);
         }
     }
 
@@ -178,7 +178,7 @@ public class Environment {
         // 1. update position and fuel level.
         envMarsRoverModel.apply(act.getPostc());
         // Then, lets check whether it is in recharge position.
-        if (envMarsRoverModel.getAgentPosition().equals(rechargePosition)) {
+        if (envMarsRoverModel.getCurAgentPosition().equals(rechargePosition)) {
             envMarsRoverModel.setAgentFuel(agent.getMaxCapacity());
         }
 

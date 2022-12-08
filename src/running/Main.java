@@ -31,6 +31,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        System.out.printf("wer");
         Runtime rt = Runtime.getRuntime();
         try {
             String output = execCmd("ls");
@@ -48,18 +49,26 @@ public class Main {
 	StateMachineGenerator genAuto = new StateMachineGenerator();
 
         // Creating and adding achievement goals automata.
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
 	    Automaton auto = genAuto.genBasicAchievementAuto(rm.nextInt(def_map_size), rm.nextInt(def_map_size));
 	    fifoagent.getAutomata().add(auto);
-        //     ArrayList<Literal> ls = new ArrayList<>();
-        //     fifoagent.adoptGoal(gen.generate(rm.nextInt(def_map_size), rm.nextInt(def_map_size)));
         }
-
         // Add maintenance goal in the form of automaton.
         fifoagent.getAutomata().add(genAuto.genBasicMaitAuto(20));
 
-        Environment defEnv = new Environment(fifoagent);
+	// Add norm automata
+	for (int i = 0; i < 30; i++) {
+	    int x = rm.nextInt(def_map_size);
+	    int y = rm.nextInt(def_map_size);
+	    Position from = new Position(x, y);
+	    Position to = new Position(x + 1, y);
 
+	    Automaton auto = genAuto.genBasicNormAuto(from, to, -0.1);
+	    fifoagent.getAutomata().add(auto);
+        fifoagent.addNormPosition(from, to);
+	}
+
+        Environment defEnv = new Environment(fifoagent);
         boolean running = true;
         defEnv.setAgent(fifoagent);
         while (running) {
@@ -70,10 +79,10 @@ public class Main {
             List<Automaton> automata = fifoagent.getAutomata();
 
             System.out.printf("Current number of intentions: %d%n", fifoagent.getIntentions().size());
-            autoDotWriter.genTransDotFile(dotDir, automata);
-           pause(500);
-            autoDotWriter.genDotFile(dotDir, automata);
-           pause(500);
+//            autoDotWriter.genTransDotFile(dotDir, automata);
+//           pause(500);
+//            autoDotWriter.genDotFile(dotDir, automata);
+//           pause(500);
         }
 
         displayer.close();

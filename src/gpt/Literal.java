@@ -20,7 +20,7 @@ public class Literal {
     }
 
     /**
-     * Flip the state of this literal */
+     * Flip the state of this literal. */
     public void flip() {
         this.state = !this.state;
     }

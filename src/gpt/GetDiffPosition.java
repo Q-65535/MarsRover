@@ -15,7 +15,7 @@ public class GetDiffPosition extends PositionFunction {
 
     @Override
     public Position ins(MarsRoverModel marsRoverModel) {
-        Position c = marsRoverModel.getAgentPosition();
+        Position c = marsRoverModel.getCurAgentPosition();
         int baseX = c.getX();
         int baseY = c.getY();
 

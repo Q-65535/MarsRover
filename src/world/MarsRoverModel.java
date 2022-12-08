@@ -6,18 +6,24 @@ import java.util.*;
 
 // @Smell: Should we implement a Model interface (or abstract class)?
 public class MarsRoverModel {
-    private Position agentPosition;
+    private Position curAgentPosition;
+    private Position preAgentPosition;
     private int agentFuel;
 
     public MarsRoverModel() {}
 
     public MarsRoverModel(Position currentPosition, int currentFuel) {
-        this.agentPosition = currentPosition;
+        this.curAgentPosition = currentPosition;
+	this.preAgentPosition = currentPosition;
         this.agentFuel = currentFuel;
     }
 
-    public Position getAgentPosition() {
-        return agentPosition;
+    public Position getPreAgentPosition() {
+        return preAgentPosition;
+    }
+
+    public Position getCurAgentPosition() {
+        return curAgentPosition;
     }
 
     public int getAgentFuel() {
@@ -26,12 +32,14 @@ public class MarsRoverModel {
 
     // Update this model according to the given model
     public void sync(MarsRoverModel marsRoverModel) {
-        setAgentPosition(marsRoverModel.getAgentPosition());
-        setAgentFuel(marsRoverModel.getAgentFuel());
+        this.curAgentPosition = marsRoverModel.curAgentPosition;
+        this.preAgentPosition = marsRoverModel.preAgentPosition;
+        this.agentFuel = marsRoverModel.agentFuel;
     }
 
-    public void setAgentPosition(Position p) {
-        this.agentPosition = p;
+    public void setCurAgentPosition(Position p) {
+	this.preAgentPosition = curAgentPosition;
+        this.curAgentPosition = p;
     }
 
     public void setAgentFuel(int f) {

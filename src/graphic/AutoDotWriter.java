@@ -5,6 +5,7 @@ import gpt.*;
 
 import java.util.*;
 import java.io.*;
+
 import static running.Utils.*;
 
 public class AutoDotWriter {
@@ -13,47 +14,32 @@ public class AutoDotWriter {
 
     public void genDotFile(File outputDir, List<Automaton> autos) {
         String dotStr = genDotStr(autos);
-        try {
-            File outputFile = join(outputDir, 1 + ".dot");
-            outputFile.createNewFile(); // if file already exists, this does nothing.
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(dotStr);
-            writer.close();
-
-        } catch (IOException e) {
-            throw new RuntimeException("state dot file fail");
-        }
+        File outputFile = join(outputDir, 1 + ".dot");
+        writeFile(outputFile, dotStr);
     }
 
     public String genDotStr(List<Automaton> autos) {
-	StringBuilder sb = new StringBuilder();
-	sb.append(digraphStart);
-	for (Automaton auto : autos) {
-	    sb.append(genDotStr(auto));
-	}
-	sb.append("}\n");
-	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(digraphStart);
+        for (Automaton auto : autos) {
+            sb.append(genDotStr(auto));
+        }
+        sb.append("}\n");
+        return sb.toString();
     }
 
     public void genDotFile(File outputDir, Automaton auto) {
         String dotStr = genDotStr(auto);
+        File outputFile = join(outputDir, auto.getName() + ".dot");
+        writeFile(outputFile, dotStr);
 
-        try {
-            File outputFile = join(outputDir, auto.getName() + ".dot");
-            outputFile.createNewFile(); // if file already exists, this does nothing.
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(dotStr);
-            writer.close();
-
-        } catch (IOException e) {
-            throw new RuntimeException("state dot file fail");
-        }
     }
 
+
     public String genDotStr(Automaton auto) {
-	StringBuilder sb = new StringBuilder();
-	sb.append(subgraphStart);
-	sb.append("label=\"" + auto.getName() + "\"\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append(subgraphStart);
+        sb.append("label=\"" + auto.getName() + "\"\n");
 
         sb.append(genNodesStr(auto));
         sb.append(genEdgesStr(auto));
@@ -65,47 +51,31 @@ public class AutoDotWriter {
 
     public void genTransDotFile(File outputDir, List<Automaton> autos) {
         String dotStr = genTransDotStr(autos);
-        try {
-            File outputFile = join(outputDir, 1 + ".dot");
-            outputFile.createNewFile();  // if file already exists, this does nothing.
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(dotStr);
-            writer.close();
-        } catch (IOException e) {
-            System.out.println(e);
-            throw new RuntimeException("transition dot file fail");
-        }
+        File outputFile = join(outputDir, 1 + ".dot");
+        writeFile(outputFile, dotStr);
     }
 
     public String genTransDotStr(List<Automaton> autos) {
-	StringBuilder sb = new StringBuilder();
-	sb.append(digraphStart);
-	for (Automaton auto : autos) {
-	    sb.append(genTransDotStr(auto));
-	}
-	sb.append("}\n");
-	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(digraphStart);
+        for (Automaton auto : autos) {
+            sb.append(genTransDotStr(auto));
+        }
+        sb.append("}\n");
+        return sb.toString();
     }
 
     public void genTransDotFile(File outputDir, Automaton auto) {
         String dotStr = genTransDotStr(auto);
-        try {
-            File outputFile = join(outputDir, auto.getName() + ".dot");
-            outputFile.createNewFile();  // if file already exists, this does nothing.
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
-            writer.write(dotStr);
-            writer.close();
+        File outputFile = join(outputDir, auto.getName() + ".dot");
+        writeFile(outputFile, dotStr);
 
-        } catch (IOException e) {
-            System.out.println(e);
-            throw new RuntimeException("transition dot file fail");
-        }
     }
 
     public String genTransDotStr(Automaton auto) {
         StringBuilder sb = new StringBuilder();
         sb.append(subgraphStart);
-	sb.append("label=\"" + auto.getName() + "\"\n");
+        sb.append("label=\"" + auto.getName() + "\"\n");
 
         sb.append(genNodesStr(auto));
         sb.append(genEdgesStr(auto));
@@ -116,10 +86,18 @@ public class AutoDotWriter {
         return sb.toString();
     }
 
+    // Wrap the ugly try-catch write file.
+    public void writeFile(File outputFile, String str) {
+        try {
+            outputFile.createNewFile(); // if file already exists, this does nothing.
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+            writer.write(str);
+            writer.close();
 
-
-
-
+        } catch (IOException e) {
+            throw new RuntimeException("dot file write error");
+        }
+    }
 
 
     private StringBuilder genNodesStr(Automaton auto) {

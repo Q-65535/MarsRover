@@ -15,7 +15,7 @@ public class At implements AppliableFormula {
 
     @Override
     public boolean eval(MarsRoverModel marsRoverModel) {
-        Position agentPosition = marsRoverModel.getAgentPosition();
+        Position agentPosition = marsRoverModel.getCurAgentPosition();
         Position targetPosition = insTerm1(marsRoverModel);
 
         // @TODO: implement the equals function.
@@ -29,7 +29,7 @@ public class At implements AppliableFormula {
     @Override
     public void apply(MarsRoverModel marsRoverModel) {
 	Position targetPosition = insTerm1(marsRoverModel);
-	marsRoverModel.setAgentPosition(targetPosition);
+	marsRoverModel.setCurAgentPosition(targetPosition);
     }
 
     public String toString() {

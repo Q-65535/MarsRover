@@ -1,6 +1,6 @@
 package agent;
 
-import generator.StateMachineGenerator;
+import generator.*;
 import running.*;
 import world.*;
 
@@ -20,20 +20,21 @@ public abstract class AbstractAgent implements Cloneable {
     // The agent's belief base.
     MarsRoverModel bb;
     List<Automaton> automata;
+    Map<Position, Position> normPositions;
     List<Tree> intentions;
     // choices in current cycle.
     List<Choice> choices;
     List<AGoalNode> achievedGoals;
+
+    private double val = 0;
 
     /**
      * The total penalty received
      */
     // @Idea: Maybe we need implement an overall value that is the sum of penalty and reward.
     double penalty;
-    HashMap<Position, Norm> norms;
     Position currentPosition;
     // @Refactor: This should be implemented by choices.
-    ActionNode currentAct;
     Position prePosition;
     Position rechargePosition;
     int maxCapacity;
@@ -56,12 +57,6 @@ public abstract class AbstractAgent implements Cloneable {
      */
     public boolean isAchieved = false;
 
-    public AbstractAgent(List<GoalNode> goals, int maxCapacity) {
-        init();
-        this.maxCapacity = maxCapacity;
-        this.bb.setAgentFuel(maxCapacity);
-        adoptGoals(goals);
-    }
 
     public AbstractAgent(int maxCapacity) {
         init();
@@ -72,7 +67,7 @@ public abstract class AbstractAgent implements Cloneable {
     private void init() {
         // init belief base.
         this.bb = new MarsRoverModel();
-        bb.setAgentPosition(def_initial_Position);
+        bb.setCurAgentPosition(def_initial_Position);
         this.prePosition = currentPosition;
         this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
@@ -81,9 +76,14 @@ public abstract class AbstractAgent implements Cloneable {
         choices = new ArrayList<>();
         achievedGoals = new ArrayList<>();
         automata = new ArrayList<>();
+        normPositions = new HashMap<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
         penalty = 0;
+    }
+
+    public double getVal() {
+        return val;
     }
 
     public MarsRoverModel getBB() {
@@ -98,26 +98,28 @@ public abstract class AbstractAgent implements Cloneable {
     public void sense(Environment env) {
         bb.sync(env.getModel());
         // Given the model transit each automaton.
-        for (Automaton auto : automata) {
+        Iterator<Automaton> it = automata.iterator();
+        while (it.hasNext()) {
+            Automaton auto = it.next();
             auto.transit(bb);
-        }
-    }
+            // Each transition apply the value.
+            val += auto.getCurState().val;
 
-    public void adoptGoals(List<GoalNode> goals) {
-        for (GoalNode goal : goals) {
-            adoptGoal(goal);
+            if (auto.isFinalTrap()) {
+                it.remove();
+            }
         }
     }
 
     // Adopt a new achievement goal.
-    public void adoptGoal(GoalNode goal) {
+    public void adoptGoal(GoalNode goal, int priority) {
         StateMachineGenerator gen = new StateMachineGenerator();
         // Achievement goals are immediately transformed to intentions.
         if (goal instanceof AGoalNode) {
             AGoalNode ag = (AGoalNode) goal;
             // Add to the first of the queue.
-            intentions.add(0, new Tree(ag));
-	    // So now we don't consider any other types of goals.  
+            intentions.add(0, new Tree(ag, priority));
+            // So now we don't consider any other types of goals.
         } else {
             throw new RuntimeException("Error in adopting new goals: we only accept achievement goals, but you give other types!");
         }
@@ -141,7 +143,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public Position getCurrentPosition() {
-        return bb.getAgentPosition();
+        return bb.getCurAgentPosition();
     }
 
     public int getAchievedGoalCount() {
@@ -159,6 +161,32 @@ public abstract class AbstractAgent implements Cloneable {
 
     public int getRechargeFuelConsumption() {
         return rechargeFuelConsumption;
+    }
+
+    public void suspendConflictingIntentions(Tree priorIntention) {
+        GoalNode tlg = priorIntention.getTlg();
+        for (Tree intention : intentions) {
+            // @Incomplete: For now, we want to suspend all the intentions that conflicts with the given intention and has lower priority than the given intention. (Two intentions conflicts when they don't have the same name......).
+            if (intention.priority < priorIntention.priority && !intention.getTlg().getName().equals(tlg.getName())) {
+                intention.suspend();
+            }
+        }
+    }
+
+    public void activeAllIntentions() {
+        for (Tree intention : intentions) {
+            intention.active();
+        }
+    }
+
+    public Tree getPriorIntention() {
+        Tree priorIntention = intentions.get(0);
+        for (Tree intention : intentions) {
+            if (intention.priority > priorIntention.priority) {
+                priorIntention = intention;
+            }
+        }
+        return priorIntention;
     }
 
 
@@ -280,7 +308,7 @@ public abstract class AbstractAgent implements Cloneable {
         updateFuelRecord(previousFuel, currentFuel);
 
         // Then, recharge.
-        if (rechargePosition.equals(bb.getAgentPosition())) {
+        if (rechargePosition.equals(bb.getCurAgentPosition())) {
             bb.setAgentFuel(maxCapacity);
         }
     }
@@ -318,7 +346,7 @@ public abstract class AbstractAgent implements Cloneable {
      * if current position is recharge position, recharge the fuel
      */
     public void updateRecharge() {
-        if (bb.getAgentPosition().equals(rechargePosition)) {
+        if (bb.getCurAgentPosition().equals(rechargePosition)) {
             bb.setAgentFuel(maxCapacity);
             // isAchieved turned to false when the agent recharge
             isAchieved = false;
@@ -337,10 +365,11 @@ public abstract class AbstractAgent implements Cloneable {
         return penalty;
     }
 
-    public Set<Position> getNormPositions() {
-        if (norms == null) {
-            return new HashSet<>();
-        }
-        return norms.keySet();
+    public void addNormPosition(Position from, Position to) {
+        normPositions.put(from, to);
+    }
+
+    public Map<Position, Position> getNormPositions() {
+        return this.normPositions;
     }
 }

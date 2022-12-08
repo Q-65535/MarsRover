@@ -7,23 +7,34 @@ import java.util.*;
 
 public class State {
     private final String name;
+    public final double val;
     private Map<Literal, State> transFunc;
     // The target literal can cause transition towards final state.
     private Literal targetLiteral;
     private boolean isFinalState;
     private boolean isFinalTrap;
 
+
     public State(String name, Map<Literal, State> transFunc) {
-        this.name = name;
+        this(name, 0, transFunc);
+    }
+
+    public State(String name, double val, Map<Literal, State> transFunc) {
+        this(name, val);
         this.transFunc = transFunc;
     }
 
     public State(String name) {
-        this.name = name;
-        this.transFunc = new HashMap<>();
+        this(name, 0);
     }
 
-    public String getName(){
+    public State(String name, double val) {
+        this.name = name;
+        this.val = val;
+        transFunc = new HashMap<>();
+    }
+
+    public String getName() {
         return this.name;
     }
 
@@ -33,20 +44,21 @@ public class State {
     }
 
     public void addTargetTransRule(Literal targetLiteral, State next) {
-	transFunc.put(targetLiteral, next);
-	this.targetLiteral = targetLiteral;
+        transFunc.put(targetLiteral, next);
+        this.targetLiteral = targetLiteral;
     }
 
     public Map<Literal, State> getTransFunc() {
-	return transFunc;
+        return transFunc;
     }
 
     /**
      * Get the next state according to the given literal.
-     */ public State nextState(Literal l) {
-	if (isFinalTrap) {
-	    return this;
-	}
+     */
+    public State nextState(Literal l) {
+        if (isFinalTrap) {
+            return this;
+        }
         return transFunc.get(l);
     }
 
@@ -54,9 +66,9 @@ public class State {
      * Get the next state according to the given Model.
      */
     public State nextState(MarsRoverModel model) {
-	if (isFinalTrap) {
-	    return this;
-	}
+        if (isFinalTrap) {
+            return this;
+        }
         for (Map.Entry<Literal, State> pair : transFunc.entrySet()) {
             if (model.eval(pair.getKey())) {
                 return pair.getValue();
@@ -67,27 +79,27 @@ public class State {
     }
 
     public void setTargetLiteral(Literal targetLiteral) {
-	this.targetLiteral = targetLiteral;
+        this.targetLiteral = targetLiteral;
     }
 
     public Literal getTargetLiteral() {
-	return this.targetLiteral;
+        return this.targetLiteral;
     }
 
     public void setAsFinalState() {
-	isFinalState = true;
+        isFinalState = true;
     }
 
     public boolean isFinalState() {
-	return isFinalState;
+        return isFinalState;
     }
 
     public void setAsFinalTrap() {
-	isFinalTrap = true;
+        isFinalTrap = true;
     }
 
     public boolean isFinalTrap() {
-	return isFinalTrap;
+        return isFinalTrap;
     }
 
     @Override

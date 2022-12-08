@@ -8,6 +8,8 @@ import java.util.*;
 
 public class Automaton {
     private final String name;
+    public final int priority;
+
     private State initState;
     private State curState;
     private State preState;
@@ -17,8 +19,15 @@ public class Automaton {
     // Initially, it is set to be true.
     private boolean transitionSucceed = true;
 
+
     public Automaton(String name, Set<State> states, State initState) {
+	// The default priority of an automaton is 0.
+	this(name, 0, states, initState);
+    }
+
+    public Automaton(String name, int priority, Set<State> states, State initState) {
         this.name = name;
+	this.priority = priority;
         this.states = states;
         this.initState = initState;
         this.curState = initState;
@@ -43,6 +52,10 @@ public class Automaton {
 
     public Set<State> getStates() {
         return states;
+    }
+
+    public boolean isFinalTrap() {
+	return curState.isFinalTrap();
     }
 
     public boolean isTransitionSucceed() {

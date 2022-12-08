@@ -10,10 +10,7 @@ import world.Environment;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.JPanel;
 
@@ -60,18 +57,23 @@ public class Points extends JPanel {
         g2d.setColor(Color.green);
         drawCellTo2D(g2d, env.getRechargePosition());
 
-        // draw norm positions
+        // draw norm from positions
         g2d.setColor(Color.DARK_GRAY);
-        drawCellTo2D(g2d, agent.getNormPositions());
+        drawCellTo2D(g2d, agent.getNormPositions().keySet());
+
+        // draw norm to positions
+        g2d.setColor(Color.BLACK);
+        drawCellTo2D(g2d, agent.getNormPositions().values());
 
         //draw status string
         g2d.setColor(Color.BLACK);
         g2d.scale(0.07, 0.07);
-        String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption(), agent.getCurrentPosition());
+        String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption(), agent.getCurrentPosition(), agent.getVal());
+
         g2d.drawString(recordStr, 10, 430);
     }
 
-    private void drawCellTo2D(Graphics2D graphic, Set<Position> positions) {
+    private void drawCellTo2D(Graphics2D graphic, Collection<Position> positions) {
         for (Position position : positions) {
             drawCellTo2D(graphic, position);
         }
@@ -93,13 +95,14 @@ public class Points extends JPanel {
     /**
      * TODO This method will be refactored
      */
-    private String recordToStr(int currentFuel, int achievedGoalCount, int totalFuelConsumption, int rechargeConsumption, Position position) {
+    private String recordToStr(int currentFuel, int achievedGoalCount, int totalFuelConsumption, int rechargeConsumption, Position position, double val) {
         StringBuilder sb = new StringBuilder();
         sb.append("goals: ").append(achievedGoalCount).append("\n");
         sb.append(" cur battery: ").append(currentFuel).append("\n");
         sb.append(" total consumption: ").append(totalFuelConsumption).append("\n");
         // sb.append(" recharge consumption: ").append(rechargeConsumption).append("\n");
         sb.append("cur position: ").append(position).append("\n");
+        sb.append("cur val: ").append(val).append("\n");
         return sb.toString();
     }
 }

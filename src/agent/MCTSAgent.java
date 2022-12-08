@@ -1,33 +1,32 @@
 package agent;
 
-import MCTSstate.AbstractState;
-import MCTSstate.MarsRoverState;
+import MCTSstate.*;
 import gpt.Position;
-import mcts.AbstractMCTSNode;
-import mcts.MCTSWorkSpace;
-import mcts.NaiveNode;
+import mcts.*;
 import running.Default;
 import world.SimEnvironment;
 
 import java.util.List;
 
 public class MCTSAgent extends AbstractAgent {
-    // Whether the agent uses proactive strategy
+    // Whether the agent uses proactive strategy (The default value is false.).
     public boolean isProactive;
     MCTSWorkSpace ws = new MCTSWorkSpace();
 
-    public MCTSAgent(List<Position> goals, int maxCapacity, boolean isProactive) {
+    public MCTSAgent(List<GoalNode> goals, int maxCapacity) {
         super(goals, maxCapacity);
-        this.isProactive = isProactive;
-    }
-
-    public MCTSAgent(int maxCapacity, boolean isProactive) {
-        super(maxCapacity);
-        this.isProactive = isProactive;
     }
 
     public MCTSAgent(int maxCapacity) {
         super(maxCapacity);
+    }
+
+    public MCTSAgent(int maxCapacity) {
+        super(maxCapacity);
+    }
+
+    public setProactive() {
+	this.isProactive = true;
     }
 
     @Override

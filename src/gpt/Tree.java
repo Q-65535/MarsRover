@@ -4,11 +4,20 @@ import java.util.*;
 
 import world.*;
 
+
+// @Idea: Maybe we can add state property to intention. When the higher
 public class Tree {
+    enum Status {
+        ACTIVE,
+        SUSPEND
+    }
+
     /**
      * The top-level goal of this tree.
      */
-    GoalNode tlg;
+    private final GoalNode tlg;
+    public final int priority;
+    Status status;
     ArrayList<GoalNode> backtrackList;
     TreeNode currentStep;
     boolean isAchieved;
@@ -19,13 +28,35 @@ public class Tree {
     // After every execution step, the agent checks whether there are any goals achieved (iterate the
     // goal base).
     public Tree(GoalNode tlg) {
+        // The default priority of a new intention is 0;
+        this(tlg, 0);
+    }
+
+    public Tree(GoalNode tlg, int priority) {
         this.tlg = tlg;
+        this.priority = priority;
         backtrackList = new ArrayList<>();
         currentStep = tlg;
     }
 
     public GoalNode getTlg() {
         return tlg;
+    }
+
+    public void active() {
+        this.status = Status.ACTIVE;
+    }
+
+    public void suspend() {
+        this.status = Status.SUSPEND;
+    }
+
+    public boolean isActive() {
+        return this.status == Status.ACTIVE;
+    }
+
+    public boolean isSuspend() {
+        return this.status == Status.SUSPEND;
     }
 
     public TreeNode getCurrentStep() {

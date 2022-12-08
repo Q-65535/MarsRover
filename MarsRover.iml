@@ -23,5 +23,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="alibaba.fastjson2" level="application" />
   </component>
 </module>
