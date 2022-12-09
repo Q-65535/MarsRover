@@ -3,24 +3,28 @@ package agent;
 import java.util.Random;
 
 import gpt.*;
+
 import java.util.*;
+
 import machine.*;
 
 public class PuppetAgent extends AbstractAgent implements Cloneable {
     static Random rm = new Random();
     List<Choice> choicePath;
+    int preActiveIntentionSize = 0;
+    int randomIndex;
 
     public PuppetAgent(int maxCapacity) {
         super(maxCapacity);
-	choicePath = new ArrayList<>();
+        choicePath = new ArrayList<>();
     }
 
     public void setChoices(List<Choice> choices) {
-	this.choices = choices;
+        this.choices = new ArrayList<>(choices);
     }
 
     public List<Choice> getChoicePath() {
-	return choicePath;
+        return choicePath;
     }
 
     @Override
@@ -30,23 +34,32 @@ public class PuppetAgent extends AbstractAgent implements Cloneable {
             return false;
         }
 
-        // Select the first highest priority intention to progress.
-        Tree selectedIntention = null;
-        int selectedIntentionIndex = -1;
+        // If the choices are specified by other function, just return true.
+        if (choices.size() > 0) {
+            return true;
+        }
+
+        List<Integer> activeIntentionIndecies = new ArrayList<>();
         for (int i = 0; i < intentions.size(); i++) {
             Tree intention = intentions.get(i);
-            // Find the first active intention to progress.
             if (intention.isActive()) {
-                selectedIntention = intention;
-                selectedIntentionIndex = i;
-                break;
+                activeIntentionIndecies.add(i);
             }
         }
-        if (selectedIntention == null) {
+        // If the active intention size changes, we then randomly select another intention.
+        if (activeIntentionIndecies.size() != preActiveIntentionSize) {
+            preActiveIntentionSize = activeIntentionIndecies.size();
+            randomIndex = activeIntentionIndecies.get(rm.nextInt(activeIntentionIndecies.size()));
+        }
+
+        int intentionIndex = activeIntentionIndecies.get(randomIndex);
+        Tree curIntention = intentions.get(intentionIndex);
+
+        if (curIntention == null) {
             return false;
         }
 
-        choices = getChoices(selectedIntentionIndex, selectedIntention.getCurrentStep());
+        choices = getChoices(intentionIndex, curIntention.getCurrentStep());
         return true;
     }
 
@@ -103,15 +116,14 @@ public class PuppetAgent extends AbstractAgent implements Cloneable {
         while (this.choices.size() > 0) {
             // get the immediate choice
             Choice choice = this.choices.get(0);
-	    // Add the choice to choice path.
-	    choicePath.add(choice);
+            // Add the choice to choice path.
+            choicePath.add(choice);
 
             if (choice.isPlanSelection()) {
                 choices.remove(0);
                 Tree gpt = this.intentions.get(choice.intentionChoice);
                 gpt.progress(choice.planChoice);
-            }
-            else if (choice.isActionExecution()) {
+            } else if (choice.isActionExecution()) {
                 Tree gpt = this.intentions.get(choice.intentionChoice);
                 ActionNode act = gpt.progress();
                 return act;
@@ -134,7 +146,7 @@ public class PuppetAgent extends AbstractAgent implements Cloneable {
             puppet.intentions.add(intention.clone());
         }
         // Clone other properties.
-	puppet.choicePath = new ArrayList<>(choicePath);
+        puppet.choicePath = new ArrayList<>(choicePath);
         puppet.val = val;
         puppet.totalFuelConsumption = totalFuelConsumption;
         puppet.achievedGoals = new ArrayList<>(achievedGoals);

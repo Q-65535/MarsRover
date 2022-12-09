@@ -13,13 +13,13 @@ public abstract class AbstractMCTSNode {
     /**
      * The choice that leads the parent node to this node
      */
-    final List<Choice> choices;
+    public final List<Choice> choices;
 
     Statistic statistic = new Statistic();
 
-    public AbstractMCTSNode() {
-	this.choices = null;
-    }
+//    public AbstractMCTSNode() {
+//	this.choices = null;
+//    }
 
     public AbstractMCTSNode(List<Choice> choices) {
 	this.choices = choices;

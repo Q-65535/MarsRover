@@ -68,6 +68,6 @@ public class MCTSAgent extends AbstractAgent {
     }
 
     AbstractMCTSNode constructNode() {
-        return new NaiveNode();
+        return new NaiveNode(null);
     }
 }

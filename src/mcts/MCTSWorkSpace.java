@@ -116,7 +116,7 @@ public class MCTSWorkSpace {
                     double simulationVal = endState.evaluateState();
                     // update the best simulation result and action list
                     // If the simulation value is greater than the record, and if the #goals is greater than the record, update
-                    if (bestSimulationResult < simulationVal || curAchievedGoalCount < achievedGoalCount) {
+                    if (bestSimulationResult < simulationVal) {
                         curAchievedGoalCount = achievedGoalCount;
                         bestSimulationResult = simulationVal;
                         // Update the best choices list.

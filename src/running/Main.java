@@ -44,21 +44,21 @@ public class Main {
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
         Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 0);
 
-        // AbstractAgent agent = new FIFOAgent(def_max_capacity);
-        AbstractAgent agent = new FIFOAgent(100);
-//        AbstractAgent agent = new MCTSAgent(100);
+//         AbstractAgent agent = new FIFOAgent(def_max_capacity);
+//        AbstractAgent agent = new FIFOAgent(100);
+        AbstractAgent agent = new MCTSAgent(100);
         MarsRoverGenerator genGPT = new MarsRoverGenerator();
-	StateMachineGenerator genAuto = new StateMachineGenerator();
+        StateMachineGenerator genAuto = new StateMachineGenerator();
 
         // Creating and adding achievement goals automata.
         for (int i = 0; i < 10; i++) {
-	    Automaton auto = genAuto.genBasicAchievementAuto(rm.nextInt(def_map_size), rm.nextInt(def_map_size));
-	    agent.getAutomata().add(auto);
+            Automaton auto = genAuto.genBasicAchievementAuto(rm.nextInt(def_map_size), rm.nextInt(def_map_size));
+            agent.getAutomata().add(auto);
         }
         // Add maintenance goal in the form of automaton.
         agent.getAutomata().add(genAuto.genBasicMaitAuto(20));
 
-	// Add norm automata
+        // Add norm automata
 //	for (int i = 0; i < 20; i++) {
 //	    int x = rm.nextInt(def_map_size);
 //	    int y = rm.nextInt(def_map_size);

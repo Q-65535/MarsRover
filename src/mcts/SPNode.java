@@ -16,9 +16,9 @@ public class SPNode extends NaiveNode {
         super(choices);
     }
 
-    public SPNode() {
-
-    }
+//    public SPNode() {
+//
+//    }
 
     // we override this method because we want the expanded nodes to be SPnodes instead of naive nodes.
     @Override

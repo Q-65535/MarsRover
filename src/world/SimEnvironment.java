@@ -18,7 +18,7 @@ public class SimEnvironment implements Cloneable {
 
     public boolean run() {
         boolean runnable = false;
-        agent.intentionUpdate();
+//        agent.intentionUpdate();
         boolean executable = agent.reason();
         if (executable) {
             runnable = true;

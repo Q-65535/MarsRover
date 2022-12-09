@@ -8,9 +8,9 @@ import java.util.*;
 public class NaiveNode extends AbstractMCTSNode {
     List<NaiveNode> children = new ArrayList<>();
 
-    public NaiveNode() {
-        super();
-    }
+//    public NaiveNode() {
+//        super();
+//    }
 
     public NaiveNode(List<Choice> choices) {
         super(choices);
@@ -24,7 +24,7 @@ public class NaiveNode extends AbstractMCTSNode {
     @Override
     public void expand(AbstractState sState) {
         List<List<Choice>> possibleNexts = sState.getPossibleNextCs();
-        if (possibleNexts == null) {
+        if (possibleNexts == null || possibleNexts.isEmpty()) {
             return;
         }
         // each possible choice corresponds to one MCTS node
