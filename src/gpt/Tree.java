@@ -6,7 +6,7 @@ import world.*;
 
 
 // @Idea: Maybe we can add state property to intention. When the higher
-public class Tree {
+public class Tree implements Cloneable {
     enum Status {
         ACTIVE,
         SUSPEND
@@ -160,5 +160,16 @@ public class Tree {
                 fail(model);
             }
         }
+    }
+
+    @Override
+    public Tree clone() {
+        Tree cloneTree = new Tree(tlg, priority);
+        cloneTree.backtrackList = new ArrayList<>(backtrackList);
+        cloneTree.status = status;
+        cloneTree.currentStep = currentStep;
+        cloneTree.isAchieved = isAchieved;
+
+        return cloneTree;
     }
 }

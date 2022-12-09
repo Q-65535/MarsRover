@@ -5,7 +5,7 @@ import gpt.*;
 import java.util.*;
 
 // @Smell: Should we implement a Model interface (or abstract class)?
-public class MarsRoverModel {
+public class MarsRoverModel implements Cloneable {
     private Position curAgentPosition;
     private Position preAgentPosition;
     private int agentFuel;
@@ -14,7 +14,7 @@ public class MarsRoverModel {
 
     public MarsRoverModel(Position currentPosition, int currentFuel) {
         this.curAgentPosition = currentPosition;
-	this.preAgentPosition = currentPosition;
+        this.preAgentPosition = currentPosition;
         this.agentFuel = currentFuel;
     }
 
@@ -38,7 +38,7 @@ public class MarsRoverModel {
     }
 
     public void setCurAgentPosition(Position p) {
-	this.preAgentPosition = curAgentPosition;
+        this.preAgentPosition = curAgentPosition;
         this.curAgentPosition = p;
     }
 
@@ -83,5 +83,14 @@ public class MarsRoverModel {
 
     public boolean eval(Formula formula) {
         return formula.eval(this);
+    }
+
+    @Override
+    public MarsRoverModel clone() {
+        MarsRoverModel cloneModel = new MarsRoverModel();
+        cloneModel.curAgentPosition = curAgentPosition;
+        cloneModel.preAgentPosition = preAgentPosition;
+        cloneModel.agentFuel = agentFuel;
+        return cloneModel;
     }
 }

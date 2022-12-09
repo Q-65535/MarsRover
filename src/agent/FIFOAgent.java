@@ -14,65 +14,29 @@ public class FIFOAgent extends AbstractAgent {
 
     @Override
     public boolean reason() {
-        // First update intentions.
-        intentionUpdate();
-
-        MarsRoverGenerator gen = new MarsRoverGenerator();
-        // Then adopt new intentions according to last automata transition.
-        List<Automaton> tempAutomata = new ArrayList<>(automata);
-        outer:
-        for (Automaton auto : tempAutomata) {
-            Literal nextTargetLiteral = auto.getNextTargetLiteral();
-	    // Some automata has not nextTargetLiteral, e.g., norms.
-            if (nextTargetLiteral == null) {
-                continue;
-            }
-
-            for (int i = 0; i < 3; i++) {
-
-            }
-            // Now, we consider the transitions that always success.
-            Literal targetLiteral = auto.getNextTargetLiteral();
-            // If the target literal is currently satisfied, just ignore.
-            if (bb.eval(targetLiteral) == true) {
-                continue;
-            }
-
-            GoalNode newGoal = gen.generate(targetLiteral, bb);
-
-            // This is achievement goal type.
-            for (Tree intention : intentions) {
-                // @Incomplete: currently, we say two goals are equal when they have the same name.
-                if (newGoal.getName().equals(intention.getTlg().getName())) {
-                    continue outer;
-                }
-            }
-            // The priority of the new intention is determined by the automaton.
-            adoptGoal(newGoal, auto.priority);
-        }
-
         if (intentions.size() == 0) {
             System.out.printf("Execution stop: the agent has 0 intention.\n");
             return false;
         }
 
-
-	// Each reasoning cycle, we active all intention and then deactive low priority conflicting
-	// intentions.
-	activeAllIntentions();
-	Tree prioIntention = getPriorIntention();
-	suspendConflictingIntentions(prioIntention);
-
         // Select the first highest priority intention to progress.
-        Tree selectedIntention = intentions.get(0);
-        for (Tree intention : intentions) {
+        Tree selectedIntention = null;
+	int selectedIntentionIndex = -1;
+        for (int i = 0; i < intentions.size(); i++) {
+	    Tree intention = intentions.get(i);
             // Find the first active intention to progress.
             if (intention.isActive()) {
                 selectedIntention = intention;
+		selectedIntentionIndex = i;
                 break;
             }
         }
-        choices = getChoices(0, selectedIntention.getCurrentStep());
+	// No active intentions, return false.
+	if (selectedIntention == null) {
+	    return false;
+	}
+
+        choices = getChoices(selectedIntentionIndex, selectedIntention.getCurrentStep());
         return true;
     }
 

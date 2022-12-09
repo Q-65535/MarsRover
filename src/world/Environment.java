@@ -108,6 +108,8 @@ public class Environment {
 
 
         boolean runnable = false;
+        //
+        agent.intentionUpdate();
         boolean executable = agent.reason();
         // each time after the agent reasons, increment the running count
         runningCount++;
@@ -128,6 +130,8 @@ public class Environment {
         }
 	// The agent senses the environment before next reasoning.
         agent.sense(this);
+	// Intention update must be executed after sense!
+        agent.intentionUpdate();
         return runnable;
     }
 

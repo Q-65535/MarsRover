@@ -29,6 +29,6 @@ public class Cross implements Formula {
 
     @Override
     public String toString() {
-	return from + "-->" + to;
+	return from + "->" + to;
     }
 }

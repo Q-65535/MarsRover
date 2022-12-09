@@ -1,26 +1,28 @@
 package mcts;
 
 import MCTSstate.AbstractState;
-import agent.MoveAction;
+import agent.*;
 import running.Default;
+import gpt.*;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public abstract class AbstractMCTSNode {
     static final double epsilon = 1e-6;
-    Random rm = new Random(Default.SEED);
+    Random rm = new Random();
     /**
      * The choice that leads the parent node to this node
      */
-    MoveAction act;
+    final List<Choice> choices;
 
     Statistic statistic = new Statistic();
 
-    public AbstractMCTSNode() {}
+    public AbstractMCTSNode() {
+	this.choices = null;
+    }
 
-    public AbstractMCTSNode(MoveAction act) {
-        this.act = act;
+    public AbstractMCTSNode(List<Choice> choices) {
+	this.choices = choices;
     }
 
     public abstract boolean isLeaf();
@@ -41,7 +43,7 @@ public abstract class AbstractMCTSNode {
 
     public abstract AbstractMCTSNode randomChild();
 
-    public abstract ArrayList<? extends AbstractMCTSNode> getChildren();
+    public abstract List<? extends AbstractMCTSNode> getChildren();
 
 }
 

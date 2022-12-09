@@ -14,7 +14,6 @@ import java.util.*;
 public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
     public static final double delta = 1e-6;
-    Random rm = new Random(Default.SEED);
     // The map size from agent perspective.
     final int mapSize = def_map_size;
     // The agent's belief base.
@@ -26,28 +25,12 @@ public abstract class AbstractAgent implements Cloneable {
     List<Choice> choices;
     List<AGoalNode> achievedGoals;
 
-    private double val = 0;
+    double val = 0;
 
-    /**
-     * The total penalty received
-     */
-    // @Idea: Maybe we need implement an overall value that is the sum of penalty and reward.
-    double penalty;
-    Position currentPosition;
-    // @Refactor: This should be implemented by choices.
-    Position prePosition;
     Position rechargePosition;
     int maxCapacity;
     int totalFuelConsumption;
     int rechargeFuelConsumption;
-    /**
-     * whether the current agent is going to recharge
-     */
-    boolean isGoToRecharge;
-    /**
-     * how much fuel will be consumed for each action (agent's perspective)
-     */
-    int actFuelConsumption;
     /**
      * Whether a goal is achieved. If a goal is achieved, the value is true.
      * The value is turned to false when the agent recharge (This prevents the agent from recharging again
@@ -61,15 +44,11 @@ public abstract class AbstractAgent implements Cloneable {
     public AbstractAgent(int maxCapacity) {
         init();
         this.maxCapacity = maxCapacity;
-        this.bb.setAgentFuel(maxCapacity);
+        this.bb = new MarsRoverModel(def_initial_Position, maxCapacity);
     }
 
     private void init() {
         // init belief base.
-        this.bb = new MarsRoverModel();
-        bb.setCurAgentPosition(def_initial_Position);
-        this.prePosition = currentPosition;
-        this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
 
         intentions = new ArrayList<>();
@@ -79,7 +58,6 @@ public abstract class AbstractAgent implements Cloneable {
         normPositions = new HashMap<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
-        penalty = 0;
     }
 
     public double getVal() {
@@ -156,7 +134,7 @@ public abstract class AbstractAgent implements Cloneable {
 
     // @? how to implement aggregate value function?
     public double getAggregateVal() {
-        return 100 * (achievedGoals.size() / (totalFuelConsumption + delta) - getTotalPenalty());
+        return 100 * (achievedGoals.size() / (totalFuelConsumption + delta));
     }
 
     public int getRechargeFuelConsumption() {
@@ -173,6 +151,14 @@ public abstract class AbstractAgent implements Cloneable {
         }
     }
 
+    public boolean eval(Literal l) {
+        return bb.eval(l);
+    }
+
+    public boolean eval(List<Literal> ls) {
+        return bb.eval(ls);
+    }
+
     public void activeAllIntentions() {
         for (Tree intention : intentions) {
             intention.active();
@@ -180,6 +166,9 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public Tree getPriorIntention() {
+        if (intentions.isEmpty()) {
+            throw new RuntimeException("No prior intention can be found, because intention is empty.");
+        }
         Tree priorIntention = intentions.get(0);
         for (Tree intention : intentions) {
             if (intention.priority > priorIntention.priority) {
@@ -198,7 +187,47 @@ public abstract class AbstractAgent implements Cloneable {
     public void intentionUpdate() {
         successIntentionUpdate();
         failIntentionUpdate();
+
+        // We also adopt new goals according to the last transition.
+        // @Note: this must happen after sense() in each cycle!!!!
+        MarsRoverGenerator gen = new MarsRoverGenerator();
+        // Then adopt new intentions according to last automata transition.
+        List<Automaton> tempAutomata = new ArrayList<>(automata);
+        outer:
+        for (Automaton auto : tempAutomata) {
+            Literal nextTargetLiteral = auto.getNextTargetLiteral();
+            // Some automata has not nextTargetLiteral, e.g., norms.
+            if (nextTargetLiteral == null) {
+                continue;
+            }
+            Literal targetLiteral = auto.getNextTargetLiteral();
+            // If the target literal is currently satisfied, just ignore.
+            if (bb.eval(targetLiteral) == true) {
+                continue;
+            }
+
+            GoalNode newGoal = gen.generate(targetLiteral, bb);
+            // This is achievement goal type.
+            for (Tree intention : intentions) {
+                // @Incomplete: currently, we say two goals are equal when they have the same name.
+                if (newGoal.getName().equals(intention.getTlg().getName())) {
+                    continue outer;
+                }
+            }
+            // The priority of the new intention is determined by the automaton.
+            adoptGoal(newGoal, auto.priority);
+        }
+
+        // In each update cycle, we activate all intention and then deactive low priority conflicting
+        // intentions.
+        activeAllIntentions();
+
+        if (!intentions.isEmpty()) {
+            Tree priorIntention = getPriorIntention();
+            suspendConflictingIntentions(priorIntention);
+        }
     }
+
 
     private void successIntentionUpdate() {
         Iterator<Tree> it = intentions.iterator();
@@ -207,7 +236,7 @@ public abstract class AbstractAgent implements Cloneable {
             GoalNode tlg = gpt.getTlg();
             // If the tlg of current intention is already achieved, drop the intention.
             if (bb.eval(tlg.getGoalConds())) {
-                System.out.println("a goal has just achieved by accident!");
+//                System.out.println("a goal has just achieved by accident!");
                 // We only add achievement goals to the achievedGoals list.
                 // @? Maybe maintenance goal should be considered?
                 if (tlg instanceof AGoalNode) {
@@ -336,12 +365,6 @@ public abstract class AbstractAgent implements Cloneable {
         totalFuelConsumption += (before - after);
     }
 
-
-    public int estimateFuelConsumption(Position from, Position to) {
-        int distance = Calculator.calculateDistance(from, to);
-        return distance * actFuelConsumption;
-    }
-
     /**
      * if current position is recharge position, recharge the fuel
      */
@@ -351,18 +374,6 @@ public abstract class AbstractAgent implements Cloneable {
             // isAchieved turned to false when the agent recharge
             isAchieved = false;
         }
-    }
-
-    /**
-     * update total penalty value according to current position and norms
-     */
-    public void receivePunish(double penaltyValue) {
-        this.penalty += penaltyValue;
-        // @Incomplete: We need a learning mechanism in the future?
-    }
-
-    public double getTotalPenalty() {
-        return penalty;
     }
 
     public void addNormPosition(Position from, Position to) {

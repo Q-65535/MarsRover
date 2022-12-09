@@ -2,6 +2,7 @@ package running;
 
 import agent.AbstractAgent;
 import agent.FIFOAgent;
+import agent.MCTSAgent;
 import generator.MarsRoverGenerator;
 import generator.StateMachineGenerator;
 import gpt.*;
@@ -43,42 +44,43 @@ public class Main {
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
         Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 0);
 
-        // AbstractAgent fifoagent = new FIFOAgent(def_max_capacity);
-        AbstractAgent fifoagent = new FIFOAgent(40);
+        // AbstractAgent agent = new FIFOAgent(def_max_capacity);
+        AbstractAgent agent = new FIFOAgent(100);
+//        AbstractAgent agent = new MCTSAgent(100);
         MarsRoverGenerator genGPT = new MarsRoverGenerator();
 	StateMachineGenerator genAuto = new StateMachineGenerator();
 
         // Creating and adding achievement goals automata.
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 10; i++) {
 	    Automaton auto = genAuto.genBasicAchievementAuto(rm.nextInt(def_map_size), rm.nextInt(def_map_size));
-	    fifoagent.getAutomata().add(auto);
+	    agent.getAutomata().add(auto);
         }
         // Add maintenance goal in the form of automaton.
-        fifoagent.getAutomata().add(genAuto.genBasicMaitAuto(20));
+        agent.getAutomata().add(genAuto.genBasicMaitAuto(20));
 
 	// Add norm automata
-	for (int i = 0; i < 30; i++) {
-	    int x = rm.nextInt(def_map_size);
-	    int y = rm.nextInt(def_map_size);
-	    Position from = new Position(x, y);
-	    Position to = new Position(x + 1, y);
+//	for (int i = 0; i < 20; i++) {
+//	    int x = rm.nextInt(def_map_size);
+//	    int y = rm.nextInt(def_map_size);
+//	    Position from = new Position(x, y);
+//	    Position to = new Position(x + 1, y);
+//
+//	    Automaton auto = genAuto.genBasicNormAuto(from, to, -0.1);
+//	    agent.getAutomata().add(auto);
+//        agent.addNormPosition(from, to);
+//	}
 
-	    Automaton auto = genAuto.genBasicNormAuto(from, to, -0.1);
-	    fifoagent.getAutomata().add(auto);
-        fifoagent.addNormPosition(from, to);
-	}
-
-        Environment defEnv = new Environment(fifoagent);
+        Environment defEnv = new Environment(agent);
         boolean running = true;
-        defEnv.setAgent(fifoagent);
+        defEnv.setAgent(agent);
         while (running) {
             running = defEnv.run();
             displayer.display(defEnv);
             File dotDir = new File("/Users/wudi/automata_dots");
             AutoDotWriter autoDotWriter = new AutoDotWriter();
-            List<Automaton> automata = fifoagent.getAutomata();
+            List<Automaton> automata = agent.getAutomata();
 
-            System.out.printf("Current number of intentions: %d%n", fifoagent.getIntentions().size());
+            System.out.printf("Current number of intentions: %d%n", agent.getIntentions().size());
 //            autoDotWriter.genTransDotFile(dotDir, automata);
 //           pause(500);
 //            autoDotWriter.genDotFile(dotDir, automata);
@@ -87,10 +89,10 @@ public class Main {
 
         displayer.close();
 
-        naiveTotal += fifoagent.getTotalFuelConsumption();
-        mctsTotal += fifoagent.getTotalFuelConsumption();
-        System.out.println("default env resource consumption: " + fifoagent.getTotalFuelConsumption());
-        System.out.println("MCTS env resource consumption: " + fifoagent.getTotalFuelConsumption());
+        naiveTotal += agent.getTotalFuelConsumption();
+        mctsTotal += agent.getTotalFuelConsumption();
+        System.out.println("default env resource consumption: " + agent.getTotalFuelConsumption());
+        System.out.println("MCTS env resource consumption: " + agent.getTotalFuelConsumption());
     }
 
     private static void pause(int millis) {

@@ -1,8 +1,7 @@
 package mcts;
 
-import MCTSstate.AbstractState;
-import MCTSstate.MarsRoverState;
-import agent.MoveAction;
+import MCTSstate.*;
+import agent.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -19,7 +18,7 @@ public class MCTSWorkSpace {
     /**
      * action sequences lead to the best evaluation score
      */
-    public List<MoveAction> bestActs;
+    public List<Choice> bestChoices;
 
     int curAchievedGoalCount = 0;
 
@@ -29,7 +28,7 @@ public class MCTSWorkSpace {
      double bestSimulationResult = Double.NEGATIVE_INFINITY;
 
     public MCTSWorkSpace() {
-        bestActs = new ArrayList<>();
+        bestChoices = new ArrayList<>();
     }
 
     public void setRootState(AbstractState rootState) {
@@ -40,43 +39,23 @@ public class MCTSWorkSpace {
         this.rootMCTSNode = rootMCTSNode;
     }
 
-
     /**
-     * Get the next action choice from best action list. If no action,return null.
+     * Get the next few choices that will finally execute an action.
      */
-    public MoveAction nextBestAct() {
-        if (!hasNextBestAct()) {
-            return null;
-        }
-        return bestActs.remove(0);
+    public List<Choice> popThisCycleChoices() {
+	List<Choice> cs = new ArrayList<>();
+	while(bestChoices.size() > 0) {
+	    Choice c = bestChoices.remove(0);
+	    cs.add(c);
+	    // Hit an action execution choice. This means that choices for current cycle is constructed,
+	    // just break.
+	    if (c.isActionExecution()) {
+		break;
+	    }
+	}
+	return cs;
     }
 
-    public boolean hasNextBestAct() {
-        return !bestActs.isEmpty();
-    }
-
-    /**
-     * Get the best action choice based on the children evaluation
-     */
-    public MoveAction bestActBasedOnChildren() {
-        AbstractMCTSNode bestChild = bestChild();
-        if (bestChild == null) {
-            return null;
-        }
-        return bestChild.act;
-    }
-
-    /**
-     * Get the child node that has the given action
-     */
-    private AbstractMCTSNode getChildBasedOnAct(AbstractMCTSNode parent, MoveAction act) {
-        for (AbstractMCTSNode child : parent.getChildren()) {
-            if (child.act.equals(act)) {
-                return child;
-            }
-        }
-        throw new RuntimeException("no child has such action: " + act);
-    }
 
     /**
      * The best child of root node based on the node's value. Notice that this evaluation is not based on UCT value, we
@@ -84,7 +63,7 @@ public class MCTSWorkSpace {
      */
     public AbstractMCTSNode bestChild() {
         // if the root node cannot be expanded any further
-        ArrayList<? extends AbstractMCTSNode> children = rootMCTSNode.getChildren();
+        List<? extends AbstractMCTSNode> children = rootMCTSNode.getChildren();
         if (children.size() == 0) {
             return null;
         }
@@ -117,13 +96,11 @@ public class MCTSWorkSpace {
      */
     public void run(int alpha, int beta) {
         for (int i = 0; i < alpha; i++) {
-            // current list of actions during selection and simulation
-            List<MoveAction> selectionPhaseActs = new ArrayList<>();
             List<AbstractMCTSNode> visited = new LinkedList<>();
             // this copied state will be iteratively updated
             AbstractState sState = rootState.clone();
             // selection
-            AbstractMCTSNode curNode = doSelectionPhase(sState, visited, selectionPhaseActs);
+            AbstractMCTSNode curNode = doSelectionPhase(sState, visited);
             // expansion
             curNode.expand(sState);
             // random selection and rollout
@@ -131,13 +108,10 @@ public class MCTSWorkSpace {
                 AbstractMCTSNode rollOutNode = randomSelectChildAndUpdateState(curNode, sState);
                 // record and update according to the randomly selected node
                 visited.add(rollOutNode);
-                selectionPhaseActs.add(rollOutNode.act);
 
                 // beta times simulation
                 for (int j = 0; j < beta; j++) {
-                    // record the actions executed during simulation
-                    List<MoveAction> simulationPhaseActs = new ArrayList<>();
-                    AbstractState endState = rollOut(sState, simulationPhaseActs);
+                    AbstractState endState = rollOut(sState);
                     int achievedGoalCount = endState.getAchievedGoalCount();
                     double simulationVal = endState.evaluateState();
                     // update the best simulation result and action list
@@ -145,12 +119,8 @@ public class MCTSWorkSpace {
                     if (bestSimulationResult < simulationVal || curAchievedGoalCount < achievedGoalCount) {
                         curAchievedGoalCount = achievedGoalCount;
                         bestSimulationResult = simulationVal;
-                        // update action list
-                        ArrayList<MoveAction> allActs = new ArrayList<>();
-                        // combine two action lists in selection and simulation phases
-                        allActs.addAll(selectionPhaseActs);
-                        allActs.addAll(simulationPhaseActs);
-                        bestActs = allActs;
+                        // Update the best choices list.
+                        bestChoices = new ArrayList<>(endState.getChoicePath());
                     }
                     // back propagation
                     for (AbstractMCTSNode node : visited) {
@@ -171,8 +141,8 @@ public class MCTSWorkSpace {
      * simulate the progression from the given state to an end state and add all the actions with greatest simulation
      * result to the given container.
      */
-    private AbstractState rollOut(AbstractState sState, List<MoveAction> actContainer) {
-        return sState.randomSim(actContainer);
+    private AbstractState rollOut(AbstractState sState) {
+        return sState.randomSim();
     }
 
     /**
@@ -183,25 +153,22 @@ public class MCTSWorkSpace {
             throw new RuntimeException("This node has no child!");
         }
         AbstractMCTSNode selectedChild = node.randomChild();
-        sState.exeAct(selectedChild.act);
+        sState.update(selectedChild.choices);
         return selectedChild;
     }
 
     /**
      * Do the selection all the way from root to a leaf node and update state and records accordingly
      */
-    private AbstractMCTSNode doSelectionPhase(AbstractState sState, List<AbstractMCTSNode> visited, List<MoveAction> currentActs) {
+    private AbstractMCTSNode doSelectionPhase(AbstractState sState, List<AbstractMCTSNode> visited) {
         AbstractMCTSNode cur = rootMCTSNode;
         visited.add(cur);
         while (cur.isNotLeaf()) {
             cur = cur.select();
             // after selection, update the state and add current mcts node to visited
-            sState.exeAct(cur.act);
+            sState.update(cur.choices);
             visited.add(cur);
-            // and add the action to the executed action list
-            currentActs.add(cur.act);
         }
         return cur;
     }
-
 }

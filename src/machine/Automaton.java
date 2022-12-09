@@ -113,9 +113,10 @@ public class Automaton {
 
     @Override
     public Automaton clone() {
-        Automaton cloneAutomaton = new Automaton(name, new HashSet<>(states), initState);
+        Automaton cloneAutomaton = new Automaton(name, priority, new HashSet<>(states), initState);
         cloneAutomaton.curState = this.curState;
         cloneAutomaton.preState = this.preState;
+        cloneAutomaton.transitionSucceed = transitionSucceed;
         return cloneAutomaton;
     }
 }

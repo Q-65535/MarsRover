@@ -1,17 +1,19 @@
 package mcts;
 
 import MCTSstate.AbstractState;
+import agent.Choice;
 import agent.MoveAction;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SPNode extends NaiveNode {
     static final double constC = 0.1;
     static final double constD = 32;
 
 
-    public SPNode(MoveAction act) {
-        super(act);
+    public SPNode(List<Choice> choices) {
+        super(choices);
     }
 
     public SPNode() {
@@ -21,13 +23,13 @@ public class SPNode extends NaiveNode {
     // we override this method because we want the expanded nodes to be SPnodes instead of naive nodes.
     @Override
     public void expand(AbstractState sState) {
-        ArrayList<MoveAction> possibleNexts = sState.getPossibleNextCs();
+        List<List<Choice>> possibleNexts = sState.getPossibleNextCs();
         if (possibleNexts == null) {
             return;
         }
         // each possible choice corresponds to one MCTS node
-        for (MoveAction possibleNext : possibleNexts) {
-            SPNode child = new SPNode(possibleNext);
+        for (List<Choice> cs : possibleNexts) {
+            SPNode child = new SPNode(cs);
             children.add(child);
         }
     }

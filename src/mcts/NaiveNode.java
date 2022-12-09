@@ -1,20 +1,19 @@
 package mcts;
 
 import MCTSstate.AbstractState;
-import agent.MoveAction;
+import agent.Choice;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class NaiveNode extends AbstractMCTSNode {
-    ArrayList<NaiveNode> children = new ArrayList<>();
-
-
-    public NaiveNode(MoveAction act) {
-        super(act);
-    }
+    List<NaiveNode> children = new ArrayList<>();
 
     public NaiveNode() {
+        super();
+    }
 
+    public NaiveNode(List<Choice> choices) {
+        super(choices);
     }
 
     @Override
@@ -24,13 +23,13 @@ public class NaiveNode extends AbstractMCTSNode {
 
     @Override
     public void expand(AbstractState sState) {
-        ArrayList<MoveAction> possibleNexts = sState.getPossibleNextCs();
+        List<List<Choice>> possibleNexts = sState.getPossibleNextCs();
         if (possibleNexts == null) {
             return;
         }
         // each possible choice corresponds to one MCTS node
-        for (MoveAction possibleNext : possibleNexts) {
-            NaiveNode child = new NaiveNode(possibleNext);
+        for (List<Choice> choices : possibleNexts) {
+            NaiveNode child = new NaiveNode(choices);
             children.add(child);
         }
     }
@@ -68,7 +67,7 @@ public class NaiveNode extends AbstractMCTSNode {
     }
 
     @Override
-    public ArrayList<NaiveNode> getChildren() {
+    public List<? extends AbstractMCTSNode> getChildren() {
         return children;
     }
 }

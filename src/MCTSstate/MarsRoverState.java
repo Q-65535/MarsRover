@@ -1,28 +1,22 @@
 package MCTSstate;
 
-import agent.MCTSAgent;
-import agent.MoveAction;
-import gpt.Position;
-import world.SimEnvironment;
+import agent.*;
+import gpt.*;
+import world.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class MarsRoverState extends AbstractState {
     SimEnvironment simEnv;
-    MCTSAgent simAgent;
-    Position rechargePosition;
+    PuppetAgent simAgent;
 
     public MarsRoverState(SimEnvironment simEnv) {
+	// @Smell: clone shouldn't be placed here...
         this.simEnv = simEnv.clone();
-        if (!(simEnv.getAgent() instanceof MCTSAgent)) {
-
-            throw new RuntimeException("only mcts agent can be added to state");
+        if (!(simEnv.getAgent() instanceof PuppetAgent)) {
+            throw new RuntimeException("Only puppet agent can be added to state");
         }
-        rechargePosition = simEnv.getRechargePosition();
         simAgent = this.simEnv.getAgent();
     }
 
@@ -32,133 +26,116 @@ public class MarsRoverState extends AbstractState {
     }
 
     @Override
-    public void exeAct(MoveAction act) {
-        simEnv.executeAct(act);
+    public void update(List<Choice> choices) {
+        simAgent.setChoices(choices);
+        simEnv.run();
     }
 
     @Override
     public double evaluateState() {
         double consumptionEval = 1.0 / (simAgent.getTotalFuelConsumption() + 1.0);
-        return simAgent.getAchievedGoalCount() + consumptionEval;
+        return simAgent.getVal() + consumptionEval;
     }
 
-    public AbstractState randomSim(List<MoveAction> actContainer) {
+    public AbstractState randomSim() {
         MarsRoverState cloneState = this.clone();
-        MCTSAgent cloneAgent = cloneState.simAgent;
-        List<Position> goals = cloneAgent.getGoals();
-        while (!goals.isEmpty()) {
-            // get the nearest goal
-            Position nearestGoal = cloneAgent.getNearestGoal();
-            // get a random goal
-            Position randomGoal = goals.get(rm.nextInt(goals.size()));
+        SimEnvironment cloneEnv = cloneState.simEnv;
 
-            // stochastically choose a goal to jump
-            Position selectedGoal = rm.nextDouble() < 0 ? nearestGoal : randomGoal;
-
-            /**
-             * reactive simulation
-             */
-            // evaluate resource consumption
-            if (!cloneAgent.isProactive) {
-                int goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
-
-                while (goToRechargeConsumption >= cloneAgent.getCurrentFuel()) {
-                    // go to recharge action
-                    MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
-                    cloneState.exeAct(act);
-                    actContainer.add(act);
-                    // refresh the consumption amount
-                    goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
-                }
-
-                while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
-                    goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
-                    // If the fuel is not enough, first go back to recharge.
-                    while (goToRechargeConsumption >= cloneAgent.getCurrentFuel()) {
-                        // go to recharge action
-                        MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
-                        cloneState.exeAct(act);
-                        actContainer.add(act);
-                        // refresh the consumption amount
-                        goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
-                    }
-
-                    MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
-                    cloneState.exeAct(act);
-                    actContainer.add(act);
-                }
-
-            }
-
-            /**
-             * Proactive simulation
-             */
-            else {
-                // evaluate resource consumption
-               int totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
-
-               while (totalConsumption > cloneAgent.getCurrentFuel()) {
-                   // go to recharge action
-                   MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
-                   cloneState.exeAct(act);
-                   actContainer.add(act);
-                   // refresh the consumption amount
-                   totalConsumption = cloneAgent.estimateFuelConsumption(selectedGoal) + cloneAgent.estimateFuelConsumption(selectedGoal, cloneState.rechargePosition);
-               }
-
-               while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
-                   MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
-                   cloneState.exeAct(act);
-                   actContainer.add(act);
-               }
-            }
+        boolean running = true;
+        while (running) {
+            running = cloneEnv.run();
         }
         return cloneState;
     }
 
     @Override
-    public ArrayList<MoveAction> getPossibleNextCs() {
-        if (simAgent.getCurrentFuel() <= 0) {
-            return null;
-        }
-        // no goals to pursuit
-        if (simAgent.getGoals().size() == 0) {
-            return null;
-        }
-        // fuel is not enough
-        if (simAgent.getCurrentFuel() < simAgent.estimateFuelConsumption(rechargePosition)) {
-            return null;
-        }
+    public List<List<Choice>> getPossibleNextCs() {
+        List<Tree> intentions = simAgent.getIntentions();
+        List<List<Choice>> paths = new ArrayList<>();
+        for (int i = 0; i < intentions.size(); i++) {
+            Tree intention = intentions.get(i);
+            // We don't expand suspended intentions.
+            if (intention.isSuspend()) continue;
 
-        // Reactive recharge
-        if (simAgent.needRecharge()) {
-            return simAgent.getAllActMoveTo(rechargePosition);
-        }
+            TreeNode curStep = intention.getCurrentStep();
+            if (curStep instanceof GoalNode) {
+                GoalNode goal = (GoalNode) curStep;
+                ArrayList<ArrayList<Integer>> planIndexPaths = getPosChoices(goal);
+                for (ArrayList<Integer> planIndexPath : planIndexPaths) {
+                    List<Choice> choicePath = new ArrayList<>();
+                    for (int planIndex : planIndexPath) {
+                        Choice c = new Choice(i, planIndex);
+                        choicePath.add(c);
+                    }
+                    // Add the last action choice.
+                    Choice ac = new Choice(i);
+                    choicePath.add(ac);
+                    paths.add(choicePath);
+                }
 
-        Set<MoveAction> moveActions = new HashSet<>();
-        // add all possible choices
-        for (Position goal : simAgent.getGoals()) {
-            moveActions.addAll(simAgent.getAllActMoveTo(goal));
-            // if all 4 directions are included, immediately return
-            if (moveActions.size() == 4) {
-                return new ArrayList<>(moveActions);
+                // If it is an action node, just add one choice to the list.
+            } else if (curStep instanceof ActionNode) {
+                ActionNode act = (ActionNode) curStep;
+                if (simAgent.eval(act.getPrec())) {
+                    List<Choice> choicePath = new ArrayList<>();
+                    Choice ac = new Choice(i);
+                    choicePath.add(ac);
+                    paths.add(choicePath);
+                }
             }
         }
-        // Add the action to recharge at EVERY step
-//       if (!simAgent.getCurrentPosition().equals(rechargePosition)) {
-//           moveActions.add(simAgent.getActMoveTo(rechargePosition));
-//       }
+        return paths;
+    }
 
-        // add goal in proactive manner
-       if (!simAgent.getCurrentPosition().equals(rechargePosition) && simAgent.isAchieved && simAgent.isProactive) {
-           moveActions.add(simAgent.getActMoveTo(rechargePosition));
-       }
-
-        return new ArrayList<>(moveActions);
+    private ArrayList<ArrayList<Integer>> getPosChoices(GoalNode sg) {
+        // initialise the list
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        // get its associated plans
+        List<PlanNode> pls = sg.getPlans();
+        // check each plan
+        for (int i = 0; i < pls.size(); i++) {
+            // get the precondition of the plan
+            List<Literal> context = pls.get(i).getPrec();
+            // if its precondition holds
+            if (simAgent.eval(context)) {
+                // get the first step of this plan
+                TreeNode first = pls.get(i).getBody().get(0);
+                // if the first step is an action
+                if (first instanceof ActionNode) {
+                    // initialise the list
+                    ArrayList<Integer> cs = new ArrayList<>();
+                    // add the plan choice
+                    cs.add(i);
+                    result.add(cs);
+                }
+                // if the first step is a subgoal
+                else {
+                    // cast it to a subgoal
+                    GoalNode g = (GoalNode) first;
+                    // get the list of choice lists
+                    ArrayList<ArrayList<Integer>> css = getPosChoices(g);
+                    // for each of these lists
+                    for (ArrayList<Integer> s : css) {
+                        ArrayList<Integer> cs = new ArrayList<>();
+                        // Add the plan choice
+                        cs.add(i);
+                        // then add all the choices in the list
+                        cs.addAll(s);
+                        result.add(cs);
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @Override
     public int getAchievedGoalCount() {
         return simAgent.getAchievedGoalCount();
+    }
+
+    @Override
+    public List<Choice> getChoicePath() {
+	return simAgent.getChoicePath();
     }
 }
