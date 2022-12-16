@@ -26,7 +26,7 @@ public class Points extends JPanel {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        g2d.scale(8, 8);
+        g2d.scale(17, 17);
 
         AbstractAgent agent = env.getAgent();
 
@@ -55,7 +55,7 @@ public class Points extends JPanel {
         g2d.setColor(Color.BLACK);
         g2d.scale(0.1, 0.1);
         String recordStr = recordToStr(agent.getCurrentFuel(), agent.getAchievedGoalCount(), agent.getTotalFuelConsumption(), agent.getRechargeFuelConsumption());
-        g2d.drawString(recordStr, 300, 800);
+        g2d.drawString(recordStr, 30, 350);
     }
 
     private void drawCellTo2D(Graphics2D graphic, Set<Cell> cells) {
@@ -84,8 +84,8 @@ public class Points extends JPanel {
         StringBuilder sb = new StringBuilder();
         sb.append("goals: ").append(achievedGoalCount).append(" ");
         sb.append(" cur fuel: ").append(currentFuel).append(" ");
-        sb.append(" total consumption: ").append(totalFuelConsumption).append(" ");
-        sb.append(" recharge consumption: ").append(rechargeConsumption).append(" ");
+        sb.append(" total cons: ").append(totalFuelConsumption).append(" ");
+        sb.append(" recharge cons: ").append(rechargeConsumption).append(" ");
         return sb.toString();
     }
 }

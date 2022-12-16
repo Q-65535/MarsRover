@@ -14,7 +14,7 @@ public class Experiment {
 
     @Test
     void mgVaryGoalNumberCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY").getPath(), 2, 15, 15, 0);
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY").getPath(), 10, 15, 15, 0);
 //        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
 //        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
 //        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
