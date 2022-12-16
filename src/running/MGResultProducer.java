@@ -70,6 +70,9 @@ public class MGResultProducer {
                     }
                     long end = System.currentTimeMillis();
                     long timeTaken = end - begin;
+                    if (agent.getAchievedGoalCount() != goalNum) {
+                        throw new RuntimeException("bug!! achieved goal:" + agent.getAchievedGoalCount() + " target: " + goalNum);
+                    }
                     // add consumption value and time to record
                     consumptionRecords[goalNum][multiplier] += agent.getTotalFuelConsumption();
                     timeRecords[goalNum][multiplier] += (timeTaken);
@@ -85,8 +88,8 @@ public class MGResultProducer {
                 timeRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR,  fileName));
-//        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
+        matrixToFile(consumptionRecords, join(RESULT_DIR,  "cons_" + fileName));
+        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
     }
 
     /**
@@ -176,9 +179,9 @@ public class MGResultProducer {
 //            case "spmcts":
 //                agent = new SPMCTSAgent(capacity);
 //                break;
-            case "profifo":
-                agent = new ProactiveFIFOAgent(capacity);
-                break;
+//            case "profifo":
+//                agent = new ProactiveFIFOAgent(capacity);
+//                break;
             case "fifo":
                 agent = new FIFOAgent(capacity);
                 break;
@@ -186,9 +189,9 @@ public class MGResultProducer {
             case "inffifo":
                 agent = new FIFOAgent(infCapacityAmount);
                 break;
-            case "greedy":
-                agent = new GreedyAgent(capacity);
-                break;
+//            case "greedy":
+//                agent = new GreedyAgent(capacity);
+//                break;
             default:
                 throw new RuntimeException("agent type name is not valid: " + agentType);
         }
@@ -200,6 +203,7 @@ public class MGResultProducer {
      */
     void matrixToFile(double[][] matrix, File resultFile) {
         try {
+            resultFile.getParentFile().mkdirs(); // create dirs if not already exist
             FileWriter writer = new FileWriter(resultFile);
             BufferedWriter bufferedWriter = new BufferedWriter(writer);
 

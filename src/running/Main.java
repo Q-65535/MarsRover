@@ -23,7 +23,7 @@ public class Main {
         }
 
         defEnv = new Environment(def_goals);
-        AbstractAgent testAgent = new ProactiveFIFOAgent(def_max_capacity);
+        AbstractAgent testAgent = new MCTSAgent(def_max_capacity);
         running = true;
         defEnv.setAgent(testAgent);
         while (running) {

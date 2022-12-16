@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/src/running/NormResultProducer.java" />
+      <file url="file://$PROJECT_DIR$/src/MCTSstate/NMarsRoverState.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/ProactiveFIFOAgent.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/GreedyAgent.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/NFIFOAgent.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/NMCTSAgent.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/VBDIAgent.java" />
+      <file url="file://$PROJECT_DIR$/src/running/NormTest.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/SPMCTSAgent.java" />
+      <file url="file://$PROJECT_DIR$/src/agent/NSPMCTSAgent.java" />
+    </excludeFromCompile>
+  </component>
+</project>

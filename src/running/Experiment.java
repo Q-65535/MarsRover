@@ -10,13 +10,13 @@ import static running.Default.*;
 import static running.Utils.*;
 
 public class Experiment {
-    public static String RESULT_ROOT_DIR = "C:\\Users\\GB\\Documents\\projects\\res_results\\MR_results";
+    public static String RESULT_ROOT_DIR = "/Users/wudi/MR_results_old";
 
     @Test
-    void mgVaryGoalNumberCapacityConfigInterval() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY_fixInterval5").getPath(), 10, 15, 15, 5);
+    void mgVaryGoalNumberCapacity() {
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY").getPath(), 2, 15, 15, 0);
 //        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
-        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
+//        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
 //        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
 //        resultProducer.expAgentVaryGoalCapacity("infmcts", "NMCTS.txt");
         resultProducer.expAgentVaryGoalCapacity("reamcts", "RMCTS.txt");
@@ -25,9 +25,10 @@ public class Experiment {
 //        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
 //        resultProducer.expAgent("spmcts", "spmcts.txt");
     }
+
     @Test
-    void mgVaryGoalNumberCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY").getPath(), 10, 15, 15, 0);
+    void mgVaryGoalNumberCapacityConfigInterval() {
+        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY_fixInterval5").getPath(), 10, 15, 15, 5);
 //        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
         resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
 //        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
@@ -62,32 +63,32 @@ public class Experiment {
 
 
 
-    @Test
-    public void normVaryNumberResultProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 0);
-        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
-        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
-        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-    }
-
-    @Test
-    public void dynamicNormVaryNumberResultProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 5);
-        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
-        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
-        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-    }
-
-    @Test
-    public void normVaryIntervalProduce() {
-        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 15, 0);
-        normResultProducer.expAgentVaryTimeGapCapacity("fifo", "vary_interval_fifo.txt");
-        normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_vbdi.txt");
-        normResultProducer.expAgentVaryTimeGapCapacity("mcts", "vary_interval_mcts.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-    }
+//    @Test
+//    public void normVaryNumberResultProduce() {
+//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 0);
+//        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
+////        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
+//    }
+//
+//    @Test
+//    public void dynamicNormVaryNumberResultProduce() {
+//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 5);
+//        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
+//        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
+////        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
+//    }
+//
+//    @Test
+//    public void normVaryIntervalProduce() {
+//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 15, 0);
+//        normResultProducer.expAgentVaryTimeGapCapacity("fifo", "vary_interval_fifo.txt");
+//        normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_vbdi.txt");
+//        normResultProducer.expAgentVaryTimeGapCapacity("mcts", "vary_interval_mcts.txt");
+////        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
+//    }
 
 
 
