@@ -1,6 +1,8 @@
 package running;
 
+import generator.StateMachineGenerator;
 import gpt.Position;
+import machine.Automaton;
 import world.Norm;
 import static world.Calculator.*;
 
@@ -43,8 +45,9 @@ public class Default {
     /**
      * Randomly generate a set of goal positions with an except location
      */
-    public static List<Position> genGoals(int mapSize, int numOfGoals, Position except, Random rm) {
-        List<Position> res = new ArrayList<>();
+    public static List<Automaton> genGoals(int mapSize, int numOfGoals, Position except, Random rm) {
+        StateMachineGenerator gen = new StateMachineGenerator();
+        List<Automaton> res = new ArrayList<>();
         while (res.size() < numOfGoals) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
@@ -53,7 +56,8 @@ public class Default {
             if (position.equals(except) || res.contains(position)) {
                 continue;
             }
-            res.add(position);
+
+            res.add(gen.genBasicAchievementAuto(x, y));
         }
         return res;
     }

@@ -3,10 +3,6 @@ package agent;
 import gpt.*;
 
 public class Choice {
-    public final Tree selectedIntention;
-    /**
-     * intention choice
-     */
     public final int intentionChoice;
     /**
      * plan choice
@@ -22,25 +18,10 @@ public class Choice {
     public Choice(int ic, int pc) {
         intentionChoice = ic;
         planChoice = pc;
-        selectedIntention = null;
     }
 
     public Choice(int ic) {
         this(ic, -1);
-    }
-
-    public Choice(Tree it, int pc) {
-        intentionChoice = -1;
-        selectedIntention = it;
-        planChoice = pc;
-    }
-
-    public Choice(Tree it) {
-        this(it, -1);
-    }
-
-    public boolean isDirectIntentionSelection() {
-        return !(selectedIntention == null);
     }
 
     /**

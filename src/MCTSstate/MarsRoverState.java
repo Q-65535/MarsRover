@@ -50,17 +50,20 @@ public class MarsRoverState extends AbstractState {
 
     @Override
     public List<List<Choice>> getPossibleNextCs() {
+		// Since there are only 4 directions, the choices that results in the same result are
+		// just ignored.
+		Set<ActionNode> acts = new HashSet<>();
+
         List<Tree> intentions = simAgent.getIntentions();
         List<List<Choice>> paths = new ArrayList<>();
         for (int i = 0; i < intentions.size(); i++) {
             Tree intention = intentions.get(i);
-            // We don't expand suspended intentions.
+            // We don't do expansion for suspended intentions.
             if (intention.isSuspend()) continue;
-
             TreeNode curStep = intention.getCurrentStep();
             if (curStep instanceof GoalNode) {
                 GoalNode goal = (GoalNode) curStep;
-                ArrayList<ArrayList<Integer>> planIndexPaths = getPosChoices(goal);
+                ArrayList<ArrayList<Integer>> planIndexPaths = getPosChoices(goal, acts);
                 for (ArrayList<Integer> planIndexPath : planIndexPaths) {
                     List<Choice> choicePath = new ArrayList<>();
                     for (int planIndex : planIndexPath) {
@@ -76,6 +79,11 @@ public class MarsRoverState extends AbstractState {
                 // If it is an action node, just add one choice to the list.
             } else if (curStep instanceof ActionNode) {
                 ActionNode act = (ActionNode) curStep;
+				// We don't add repeated actions for performance consideration.
+				if (acts.contains(act)) {
+					continue;
+				}
+                acts.add(act);
                 if (simAgent.eval(act.getPrec())) {
                     List<Choice> choicePath = new ArrayList<>();
                     Choice ac = new Choice(i);
@@ -87,7 +95,8 @@ public class MarsRoverState extends AbstractState {
         return paths;
     }
 
-    private ArrayList<ArrayList<Integer>> getPosChoices(GoalNode sg) {
+	// The acts is the set of actions that already considered.
+    private ArrayList<ArrayList<Integer>> getPosChoices(GoalNode sg, Set<ActionNode> acts) {
         // initialise the list
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
         // get its associated plans
@@ -102,6 +111,12 @@ public class MarsRoverState extends AbstractState {
                 TreeNode first = pls.get(i).getBody().get(0);
                 // if the first step is an action
                 if (first instanceof ActionNode) {
+                    ActionNode act = (ActionNode) first;
+					// We don't add repeated actions for performance consideration.
+					if (acts.contains(act)) {
+						continue;
+					}
+                    acts.add(act);
                     // initialise the list
                     ArrayList<Integer> cs = new ArrayList<>();
                     // add the plan choice
@@ -113,7 +128,7 @@ public class MarsRoverState extends AbstractState {
                     // cast it to a subgoal
                     GoalNode g = (GoalNode) first;
                     // get the list of choice lists
-                    ArrayList<ArrayList<Integer>> css = getPosChoices(g);
+                    ArrayList<ArrayList<Integer>> css = getPosChoices(g, acts);
                     // for each of these lists
                     for (ArrayList<Integer> s : css) {
                         ArrayList<Integer> cs = new ArrayList<>();

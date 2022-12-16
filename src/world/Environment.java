@@ -37,6 +37,11 @@ public class Environment {
         envMarsRoverModel.sync(agent.getBB());
     }
 
+    public Environment(AbstractAgent agent, int postInterval) {
+        this(agent);
+        this.postInterval = postInterval;
+    }
+
     public Environment(AbstractAgent agent, List<AGoalNode> goals, int postInterval) {
         this(agent);
         this.goals = new ArrayList<>(goals);

@@ -32,4 +32,23 @@ public class ActionNode extends TreeNode {
     public List<Literal> getPostc() {
 	return postc;
     }
+
+
+	// @Incomplete: For the current problem domain, we say two actions are
+	// equal when they have the same name.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ActionNode that = (ActionNode) o;
+
+        return this.getName().equals(that.getName());
+    }
+
+	// The hash code is determined by its name.
+    @Override
+    public int hashCode() {
+        return this.name.hashCode();
+    }
 }

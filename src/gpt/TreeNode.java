@@ -3,7 +3,7 @@ package gpt;
 import java.util.*;
 
 public abstract class TreeNode {
-   private String name;
+   public final String name;
    protected TreeNode parent;
    protected String Name;
    protected TreeNode next;

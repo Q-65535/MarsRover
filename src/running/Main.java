@@ -42,12 +42,10 @@ public class Main {
 
 
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
-        Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 0);
 
 //         AbstractAgent agent = new FIFOAgent(def_max_capacity);
-//        AbstractAgent agent = new FIFOAgent(100);
-        AbstractAgent agent = new MCTSAgent(100);
-        MarsRoverGenerator genGPT = new MarsRoverGenerator();
+//        AbstractAgent agent = new FIFOAgent(60);
+        AbstractAgent agent = new MCTSAgent(60);
         StateMachineGenerator genAuto = new StateMachineGenerator();
 
         // Creating and adding achievement goals automata.
@@ -59,7 +57,7 @@ public class Main {
         agent.getAutomata().add(genAuto.genBasicMaitAuto(20));
 
         // Add norm automata
-//	for (int i = 0; i < 20; i++) {
+//	for (int i = 0; i < 100; i++) {
 //	    int x = rm.nextInt(def_map_size);
 //	    int y = rm.nextInt(def_map_size);
 //	    Position from = new Position(x, y);
@@ -81,9 +79,9 @@ public class Main {
             List<Automaton> automata = agent.getAutomata();
 
             System.out.printf("Current number of intentions: %d%n", agent.getIntentions().size());
-//            autoDotWriter.genTransDotFile(dotDir, automata);
+            autoDotWriter.genTransDotFile(dotDir, automata);
 //           pause(500);
-//            autoDotWriter.genDotFile(dotDir, automata);
+            autoDotWriter.genDotFile(dotDir, automata);
 //           pause(500);
         }
 

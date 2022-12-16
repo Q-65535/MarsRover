@@ -15,6 +15,7 @@ public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
     public static final double delta = 1e-6;
     // The map size from agent perspective.
+    // @Smell: Maybe we don't need this property? Just maybe...
     final int mapSize = def_map_size;
     // The agent's belief base.
     MarsRoverModel bb;
@@ -30,6 +31,7 @@ public abstract class AbstractAgent implements Cloneable {
     Position rechargePosition;
     int maxCapacity;
     int totalFuelConsumption;
+    // @Smell: Recharge fuel consumption is totally unnecessary.
     int rechargeFuelConsumption;
     /**
      * Whether a goal is achieved. If a goal is achieved, the value is true.
@@ -50,14 +52,14 @@ public abstract class AbstractAgent implements Cloneable {
     private void init() {
         // init belief base.
         this.rechargePosition = def_initial_Position;
+        this.totalFuelConsumption = 0;
+        this.rechargeFuelConsumption = 0;
 
         intentions = new ArrayList<>();
         choices = new ArrayList<>();
         achievedGoals = new ArrayList<>();
         automata = new ArrayList<>();
         normPositions = new HashMap<>();
-        totalFuelConsumption = 0;
-        rechargeFuelConsumption = 0;
     }
 
     public double getVal() {
@@ -72,10 +74,9 @@ public abstract class AbstractAgent implements Cloneable {
         return automata;
     }
 
-    // @Incomplete: implement sense method.
     public void sense(Environment env) {
         bb.sync(env.getModel());
-        // Given the model transit each automaton.
+        // After belief updating, we transit each automata.
         Iterator<Automaton> it = automata.iterator();
         while (it.hasNext()) {
             Automaton auto = it.next();
@@ -89,8 +90,19 @@ public abstract class AbstractAgent implements Cloneable {
         }
     }
 
-    // Adopt a new achievement goal.
+    public void addAuto(List<Automaton> automata) {
+        this.automata.addAll(automata);
+    }
+
+    public void addAuto(Automaton automaton) {
+        this.automata.add(automaton);
+    }
+
+    // Adopt a new achievement goal. I mean...., the goal can only be achievement goal.
     public void adoptGoal(GoalNode goal, int priority) {
+	if (!(goal instanceof AGoalNode)) {
+            throw new RuntimeException("Error in adopting new goals: we only accept achievement goals, but you give other types!");
+	}
         StateMachineGenerator gen = new StateMachineGenerator();
         // Achievement goals are immediately transformed to intentions.
         if (goal instanceof AGoalNode) {
@@ -98,8 +110,6 @@ public abstract class AbstractAgent implements Cloneable {
             // Add to the first of the queue.
             intentions.add(0, new Tree(ag, priority));
             // So now we don't consider any other types of goals.
-        } else {
-            throw new RuntimeException("Error in adopting new goals: we only accept achievement goals, but you give other types!");
         }
     }
 
@@ -186,7 +196,7 @@ public abstract class AbstractAgent implements Cloneable {
      */
     public void intentionUpdate() {
         successIntentionUpdate();
-        failIntentionUpdate();
+        // failIntentionUpdate();
 
         // We also adopt new goals according to the last transition.
         // @Note: this must happen after sense() in each cycle!!!!
@@ -238,7 +248,6 @@ public abstract class AbstractAgent implements Cloneable {
             if (bb.eval(tlg.getGoalConds())) {
 //                System.out.println("a goal has just achieved by accident!");
                 // We only add achievement goals to the achievedGoals list.
-                // @? Maybe maintenance goal should be considered?
                 if (tlg instanceof AGoalNode) {
                     AGoalNode ag = (AGoalNode) tlg;
                     achievedGoals.add(ag);

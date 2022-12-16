@@ -3,7 +3,7 @@ package running;
 public class LoopRun {
     public static double epsilon = 1e-6;
     public static void main(String[] args) {
-        int repetition = 100;
+        int repetition = 50;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < repetition; i++) {
             Main.main(null);

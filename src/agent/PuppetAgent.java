@@ -19,6 +19,8 @@ public class PuppetAgent extends AbstractAgent implements Cloneable {
         choicePath = new ArrayList<>();
     }
 
+	// @Note: We need to create a new list for storing the given choices so that the given list
+	// is not affected when the agent execute these choices.
     public void setChoices(List<Choice> choices) {
         this.choices = new ArrayList<>(choices);
     }
