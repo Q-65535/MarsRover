@@ -32,7 +32,6 @@ public class PuppetAgent extends AbstractAgent implements Cloneable {
     @Override
     public boolean reason() {
         if (intentions.size() == 0) {
-            // System.out.printf("Execution stop: the agent has 0 intention.\n");
             return false;
         }
 

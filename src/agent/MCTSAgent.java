@@ -31,7 +31,7 @@ public class MCTSAgent extends AbstractAgent {
         ws.setRootMCTSNode(rootNode);
 
         // run the MCTS process
-        ws.run(10, 10);
+        ws.run(100, 10);
         if (ws.bestChoices.size() > 0) {
             this.choices = ws.popThisCycleChoices();
             return true;

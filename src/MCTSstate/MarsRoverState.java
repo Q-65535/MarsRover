@@ -84,6 +84,10 @@ public class MarsRoverState extends AbstractState {
 					continue;
 				}
                 acts.add(act);
+                // If all 4 directions are included, immediately return
+                if (acts.size() > 4) {
+                    return paths;
+                }
                 if (simAgent.eval(act.getPrec())) {
                     List<Choice> choicePath = new ArrayList<>();
                     Choice ac = new Choice(i);
@@ -117,6 +121,10 @@ public class MarsRoverState extends AbstractState {
 						continue;
 					}
                     acts.add(act);
+                    // If all 4 directions are included, immediately return
+                    if (acts.size() > 4) {
+                        return result;
+                    }
                     // initialise the list
                     ArrayList<Integer> cs = new ArrayList<>();
                     // add the plan choice
