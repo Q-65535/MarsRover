@@ -18,7 +18,7 @@ import static running.Default.*;
 
 public class MGResultProducer {
     public static final String doubleFormatter = "%.3f";
-    public static final int repetitionCount = 100;
+    public static final int repetitionCount = 50;
     public static final int def_goal_count = 10;
     public static final int infCapacityAmount = 99999999;
     static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
@@ -52,7 +52,7 @@ public class MGResultProducer {
     public void expAgentVaryGoalCapacity(String agentType, String fileName) {
         double[][] consumptionRecords = new double[maxGoalNum + 1][maxMultiplier + 1];
         long[][] timeRecords = new long[maxGoalNum + 1][maxMultiplier + 1];
-        for (int goalNum = 1; goalNum <= maxGoalNum; goalNum++) {
+        for (int goalNum = 10; goalNum <= maxGoalNum; goalNum++) {
             for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
                 int capacity = def_map_size * multiplier;
                 // always init the random object to make sure consistency

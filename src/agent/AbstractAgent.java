@@ -242,8 +242,8 @@ public abstract class AbstractAgent implements Cloneable {
      * Estimate whether the agent needs to do recharge operation
      */
     public boolean needRecharge() {
-        return currentFuel <= estimateFuelConsumption(rechargePosition);
-//        return currentFuel <= 20;
+//        return currentFuel <= estimateFuelConsumption(rechargePosition);
+        return currentFuel <= 20;
     }
 
     /**

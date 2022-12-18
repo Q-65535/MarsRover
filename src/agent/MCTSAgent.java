@@ -32,14 +32,20 @@ public class MCTSAgent extends AbstractAgent {
 
     @Override
     public boolean reason() {
+//        long beginA = System.nanoTime();             //------------begin time record-----------------
         SimEnvironment simEnv = constructSimEnvironment();
         AbstractState rootState = constructState(simEnv);
         AbstractMCTSNode rootNode = constructNode();
         ws.setRootState(rootState);
         ws.setRootMCTSNode(rootNode);
+//        System.out.println("workspace construct time cons: " + (System.nanoTime() - beginA));       //-------------end time record------------------
 
         // run the MCTS process
+//        long begin = System.nanoTime();             //------------begin time record-----------------
         ws.run(100, 10);
+//        long timeCons = System.currentTimeMillis() - begin;
+//        System.out.println("MCTS running time cons: " + (System.nanoTime() - begin));       //-------------end time record------------------
+
         if (ws.hasNextBestAct()) {
             this.currentAct = ws.nextBestAct();
             return true;

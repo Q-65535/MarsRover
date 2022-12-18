@@ -137,7 +137,12 @@ public class MCTSWorkSpace {
                 for (int j = 0; j < beta; j++) {
                     // record the actions executed during simulation
                     List<MoveAction> simulationPhaseActs = new ArrayList<>();
-                    AbstractState endState = rollOut(sState, simulationPhaseActs);
+
+//                    long begin = System.nanoTime();
+                    AbstractState endState = sState.randomSim(simulationPhaseActs);
+//                    long timeCons = System.nanoTime() - begin;
+//                    System.out.println("one rollout time cons: " + timeCons);
+
                     int achievedGoalCount = endState.getAchievedGoalCount();
                     double simulationVal = endState.evaluateState();
                     // update the best simulation result and action list

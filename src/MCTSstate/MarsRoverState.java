@@ -44,9 +44,14 @@ public class MarsRoverState extends AbstractState {
 
     @Override
     public AbstractState randomSim(List<MoveAction> actContainer) {
+//        long begin = System.nanoTime();
         MarsRoverState cloneState = this.clone();
         MCTSAgent cloneAgent = cloneState.simAgent;
         List<Cell> goals = cloneAgent.getGoals();
+//        long timeCons = System.nanoTime() - begin;
+//        System.out.println("clone time cons: " + timeCons);
+
+//        begin = System.nanoTime();
         while (!goals.isEmpty()) {
             // get the nearest goal
             Cell nearestGoal = cloneAgent.getNearestGoal();
@@ -61,34 +66,18 @@ public class MarsRoverState extends AbstractState {
              */
             // evaluate resource consumption
             if (!cloneAgent.isProactive) {
-                int goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
-
-                while (goToRechargeConsumption >= cloneAgent.getCurrentFuel()) {
-                    // go to recharge action
-                    MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
-                    cloneState.exeAct(act);
-                    actContainer.add(act);
-                    // refresh the consumption amount
-                    goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
-                }
-
                 while (!cloneAgent.getCurrentPosition().equals(selectedGoal)) {
-                    goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
                     // If the fuel is not enough, first go back to recharge.
-                    while (goToRechargeConsumption >= cloneAgent.getCurrentFuel()) {
+                    while (cloneAgent.needRecharge()) {
                         // go to recharge action
                         MoveAction act = cloneAgent.getActMoveTo(cloneState.rechargePosition);
                         cloneState.exeAct(act);
                         actContainer.add(act);
-                        // refresh the consumption amount
-                        goToRechargeConsumption = cloneAgent.estimateFuelConsumption(cloneAgent.getCurrentPosition(), cloneState.rechargePosition);
                     }
-
                     MoveAction act = cloneAgent.getActMoveTo(selectedGoal);
                     cloneState.exeAct(act);
                     actContainer.add(act);
                 }
-
             }
 
             /**
@@ -114,6 +103,9 @@ public class MarsRoverState extends AbstractState {
                }
             }
         }
+//        timeCons = System.nanoTime() - begin;
+//        System.out.println("one randSim time cons: " + timeCons);
+
         return cloneState;
     }
 
