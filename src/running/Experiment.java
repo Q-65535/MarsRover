@@ -71,14 +71,14 @@ public class Experiment {
 		String resDir = join(RESULT_ROOT_DIR, "sectorSetting_goalX_normY_infCap_static").getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
 //        resultProducer.setInterval(5);
-        resultProducer.setGoalRange(1, 15, 1);
+        resultProducer.setGoalRange(10, 30, 1);
 //        resultProducer.setNormRange(0, 5, 10);
 
-        resultProducer.enableProduceFile();
-//        resultProducer.enableDrawGraphic();
+        // resultProducer.enableProduceFile();
+       resultProducer.enableDrawGraphic();
 
-        resultProducer.exp_goalX_normY("NMG", MGResultProducer.infCapacity);
-        resultProducer.exp_goalX_normY("vBDI", MGResultProducer.infCapacity);
+        // resultProducer.exp_goalX_normY("NMG", MGResultProducer.infCapacity);
+        // resultProducer.exp_goalX_normY("vBDI", MGResultProducer.infCapacity);
         resultProducer.exp_goalX_normY("NMCTS", MGResultProducer.infCapacity);
     }
 
@@ -142,22 +142,22 @@ public class Experiment {
 
     @Test
     void goalX_normY_dynamic(int capacity, int interval) {
-		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_dynamic").getPath();
+		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_interval" + interval).getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
-       resultProducer.setInterval(interval);
+        resultProducer.setInterval(interval);
         resultProducer.setGoalRange(1, 15, 1);
         resultProducer.setNormRange(0, 5, 10);
 
-        // resultProducer.enableProduceFile();
-       resultProducer.enableDrawGraphic();
+        resultProducer.enableProduceFile();
+       // resultProducer.enableDrawGraphic();
 
         // resultProducer.exp_goalX_normY("NMG", capacity);
         // resultProducer.exp_goalX_normY("RMG", capacity);
         resultProducer.exp_goalX_normY("PMG", capacity);
         // resultProducer.exp_goalX_normY("NMCTS", capacity);
         // resultProducer.exp_goalX_normY("RMCTS", capacity);
-        resultProducer.exp_goalX_normY("PMCTS", capacity);
         resultProducer.exp_goalX_normY("vBDI", capacity);
+        resultProducer.exp_goalX_normY("PMCTS", capacity);
     }
 
     @Test

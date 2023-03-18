@@ -19,7 +19,7 @@ public class Environment {
     /**
      * Record how many times this environment has run
      */
-    int runningCount;
+    int runningCount = 0;
     int realActFuelConsumption;
     /**
      * set the default value to be 0, that is, post all goals at the beginning

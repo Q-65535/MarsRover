@@ -58,7 +58,7 @@ public class VBDIAgent extends FIFOAgent {
 
 	private double sectorPenalty(MoveAction act) {
         Cell nextPosition = getNextPosition(act);
-		int nextSector = getSector(nextPosition);
+		Sector nextSector = getSector(nextPosition);
 		if (nextSector != this.curSector) {
 			return crossSectorPenalty;
 		} else {

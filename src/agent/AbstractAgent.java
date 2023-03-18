@@ -29,8 +29,8 @@ public abstract class AbstractAgent implements Cloneable {
     final int mapSize = def_map_size;
     int maxCapacity;
     int currentFuel;
-	int curSector;
-	int preSector;
+	Sector curSector;
+	Sector preSector;
 
     int totalFuelConsumption;
     int rechargeFuelConsumption;
@@ -73,8 +73,8 @@ public abstract class AbstractAgent implements Cloneable {
     private void init() {
         this.currentPosition = def_initial_Position;
         this.prePosition = currentPosition;
-		this.curSector = 2;
-		this.preSector = 2;
+		this.curSector = Sector.two;
+		this.preSector = Sector.two;
         this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
         goals = new ArrayList<>();
@@ -292,28 +292,28 @@ public abstract class AbstractAgent implements Cloneable {
 		// Separate the map into 4 sectors.
 		// if (x < 10 && y < 10) {
 		// 	this.curSector = 1;
-		// } else if ( x < 10 && y >= 9) {
+		// } else if (x < 10 && y >= 9) {
 		// 	this.curSector = 2;
-		// } else if ( x >= 9 && y < 10) {
+		// } else if (x >= 9 && y < 10) {
 		// 	this.curSector = 3;
-		// } else if ( x >= 9 && y >= 9) {
+		// } else if (x >= 9 && y >= 9) {
 		// 	this.curSector = 4;
 		// }
 
 		// Separate the map into 2 sectors.
 		if (x < 10) {
-			this.curSector = 1;
+			this.curSector = Sector.one;
 		} else {
-			this.curSector = 2;
+			this.curSector = Sector.two;
 		}
 	}
 
 	// Given the cell, return its sector.
-	public int getSector(Cell cell) {
+	public Sector getSector(Cell cell) {
         if (cell.getX() < 10) {
-            return 1;
+            return Sector.one;
         } else {
-            return 2;
+            return Sector.two;
         }
 	}
 
@@ -328,4 +328,3 @@ public abstract class AbstractAgent implements Cloneable {
         return norms.keySet();
     }
 }
-

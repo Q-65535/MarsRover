@@ -204,23 +204,15 @@ public class MGResultProducer {
         double[][] penaltyRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
         double[][] consumptionRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
         double[][] aggregateRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
+        int normCount = defNormCount;
+        int normCountMultiplier = 0;
 
         for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount++) {
-            // Changed gap jump to 10
-            for (int normCountMultiplier = normCountStartMultiplier; normCountMultiplier <= normCountEndMultiplier; normCountMultiplier++) {
-                // The actual number of norms is multiplier times 5.
-                int normCount = normCountMultiplier * normCountStep;
-                // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
-                // important: make sure that the random seeds for generating goals and goals are different
-                Random normRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
-                    HashMap<Cell, Norm> norms = genNorms(def_map_size, normCount, defPenalty, def_recharge_position, normRandomObj);
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-					agent.setNorms(norms);
                     Environment environment = new Environment(agent, goals, defInterval);
-
                     boolean running = true;
                     while (running) {
                         running = environment.run();
@@ -237,7 +229,6 @@ public class MGResultProducer {
                 System.out.println("avg penalty: " + penaltyRecords[goalCount][normCountMultiplier] / repetitionCount);
                 System.out.println("avg consumption: " + consumptionRecords[goalCount][normCountMultiplier] / repetitionCount);
                 System.out.println("avg aggregate: " + aggregateRecords[goalCount][normCountMultiplier] / repetitionCount);
-            }
         }
         // get average value
         for (int i = 0; i < penaltyRecords.length; i++) {
