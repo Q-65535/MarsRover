@@ -15,8 +15,8 @@ public class NFIFOAgent extends FIFOAgent {
         this.norms = norms;
     }
 
-    public NFIFOAgent(HashMap<Cell, Norm> norms) {
-        super(infinite_capacity);
+    public NFIFOAgent(int capacity, HashMap<Cell, Norm> norms) {
+        super(capacity);
         this.norms = norms;
     }
 }

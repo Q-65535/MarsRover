@@ -31,14 +31,14 @@ public class FIFOAgent extends AbstractAgent {
 
         if (needRecharge()) {
             isGoToRecharge = true;
-            currentAct = getActMoveTo(rechargePosition);
+            currentAct = getRandomActMoveTo(rechargePosition);
             return true;
         } else {
             isGoToRecharge = false;
         }
 
         // finally set current action
-        currentAct = getActMoveTo(currentGoal);
+        currentAct = getRandomActMoveTo(currentGoal);
         return true;
     }
 

@@ -1,7 +1,9 @@
 package agent;
 
 import world.Cell;
+import world.Norm;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +16,11 @@ public class ProactiveFIFOAgent extends FIFOAgent {
 
     public ProactiveFIFOAgent(int maxCapacity) {
         super(maxCapacity);
+    }
+
+    public ProactiveFIFOAgent(int capacity, HashMap<Cell, Norm> norms) {
+        super(capacity);
+        this.norms = norms;
     }
 
     @Override

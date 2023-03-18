@@ -11,6 +11,7 @@ import java.util.*;
 public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
     public static final double delta = 1e-6;
+	public static final double crossSectorPenalty = 0.1;
     Random rm = new Random(Default.SEED);
 
     /**
@@ -28,6 +29,9 @@ public abstract class AbstractAgent implements Cloneable {
     final int mapSize = def_map_size;
     int maxCapacity;
     int currentFuel;
+	int curSector;
+	int preSector;
+
     int totalFuelConsumption;
     int rechargeFuelConsumption;
     /**
@@ -40,11 +44,18 @@ public abstract class AbstractAgent implements Cloneable {
     int actFuelConsumption;
     /**
      * Whether a goal is achieved. If a goal is achieved, the value is true.
-     * The value is turned to false when the agent recharge (This prevents the agent from recharging again
-     * and again without achieving any goals.
+     * The value is turned to false when the agent recharge (This prevents the agent from recharging
+	 * again and again without achieving any goals.
      * @Smell: init the value in the constructor!!!!!!!
      */
     public boolean isAchieved = false;
+
+    public AbstractAgent(List<Cell> goals, HashMap<Cell, Norm> norms,  int maxCapacity) {
+        init();
+        this.maxCapacity = maxCapacity;
+        this.currentFuel = maxCapacity;
+		this.norms = norms;
+    }
 
     public AbstractAgent(List<Cell> goals, int maxCapacity) {
         init();
@@ -62,10 +73,13 @@ public abstract class AbstractAgent implements Cloneable {
     private void init() {
         this.currentPosition = def_initial_Position;
         this.prePosition = currentPosition;
+		this.curSector = 2;
+		this.preSector = 2;
         this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
         goals = new ArrayList<>();
         achievedGoals = new ArrayList<>();
+        this.norms = new HashMap<>();
         totalFuelConsumption = 0;
         rechargeFuelConsumption = 0;
         penalty = 0;
@@ -87,6 +101,10 @@ public abstract class AbstractAgent implements Cloneable {
         return goals;
     }
 
+	public void setNorms(HashMap<Cell, Norm> norms) {
+		this.norms = norms;
+	}
+
     public Cell getCurrentPosition() {
         return currentPosition;
     }
@@ -100,7 +118,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public double getAggregateVal() {
-        return 100 * (achievedGoals.size() / (totalFuelConsumption + delta) - getTotalPenalty());
+        return achievedGoals.size() / (totalFuelConsumption + delta) - getTotalPenalty();
     }
 
     public int getRechargeFuelConsumption() {
@@ -116,9 +134,9 @@ public abstract class AbstractAgent implements Cloneable {
     /**
      * Generate an action based on the goal position and agent current position
      */
-    public MoveAction getActMoveTo(Cell goal) {
+    public MoveAction getRandomActMoveTo(Cell goal) {
         ArrayList<MoveAction> acts = getAllActMoveTo(goal);
-        // randomly pick a possible action
+        // Randomly pick a possible action.
         return acts.get(rm.nextInt(acts.size()));
     }
 
@@ -200,10 +218,6 @@ public abstract class AbstractAgent implements Cloneable {
         return distance * actFuelConsumption;
     }
 
-    public void updatePosition(Cell newPosition) {
-        this.currentPosition = newPosition;
-    }
-
     public void updatePosition(int x, int y) {
         this.prePosition = this.currentPosition;
         this.currentPosition = new Cell(x, y);
@@ -250,17 +264,58 @@ public abstract class AbstractAgent implements Cloneable {
      * update total penalty value according to current position and norms
      */
     public void updatePunish() {
-        // if no norm, nothing happens
-        if (norms == null) {
-            return;
-        }
+        // If no norm, nothing happens.
+        // if (norms == null) {
+        //     return;
+        // }
 
         // If current position is norm and previous position is not norm, punish is invoked.
-        if (norms.containsKey(currentPosition) && !norms.containsKey(prePosition)) {
-            Norm relatedNorm = norms.get(currentPosition);
-            this.penalty += relatedNorm.getPenalty();
-        }
+        // if (norms.containsKey(currentPosition) && !norms.containsKey(prePosition)) {
+        //     Norm relatedNorm = norms.get(currentPosition);
+        //     this.penalty += relatedNorm.getPenalty();
+        // }
+
+		updateSectorPunish();
     }
+
+	public void updateSectorPunish() {
+		if (this.curSector != this.preSector) {
+			this.penalty += crossSectorPenalty;
+		}
+	}
+
+	public void updateSector() {
+		int x = this.currentPosition.getX();
+		int y = this.currentPosition.getY();
+		this.preSector = this.curSector;
+
+		// Separate the map into 4 sectors.
+		// if (x < 10 && y < 10) {
+		// 	this.curSector = 1;
+		// } else if ( x < 10 && y >= 9) {
+		// 	this.curSector = 2;
+		// } else if ( x >= 9 && y < 10) {
+		// 	this.curSector = 3;
+		// } else if ( x >= 9 && y >= 9) {
+		// 	this.curSector = 4;
+		// }
+
+		// Separate the map into 2 sectors.
+		if (x < 10) {
+			this.curSector = 1;
+		} else {
+			this.curSector = 2;
+		}
+	}
+
+	// Given the cell, return its sector.
+	public int getSector(Cell cell) {
+        if (cell.getX() < 10) {
+            return 1;
+        } else {
+            return 2;
+        }
+	}
 
     public double getTotalPenalty() {
         return penalty;

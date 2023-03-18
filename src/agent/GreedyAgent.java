@@ -3,7 +3,6 @@ package agent;
 import world.Cell;
 
 import java.util.List;
-import java.util.Set;
 
 public class GreedyAgent extends ProactiveFIFOAgent {
 
@@ -32,7 +31,7 @@ public class GreedyAgent extends ProactiveFIFOAgent {
 
         if (needRecharge()) {
             isGoToRecharge = true;
-            currentAct = getActMoveTo(rechargePosition);
+            currentAct = getRandomActMoveTo(rechargePosition);
             return true;
         } else {
             isGoToRecharge = false;
@@ -40,7 +39,7 @@ public class GreedyAgent extends ProactiveFIFOAgent {
 
         // finally set nearest and generate an action
         setNearestAsCurrentGoal();
-        currentAct = getActMoveTo(currentGoal);
+        currentAct = getRandomActMoveTo(currentGoal);
         return true;
     }
 }

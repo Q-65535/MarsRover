@@ -4,11 +4,13 @@ import agent.*;
 import graphic.EnvironmentDisplayer;
 import world.Cell;
 import world.Environment;
+import world.Norm;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -18,67 +20,127 @@ import static running.Default.*;
 
 public class MGResultProducer {
     public static final String doubleFormatter = "%.3f";
-    public static final int repetitionCount = 50;
-    public static final int def_goal_count = 10;
-    public static final int infCapacityAmount = 99999999;
+    public static final int infCapacity = Integer.MAX_VALUE;
     static EnvironmentDisplayer displayer = new EnvironmentDisplayer();
     /**
      * The result directory
      */
     public final String RESULT_DIR;
-    /**
-     * Capacity is multiplier x mapSize
-     */
-    public final int maxMultiplier;
-    public final int maxGoalNum;
-    public final int maxPostGoalTimeGap;
-    public final int defPostGoalTimeGap;
-    // TODO refactor: properly set the parameters
-    public final int maxDispersionDegree = 8;
 
-    public MGResultProducer(String RESULT_DIR, int maxMultiplier, int maxGoalNum, int maxPostGoalTimeGap, int defPostGoalTimeGap) {
+    private int repetitionCount = 100;
+    private boolean isProduceFile = false;
+    private boolean isDrawGraphic = false;
+
+	private int goalCountStart = 1;
+	private int goalCountEnd = 15;
+	private int goalCountStep = 1;
+	private int defGoalCount = 10;
+
+    /**
+     * Capacity = multiplier x capStep
+     */
+	private int capStartMultiplier = 2;
+	private int capEndMultiplier = 10;
+	private int capStep = 20;
+
+	private double defPenalty = 0.1;
+
+	private int normCountStartMultiplier = 0;
+	private int normCountEndMultiplier = 5;
+	private int normCountStep = 10;
+	private int defNormCount = 0;
+
+	private int intervalStart = 1;
+	private int intervalEnd = 15;
+	private int intervalStep = 1;
+	private int defInterval = 0;
+
+
+    public MGResultProducer(String RESULT_DIR) {
         this.RESULT_DIR = RESULT_DIR;
-        this.maxMultiplier = maxMultiplier;
-        this.maxGoalNum = maxGoalNum;
-        this.maxPostGoalTimeGap = maxPostGoalTimeGap;
-        this.defPostGoalTimeGap = defPostGoalTimeGap;
         // create the new dir
         new File(RESULT_DIR).mkdir();
     }
 
+	public void setRepetitionCount(int count) {
+		this.repetitionCount = count;
+	}
+
+    public void enableProduceFile() {
+        this.isProduceFile = true;
+    }
+
+    public void enableDrawGraphic() {
+        this.isDrawGraphic = true;
+    }
+
+	public void setGoalCount(int goalCount) {
+		this.defGoalCount = goalCount;
+	}
+
+	public void setInterval(int interval) {
+		this.defInterval = interval;
+	}
+
+	public void setGoalRange(int start, int end, int step) {
+		this.goalCountStart = start;
+		this.goalCountEnd = end;
+		this.goalCountStep = step;
+	}
+
+	public void setCapRange(int startMultiplier, int endMultiplier, int step) {
+		this.capStartMultiplier = startMultiplier;
+		this.capEndMultiplier = endMultiplier;
+		this.capStep = step;
+	}
+
+	public void setNormRange(int startMultiplier, int endMultiplier, int step) {
+		this.normCountStartMultiplier = startMultiplier;
+		this.normCountEndMultiplier = endMultiplier;
+		this.normCountStep = step;
+	}
+
+	public void setIntervalRange(int start, int end, int step) {
+		this.intervalStart = start;
+		this.intervalEnd = end;
+		this.intervalStep = step;
+	}
+
     /**
      * experiment a type of agent with different number of goals and different capacity, then write the result to a file
      */
-    public void expAgentVaryGoalCapacity(String agentType, String fileName) {
-        double[][] consumptionRecords = new double[maxGoalNum + 1][maxMultiplier + 1];
-        long[][] timeRecords = new long[maxGoalNum + 1][maxMultiplier + 1];
-        for (int goalNum = 10; goalNum <= maxGoalNum; goalNum++) {
-            for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
-                int capacity = def_map_size * multiplier;
+    public void exp_goalX_capY(String agentType) {
+        double[][] consumptionRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
+        long[][] timeRecords = new long[goalCountEnd + 1][capEndMultiplier + 1];
+        for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount += goalCountStep) {
+            for (int capMultiplier = capStartMultiplier; capMultiplier <= capEndMultiplier; capMultiplier++) {
+                int capacity = capStep * capMultiplier;
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = Default.genGoals(def_map_size, goalNum, def_recharge_position, random);
+                    List<Cell> goals = Default.genGoals(def_map_size, goalCount, def_recharge_position, random);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    Environment environment = new Environment(agent, goals, defPostGoalTimeGap);
+                    Environment environment = new Environment(agent, goals, defInterval);
                     // Record time
                     long begin = System.currentTimeMillis();
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-//                        displayer.display(environment);
+                        if (isDrawGraphic) {
+                            displayer.display(environment);
+                        }
                     }
                     long end = System.currentTimeMillis();
-                    long timeTaken = end - begin;
-                    if (agent.getAchievedGoalCount() != goalNum) {
-                        throw new RuntimeException("bug!! achieved goal:" + agent.getAchievedGoalCount() + " target: " + goalNum);
+                    long timeCons = end - begin;
+                    if (agent.getAchievedGoalCount() != goalCount) {
+                        throw new RuntimeException("bug!! achieved goal:" + agent.getAchievedGoalCount() + " target: " + goalCount);
                     }
                     // add consumption value and time to record
-                    consumptionRecords[goalNum][multiplier] += agent.getTotalFuelConsumption();
-                    timeRecords[goalNum][multiplier] += (timeTaken);
+                    consumptionRecords[goalCount][capMultiplier] += agent.getTotalFuelConsumption();
+                    timeRecords[goalCount][capMultiplier] += (timeCons);
                 }
-                System.out.println("goal: " + goalNum +", tank: " + capacity + ", avg consumption: " + consumptionRecords[goalNum][multiplier] / repetitionCount);
-                System.out.println("time taken: " + timeRecords[goalNum][multiplier] / repetitionCount);
+                System.out.println("goal: " + goalCount +", battery: " + capacity + ", avg cons: " + consumptionRecords[goalCount][capMultiplier] / repetitionCount);
+                System.out.println("time cons: " + timeRecords[goalCount][capMultiplier] / repetitionCount);
             }
         }
         // get average value
@@ -88,35 +150,40 @@ public class MGResultProducer {
                 timeRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR,  "cons_" + fileName));
-        matrixToFile(timeRecords, join(RESULT_DIR, "time_" + fileName));
+        if (isProduceFile) {
+            matrixToFile(consumptionRecords, join(RESULT_DIR,  "cons_" + agentType + ".txt"));
+            matrixToFile(timeRecords, join(RESULT_DIR, "time_" + agentType + ".txt"));
+        }
     }
 
     /**
      * experiment a type of agent with differrent posting goal intervals and different capacity,
      * then write the result to a file
      */
-    public void expAgentVaryTimeGapCapacity(String agentType, String fileName) {
-        double[][] consumptionRecords = new double[maxPostGoalTimeGap + 1][maxMultiplier + 1];
-        for (int timeGap = 1; timeGap <= maxPostGoalTimeGap; timeGap++) {
-            for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
-                int capacity = def_map_size * multiplier;
+	//@Incomplete: We need the number of norms to be specifed.
+    public void exp_intervalX_capY(String agentType, int goalCount) {
+        double[][] consumptionRecords = new double[intervalEnd + 1][capEndMultiplier + 1];
+        for (int interval = 1; interval <= intervalEnd; interval++) {
+            for (int capMultiplier = 2; capMultiplier <= capEndMultiplier; capMultiplier++) {
+                int capacity = def_map_size * capMultiplier;
                 // always init the random object to make sure consistency
                 Random random = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = Default.genGoals(def_map_size, def_goal_count, def_recharge_position, random);
+                    List<Cell> goals = Default.genGoals(def_map_size, goalCount, def_recharge_position, random);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    Environment environment = new Environment(agent, goals, timeGap);
+                    Environment environment = new Environment(agent, goals, interval);
 
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-//                        displayer.display(environment);
+                        if (isDrawGraphic) {
+                            displayer.display(environment);
+                        }
                     }
                     // add consumption value to record
-                    consumptionRecords[timeGap][multiplier] += agent.getTotalFuelConsumption();
+                    consumptionRecords[interval][capMultiplier] += agent.getTotalFuelConsumption();
                 }
-                System.out.println("timeGap: " + timeGap +", tank: " + capacity + ", avg consumption: " + consumptionRecords[timeGap][multiplier] / repetitionCount);
+                System.out.println("interval: " + interval +", tank: " + capacity + ", avg consumption: " + consumptionRecords[interval][capMultiplier] / repetitionCount);
             }
         }
         // get average value
@@ -125,73 +192,97 @@ public class MGResultProducer {
                 consumptionRecords[i][j] /= repetitionCount;
             }
         }
-        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        if (isProduceFile) {
+            matrixToFile(consumptionRecords, join(RESULT_DIR, agentType + ".txt"));
+        }
     }
 
-    /**
-     * experiment a type of agent with different dispersion degrees and different capacity, then write the result to a file
-     */
-    public void expAgentVaryDispersionCapacity(String agentType, String fileName) {
-        double[][] consumptionRecords = new double[maxDispersionDegree + 1][maxMultiplier + 1];
-        for (int degree = 0; degree <= maxDispersionDegree; degree++) {
-            for (int multiplier = 2; multiplier <= maxMultiplier; multiplier++) {
-                int capacity = def_map_size * multiplier;
+	/**
+	 * norm experiments. In this experiment setting, we need to specify the fixed capacity.
+	 */
+    public void exp_goalX_normY(String agentType, int capacity) {
+        double[][] penaltyRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
+        double[][] consumptionRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
+        double[][] aggregateRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
+
+        for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount++) {
+            // Changed gap jump to 10
+            for (int normCountMultiplier = normCountStartMultiplier; normCountMultiplier <= normCountEndMultiplier; normCountMultiplier++) {
+                // The actual number of norms is multiplier times 5.
+                int normCount = normCountMultiplier * normCountStep;
                 // always init the random object to make sure consistency
-                Random random = new Random(SEED);
+                Random goalRandomObj = new Random(SEED);
+                // important: make sure that the random seeds for generating goals and goals are different
+                Random normRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = Default.genGoals(def_map_size, def_goal_count, def_recharge_position, random, degree);
+                    HashMap<Cell, Norm> norms = genNorms(def_map_size, normCount, defPenalty, def_recharge_position, normRandomObj);
+                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    Environment environment = new Environment(agent, goals);
+					agent.setNorms(norms);
+                    Environment environment = new Environment(agent, goals, defInterval);
 
                     boolean running = true;
                     while (running) {
                         running = environment.run();
-                        displayer.display(environment);
+                        if (isDrawGraphic) {
+                            displayer.display(environment);
+                        }
                     }
                     // add consumption value to record
-                    consumptionRecords[degree][multiplier] += agent.getTotalFuelConsumption();
+                    penaltyRecords[goalCount][normCountMultiplier] += agent.getTotalPenalty();
+                    consumptionRecords[goalCount][normCountMultiplier] += agent.getTotalFuelConsumption();
+                    aggregateRecords[goalCount][normCountMultiplier] += agent.getAggregateVal();
                 }
-                System.out.println("dispersion degree: " + degree +", capacity: " + multiplier * def_map_size + ", avg consumption: " + consumptionRecords[degree][multiplier] / repetitionCount);
+                System.out.println("goalCount: " + goalCount + ", normCount: " + normCount);
+                System.out.println("avg penalty: " + penaltyRecords[goalCount][normCountMultiplier] / repetitionCount);
+                System.out.println("avg consumption: " + consumptionRecords[goalCount][normCountMultiplier] / repetitionCount);
+                System.out.println("avg aggregate: " + aggregateRecords[goalCount][normCountMultiplier] / repetitionCount);
             }
         }
         // get average value
-        for (int i = 0; i < consumptionRecords.length; i++) {
-            for (int j = 0; j < consumptionRecords[i].length; j++) {
+        for (int i = 0; i < penaltyRecords.length; i++) {
+            for (int j = 0; j < penaltyRecords[i].length; j++) {
+                penaltyRecords[i][j] /= repetitionCount;
                 consumptionRecords[i][j] /= repetitionCount;
+                aggregateRecords[i][j] /= repetitionCount;
             }
         }
-//        matrixToFile(consumptionRecords, join(RESULT_DIR, fileName));
+        System.out.println("------------------------------------------------------------Experiment: " + agentType + "---------------------------------------------------------------------------------------------");
+
+        if (isProduceFile) {
+            matrixToFile(penaltyRecords, join(RESULT_DIR, "penalty_" + agentType + ".txt"));
+            matrixToFile(consumptionRecords, join(RESULT_DIR, "cons_" + agentType + ".txt"));
+            matrixToFile(aggregateRecords, join(RESULT_DIR, "agg_" + agentType + ".txt"));
+        }
     }
 
     AbstractAgent genNewAgent(String agentType, int capacity) {
         AbstractAgent agent;
         switch (agentType) {
-            case "promcts":
+            case "PMCTS":
                 agent = new MCTSAgent(capacity, true);
                 break;
-            case "reamcts":
-                agent = new MCTSAgent(capacity, false);
+            case "RMCTS":
+				// The default strategy is not proactive.
+                agent = new MCTSAgent(capacity);
                 break;
                 // Infinite fuel mcts
-            case "infmcts":
-                agent = new MCTSAgent(infCapacityAmount, false);
+            case "NMCTS":
+                agent = new MCTSAgent(infCapacity);
                 break;
-//            case "spmcts":
-//                agent = new SPMCTSAgent(capacity);
-//                break;
-//            case "profifo":
-//                agent = new ProactiveFIFOAgent(capacity);
-//                break;
-            case "fifo":
+            case "PMG":
+                agent = new ProactiveFIFOAgent(capacity);
+                break;
+            case "RMG":
                 agent = new FIFOAgent(capacity);
                 break;
                 // Infinite fuel fifo
-            case "inffifo":
-                agent = new FIFOAgent(infCapacityAmount);
+            case "NMG":
+                agent = new FIFOAgent(infCapacity);
                 break;
-//            case "greedy":
-//                agent = new GreedyAgent(capacity);
-//                break;
+            case "vBDI":
+                agent = new VBDIAgent(capacity);
+                break;
             default:
                 throw new RuntimeException("agent type name is not valid: " + agentType);
         }

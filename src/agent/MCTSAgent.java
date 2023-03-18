@@ -7,9 +7,12 @@ import mcts.MCTSWorkSpace;
 import mcts.NaiveNode;
 import running.Default;
 import world.Cell;
+import world.Norm;
 import world.SimEnvironment;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MCTSAgent extends AbstractAgent {
     // Whether the agent uses proactive strategy
@@ -26,13 +29,22 @@ public class MCTSAgent extends AbstractAgent {
         this.isProactive = isProactive;
     }
 
+    public MCTSAgent(int maxCapacity, HashMap<Cell, Norm> norms) {
+        super(maxCapacity);
+		this.norms = norms;
+    }
+
     public MCTSAgent(int maxCapacity) {
         super(maxCapacity);
     }
 
+	public void setIsProactive(boolean isProactive) {
+		this.isProactive = isProactive;
+	}
+
     @Override
     public boolean reason() {
-//        long beginA = System.nanoTime();             //------------begin time record-----------------
+//        long beginA = System.nanoTime();             //------------start time record-----------------
         SimEnvironment simEnv = constructSimEnvironment();
         AbstractState rootState = constructState(simEnv);
         AbstractMCTSNode rootNode = constructNode();
@@ -95,7 +107,7 @@ public class MCTSAgent extends AbstractAgent {
 
         MCTSAgent cloneAgent = new MCTSAgent(cloneGoals, maxCapacity, isProactive);
 
-        // important: clone all the records
+        // @Important: clone all the records
         cloneAgent.currentPosition = this.currentPosition;
         cloneAgent.currentFuel = this.currentFuel;
         cloneAgent.totalFuelConsumption = this.totalFuelConsumption;

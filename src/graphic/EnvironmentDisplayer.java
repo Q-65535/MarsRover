@@ -24,4 +24,8 @@ public class EnvironmentDisplayer {
             throw new RuntimeException(e);
         }
     }
+
+    public void close() {
+        frame.dispose();
+    }
 }

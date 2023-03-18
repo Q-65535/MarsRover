@@ -16,20 +16,22 @@ public class Main {
         AbstractAgent mctsAgent = new MCTSAgent(def_max_capacity);
 
         boolean running = true;
-        defEnv.setAgent(mctsAgent);
-        while (running) {
-            running = defEnv.run();
-            displayer.display(defEnv);
-        }
+//        defEnv.setAgent(mctsAgent);
+//        while (running) {
+//            running = defEnv.run();
+//            displayer.display(defEnv);
+//        }
 
         defEnv = new Environment(def_goals);
-        AbstractAgent testAgent = new MCTSAgent(def_max_capacity);
+        AbstractAgent testAgent = new FIFOAgent(def_max_capacity);
         running = true;
         defEnv.setAgent(testAgent);
         while (running) {
             running = defEnv.run();
-            displayer.display(defEnv);
+//            displayer.display(defEnv);
+            System.out.println("1111111");
         }
+        displayer.close();
 
         naiveTotal += testAgent.getTotalFuelConsumption();
         mctsTotal += mctsAgent.getTotalFuelConsumption();

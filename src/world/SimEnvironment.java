@@ -32,20 +32,8 @@ public class SimEnvironment extends Environment implements Cloneable {
         agent.updateGoal();
         agent.consumeFuel(realActFuelConsumption);
         agent.updateRecharge();
+		agent.updateSector();
         agent.updatePunish();
-    }
-
-    /**
-     * allow the agent to jump between loactions during the simulation for saving exection time.
-     */
-    public void executeJump(Cell goal) {
-        Cell currentPosition = agent.getCurrentPosition();
-        int distance = Calculator.calculateDistance(currentPosition, goal);
-
-        agent.updatePosition(goal);
-        agent.updateGoal();
-        agent.consumeFuel(realActFuelConsumption * distance);
-        agent.updateRecharge();
     }
 
     @Override

@@ -103,7 +103,7 @@ public class Environment {
         boolean executable = agent.reason();
         // each time after the agent reasons, increment the running count
 
-//        long begin = System.nanoTime();               // ----------begin time record------------
+       // long begin = System.nanoTime();               // ----------begin time record------------
         runningCount++;
         if (executable) {
             runnable = true;
@@ -115,7 +115,7 @@ public class Environment {
         } else if (haveGoal()) {
             runnable = true;
         }
-//        System.out.println("env execute (include all but no reason) time cons: " + (System.nanoTime() - begin));    // ----------end time record------------
+       // System.out.println("env execute (include all but no reason) time cons: " + (System.nanoTime() - begin));    // ----------end time record------------
         return runnable;
     }
 
@@ -174,6 +174,7 @@ public class Environment {
         agent.updateGoal();
         agent.consumeFuel(realActFuelConsumption);
         agent.updateRecharge();
+		agent.updateSector();
         agent.updatePunish();
     }
 

@@ -10,47 +10,50 @@ import static running.Default.*;
 import static running.Utils.*;
 
 public class Experiment {
-    public static String RESULT_ROOT_DIR = "/Users/wudi/MR_results_old";
+    public static String homeDir = System.getProperty("user.home");
+    public static String RESULT_ROOT_DIR = join(homeDir, "MR_results_old").getPath();
 
     @Test
-    void mgVaryGoalNumberCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY").getPath(), 2, 15, 15, 0);
-//        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
-//        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
-//        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
-//        resultProducer.expAgentVaryGoalCapacity("infmcts", "NMCTS.txt");
-        resultProducer.expAgentVaryGoalCapacity("reamcts", "RMCTS.txt");
-//        resultProducer.expAgentVaryGoalCapacity("promcts", "PMCTS.txt");
+    void goalX_capY() {
+		String resDir = join(RESULT_ROOT_DIR, "mg_goalX_capY").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+		resultProducer.setGoalRange(1, 15, 1);
+		resultProducer.setCapRange(2, 10, 20);
+//        resultProducer.enableProduceFile();
+//       resultProducer.enableDrawGraphic();
 
-//        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
-//        resultProducer.expAgent("spmcts", "spmcts.txt");
+        // resultProducer.exp_goalX_capY("infbasic", capacity);
+        // resultProducer.exp_goalX_capY("basic", capacity);
+        // resultProducer.exp_goalX_capY("probasic", capacity);
+        // resultProducer.exp_goalX_capY("infmcts", capacity);
+        resultProducer.exp_goalX_capY("reamcts");
+        resultProducer.exp_goalX_capY("promcts");
+        // resultProducer.exp_goalX_capY("vbdi", capacity);
     }
 
     @Test
-    void mgVaryGoalNumberCapacityConfigInterval() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_goalX_capY_fixInterval5").getPath(), 10, 15, 15, 5);
-//        resultProducer.expAgentVaryGoalCapacity("inffifo", "NMG.txt");
-        resultProducer.expAgentVaryGoalCapacity("fifo", "RMG.txt");
-//        resultProducer.expAgentVaryGoalCapacity("profifo", "PMG.txt");
-//        resultProducer.expAgentVaryGoalCapacity("infmcts", "NMCTS.txt");
-        resultProducer.expAgentVaryGoalCapacity("reamcts", "RMCTS.txt");
-//        resultProducer.expAgentVaryGoalCapacity("promcts", "PMCTS.txt");
+    void goalX_capY_fixInterval() {
+		String resDir = join(RESULT_ROOT_DIR, "mg_goalX_capY").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+		resultProducer.setGoalRange(1, 15, 1);
+		resultProducer.setCapRange(2, 10, 20);
+		resultProducer.setInterval(5);
+//        resultProducer.enableProduceFile();
+//        resultProducer.enableDrawGraphic();
 
-//        resultProducer.expAgentVaryGoalCapacity("greedy", "greedy.txt");
-//        resultProducer.expAgent("spmcts", "spmcts.txt");
+//        resultProducer.exp_goalX_capY("reamcts");
+//        resultProducer.exp_goalX_capY("fifo");
+        resultProducer.exp_goalX_capY("vbdi");
     }
 
     @Test
-    void mgVaryTimeGapCapacity() {
-        MGResultProducer resultProducer = new MGResultProducer(join(RESULT_ROOT_DIR, "100avg_mg_intervalX_capY").getPath(), 10, 15, 15, 0);
-//        resultProducer.expAgentVaryTimeGapCapacity("inffifo", "NMG.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("fifo", "RMG.txt");
-//        resultProducer.expAgentVaryTimeGapCapacity("profifo", "PMG.txt");
-//        resultProducer.expAgentVaryTimeGapCapacity("infmcts", "NMCTS.txt");
-        resultProducer.expAgentVaryTimeGapCapacity("reamcts", "RMCTS.txt");
-//        resultProducer.expAgentVaryTimeGapCapacity("promcts", "PMCTS.txt");
-
-//        resultProducer.expAgentVaryTimeGapCapacity("greedy", "timeGap_capacity_greedy.txt");
+    void intervalX_capY() {
+		String resDir = join(RESULT_ROOT_DIR, "mg_intervalX_capY").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+		resultProducer.setCapRange(2, 10, 20);
+		resultProducer.setIntervalRange(1, 15, 1);
+		resultProducer.exp_intervalX_capY("reamcts", 10);
+		resultProducer.exp_intervalX_capY("fifo", 10);
     }
 
 
@@ -61,116 +64,128 @@ public class Experiment {
 
 
 
-
-
-//    @Test
-//    public void normVaryNumberResultProduce() {
-//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 0);
-//        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
-////        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-//    }
-//
-//    @Test
-//    public void dynamicNormVaryNumberResultProduce() {
-//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 5);
-//        normResultProducer.expAgentVaryNumOfNorms("fifo", "vary_norms_fifo.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("vbdi", "vary_norms_vbdi.txt");
-//        normResultProducer.expAgentVaryNumOfNorms("mcts", "vary_norms_mcts.txt");
-////        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-//    }
-//
-//    @Test
-//    public void normVaryIntervalProduce() {
-//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 10, 15, 0);
-//        normResultProducer.expAgentVaryTimeGapCapacity("fifo", "vary_interval_fifo.txt");
-//        normResultProducer.expAgentVaryTimeGapCapacity("vbdi", "vary_interval_vbdi.txt");
-//        normResultProducer.expAgentVaryTimeGapCapacity("mcts", "vary_interval_mcts.txt");
-////        normResultProducer.expAgentVaryNumOfNorms("spmcts", "vary_number_spmcts.txt");
-//    }
-
-
-
-
-
-    // this experiment is currently not considered
-//    @Test
-//    void normVaryPenaltyResultProduce() {
-//        NormResultProducer normResultProducer = new NormResultProducer(join(RESULT_ROOT_DIR, "norm").getPath(), 15, 10, 50);
-//        normResultProducer.expAgentVaryNormPenalty("vbdi", "vary_penalty_vbdi.txt");
-//        normResultProducer.expAgentVaryNormPenalty("fifo", "vary_penalty_fifo.txt");
-//        normResultProducer.expAgentVaryNormPenalty("mcts", "vary_penalty_mcts.txt");
-////        normResultProducer.expAgentVaryNormPenalty("spmcts", "vary_penalty_spmcts.txt");
-//    }
-
-
-
-
-
+// ------------------------------------norm experiment------------------------------------
 
     @Test
-    public void randomSeedTest() throws InterruptedException {
-        Random r1 = new Random(SEED);
-        Random r2 = new Random(SEED);
-        r1.nextDouble();
-        System.out.println(r1.nextInt());
-        System.out.println(r2.nextInt());
-        while (true) {
-            TimeUnit.SECONDS.sleep(1);
-            System.out.println("------------");
-            System.out.println(r1.nextInt());
-            System.out.println(r2.nextInt());
+    void goalX_normY_static() {
+		String resDir = join(RESULT_ROOT_DIR, "sectorSetting_goalX_normY_infCap_static").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+//        resultProducer.setInterval(5);
+        resultProducer.setGoalRange(1, 15, 1);
+//        resultProducer.setNormRange(0, 5, 10);
+
+        resultProducer.enableProduceFile();
+//        resultProducer.enableDrawGraphic();
+
+        resultProducer.exp_goalX_normY("NMG", MGResultProducer.infCapacity);
+        resultProducer.exp_goalX_normY("vBDI", MGResultProducer.infCapacity);
+        resultProducer.exp_goalX_normY("NMCTS", MGResultProducer.infCapacity);
+    }
+
+    @Test
+    void goalX_normY_dynamic() {
+		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_infCap_dynamic").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+       resultProducer.setInterval(5);
+        resultProducer.setGoalRange(1, 15, 1);
+        resultProducer.setNormRange(0, 5, 10);
+
+        resultProducer.enableProduceFile();
+//        resultProducer.enableDrawGraphic();
+
+        resultProducer.exp_goalX_normY("NMG", MGResultProducer.infCapacity);
+        resultProducer.exp_goalX_normY("NMCTS", MGResultProducer.infCapacity);
+        resultProducer.exp_goalX_normY("vBDI", MGResultProducer.infCapacity);
+    }
+
+
+// ------------------------------------state machine experiment------------------------------------
+    @Test
+    void goalX_normY_static(int capacity) {
+		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_static").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+//        resultProducer.setInterval(5);
+        resultProducer.setGoalRange(1, 15, 1);
+        resultProducer.setNormRange(0, 5, 10);
+
+        resultProducer.enableProduceFile();
+//        resultProducer.enableDrawGraphic();
+
+        resultProducer.exp_goalX_normY("NMG", capacity);
+        resultProducer.exp_goalX_normY("RMG", capacity);
+        resultProducer.exp_goalX_normY("PMG", capacity);
+        resultProducer.exp_goalX_normY("NMCTS", capacity);
+        resultProducer.exp_goalX_normY("RMCTS", capacity);
+        resultProducer.exp_goalX_normY("PMCTS", capacity);
+        resultProducer.exp_goalX_normY("vBDI", capacity);
+    }
+
+    @Test
+    void goalX_normY_dynamic(int capacity) {
+		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_dynamic").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+       resultProducer.setInterval(1);
+        resultProducer.setGoalRange(1, 15, 1);
+        resultProducer.setNormRange(0, 5, 10);
+
+        // resultProducer.enableProduceFile();
+       resultProducer.enableDrawGraphic();
+
+        // resultProducer.exp_goalX_normY("NMG", capacity);
+        // resultProducer.exp_goalX_normY("RMG", capacity);
+        resultProducer.exp_goalX_normY("PMG", capacity);
+        // resultProducer.exp_goalX_normY("NMCTS", capacity);
+        // resultProducer.exp_goalX_normY("RMCTS", capacity);
+        resultProducer.exp_goalX_normY("PMCTS", capacity);
+        resultProducer.exp_goalX_normY("vBDI", capacity);
+    }
+
+    @Test
+    void goalX_normY_dynamic(int capacity, int interval) {
+		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_dynamic").getPath();
+		MGResultProducer resultProducer = new MGResultProducer(resDir);
+       resultProducer.setInterval(interval);
+        resultProducer.setGoalRange(1, 15, 1);
+        resultProducer.setNormRange(0, 5, 10);
+
+        // resultProducer.enableProduceFile();
+       resultProducer.enableDrawGraphic();
+
+        // resultProducer.exp_goalX_normY("NMG", capacity);
+        // resultProducer.exp_goalX_normY("RMG", capacity);
+        resultProducer.exp_goalX_normY("PMG", capacity);
+        // resultProducer.exp_goalX_normY("NMCTS", capacity);
+        // resultProducer.exp_goalX_normY("RMCTS", capacity);
+        resultProducer.exp_goalX_normY("PMCTS", capacity);
+        resultProducer.exp_goalX_normY("vBDI", capacity);
+    }
+
+    @Test
+    void goalX_normY_fix_cap_static() {
+        for (int capacity = 40; capacity <= 200; capacity += 20) {
+            goalX_normY_static(capacity);
         }
     }
+
     @Test
-    public void cacheSpeedTest() {
-        int len = 69999999;
-        class ListNode {
-            public ListNode next;
-            public int val;
-            public ListNode(int val, ListNode next) {
-                this.val = val;
-                this.next = next;
-            }
-            public ListNode(int val) {
-                this.val = val;
-            }
+    void goalX_normY_fix_cap_dynamic() {
+        for (int capacity = 40; capacity <= 200; capacity += 20) {
+            goalX_normY_dynamic(capacity);
         }
-        // Construct linked list
-        int count = 0;
-        ListNode head = new ListNode(count++);
-        ListNode cur = head;
-        while (count < len) {
-            cur.next = new ListNode(count++);
-            cur = cur.next;
-        }
+    }
 
-        // Construct array list
-        ListNode[] arr = new ListNode[len];
-        for (int i = 0; i < len; i++) {
-            arr[i] = new ListNode(i);
+    @Test
+    void goalX_normY_fix_cap_varyInterval() {
+        for (int capacity = 40; capacity <= 200; capacity += 20) {
+			for (int interval = 1; interval <= 15; interval++) {
+				goalX_normY_dynamic(capacity, interval);
+			}
         }
+    }
 
-        long linkSum = 0;
-        cur = head;
-        // Record time
-        long linkBegin = System.currentTimeMillis();
-        while (cur != null) {
-            linkSum += cur.val;
-            cur = cur.next;
-        }
-        long linkEnd = System.currentTimeMillis();
-        System.out.println("linked list sum: " + linkSum);
-        System.out.println("linked list time consumed " + (linkEnd - linkBegin));
-        long arrSum = 0;
-        // record time
-        long arrBegin = System.currentTimeMillis();
-        for (int i = 0; i < len; i++) {
-            arrSum += arr[i].val;
-        }
-        long arrEnd = System.currentTimeMillis();
-        System.out.println("array sum: " + arrSum);
-        System.out.println("array time consumed " + (arrEnd - arrBegin));
+    @Test
+    void testDirectoryString() {
+        String homeDir = System.getProperty("user.home");
+        System.out.println(homeDir);
     }
 }
