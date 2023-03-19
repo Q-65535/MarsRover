@@ -67,120 +67,56 @@ public class Experiment {
 // ------------------------------------norm experiment------------------------------------
 
     @Test
-    void goalX_normY_static() {
-		String resDir = join(RESULT_ROOT_DIR, "sectorSetting_goalX_normY_infCap_static").getPath();
+    void intervalX_goalY() {
+		String resDir = join(RESULT_ROOT_DIR, "sectorSetting_intervalX_goalY_onlyNorm").getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
-//        resultProducer.setInterval(5);
-        resultProducer.setGoalRange(1, 15, 1);
-//        resultProducer.setNormRange(0, 5, 10);
+		resultProducer.setGoalRange(1, 15, 1);
+		 resultProducer.enableProduceFile();
+//		resultProducer.enableDrawGraphic();
 
-        // resultProducer.enableProduceFile();
-       resultProducer.enableDrawGraphic();
-
-        // resultProducer.exp_goalX_normY("NMG", MGResultProducer.infCapacity);
-        // resultProducer.exp_goalX_normY("vBDI", MGResultProducer.infCapacity);
-        resultProducer.exp_goalX_normY("NMCTS", MGResultProducer.infCapacity);
-    }
-
-    @Test
-    void goalX_normY(int interval) {
-		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_infCap_dynamic").getPath();
-		MGResultProducer resultProducer = new MGResultProducer(resDir);
-       resultProducer.setInterval(interval);
-        resultProducer.setGoalRange(1, 15, 1);
-        resultProducer.setNormRange(0, 5, 10);
-
-        resultProducer.enableProduceFile();
-//        resultProducer.enableDrawGraphic();
-
-        resultProducer.exp_goalX_normY("NMG", MGResultProducer.infCapacity);
-        resultProducer.exp_goalX_normY("NMCTS", MGResultProducer.infCapacity);
-        resultProducer.exp_goalX_normY("vBDI", MGResultProducer.infCapacity);
+		resultProducer.norm_exp_intervalX_goalY("NMG");
+		resultProducer.norm_exp_intervalX_goalY("vBDI");
+		resultProducer.norm_exp_intervalX_goalY("NMCTS");
     }
 
 
 // ------------------------------------state machine experiment------------------------------------
-    @Test
-    void goalX_normY_static(int capacity) {
-		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_static").getPath();
-		MGResultProducer resultProducer = new MGResultProducer(resDir);
-//        resultProducer.setInterval(5);
-        resultProducer.setGoalRange(1, 15, 1);
-        resultProducer.setNormRange(0, 5, 10);
-
-        resultProducer.enableProduceFile();
-//        resultProducer.enableDrawGraphic();
-
-        resultProducer.exp_goalX_normY("NMG", capacity);
-        resultProducer.exp_goalX_normY("RMG", capacity);
-        resultProducer.exp_goalX_normY("PMG", capacity);
-        resultProducer.exp_goalX_normY("NMCTS", capacity);
-        resultProducer.exp_goalX_normY("RMCTS", capacity);
-        resultProducer.exp_goalX_normY("PMCTS", capacity);
-        resultProducer.exp_goalX_normY("vBDI", capacity);
-    }
 
     @Test
-    void goalX_normY_dynamic(int capacity) {
-		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_dynamic").getPath();
-		MGResultProducer resultProducer = new MGResultProducer(resDir);
-       resultProducer.setInterval(1);
-        resultProducer.setGoalRange(1, 15, 1);
-        resultProducer.setNormRange(0, 5, 10);
+    void machine_goalX_capY_varyInterval() {
+		for (int interval = 0; interval <= 0; interval++) {
+			String resDir = join(RESULT_ROOT_DIR, "sectorSetting_goalX_capY_interval" + interval).getPath();
+			MGResultProducer resultProducer = new MGResultProducer(resDir);
+			resultProducer.setGoalRange(1, 15, 1);
+			resultProducer.setCapRange(2, 10, 20);
+			 resultProducer.enableProduceFile();
+//			resultProducer.enableDrawGraphic();
 
-        // resultProducer.enableProduceFile();
-       resultProducer.enableDrawGraphic();
-
-        // resultProducer.exp_goalX_normY("NMG", capacity);
-        // resultProducer.exp_goalX_normY("RMG", capacity);
-        resultProducer.exp_goalX_normY("PMG", capacity);
-        // resultProducer.exp_goalX_normY("NMCTS", capacity);
-        // resultProducer.exp_goalX_normY("RMCTS", capacity);
-        resultProducer.exp_goalX_normY("PMCTS", capacity);
-        resultProducer.exp_goalX_normY("vBDI", capacity);
-    }
-
-    @Test
-    void goalX_intervalY_norm(int interval) {
-		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_interval" + interval).getPath();
-		MGResultProducer resultProducer = new MGResultProducer(resDir);
-        resultProducer.setInterval(interval);
-		resultProducer.setCapRange(2, 10, 20);
-        resultProducer.setGoalRange(1, 15, 1);
-        resultProducer.setNormRange(0, 5, 10);
-
-        resultProducer.enableProduceFile();
-       // resultProducer.enableDrawGraphic();
-
-        // resultProducer.exp_goalX_normY("NMG", capacity);
-        // resultProducer.exp_goalX_normY("RMG", capacity);
-        resultProducer.exp_goalX_normY("PMG");
-        // resultProducer.exp_goalX_normY("NMCTS", capacity);
-        // resultProducer.exp_goalX_normY("RMCTS", capacity);
-        resultProducer.exp_goalX_normY("vBDI");
-        resultProducer.exp_goalX_normY("PMCTS");
-    }
-
-    @Test
-    void goalX_normY_fix_cap_static() {
-        for (int capacity = 40; capacity <= 200; capacity += 20) {
-            goalX_normY_static(capacity);
-        }
-    }
-
-    @Test
-    void goalX_normY_fix_cap_dynamic() {
-        for (int capacity = 40; capacity <= 200; capacity += 20) {
-            goalX_normY_dynamic(capacity);
-        }
-    }
-
-    @Test
-    void goalX_normY_fix_cap_varyInterval() {
-		for (int interval = 1; interval <= 15; interval++) {
-			goalX_normY_dynamic(interval);
+			resultProducer.norm_exp_goalX_capY_varyInterval("PMG", interval);
+			resultProducer.norm_exp_goalX_capY_varyInterval("vBDI", interval);
+			resultProducer.norm_exp_goalX_capY_varyInterval("PMCTS", interval);
 		}
     }
+
+    @Test
+    void machine_intervalX_capY_varyGoalCount() {
+		for (int goalCount = 10; goalCount <= 10; goalCount++) {
+			String resDir = join(RESULT_ROOT_DIR, "sectorSetting_intervalX_capY_GoalCount_" + goalCount).getPath();
+			MGResultProducer resultProducer = new MGResultProducer(resDir);
+			resultProducer.setIntervalRange(1, 15, 1);
+			resultProducer.setCapRange(2, 10, 20);
+			 resultProducer.enableProduceFile();
+//			resultProducer.enableDrawGraphic();
+
+			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("PMG", goalCount);
+			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("vBDI", goalCount);
+			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("PMCTS", goalCount);
+		}
+    }
+
+
+
+
 
     @Test
     void testDirectoryString() {

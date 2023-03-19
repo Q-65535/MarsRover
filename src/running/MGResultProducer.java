@@ -197,10 +197,76 @@ public class MGResultProducer {
         }
     }
 
+
+
+
 	/**
-	 * norm experiments. In this experiment setting, we need to specify the fixed capacity.
+	 * norm experiments. (the capacity is infinite)
 	 */
-    public void exp_goalX_normY(String agentType) {
+    public void norm_exp_intervalX_goalY(String agentType) {
+        double[][] penaltyRecords = new double[intervalEnd + 1][goalCountEnd + 1];
+        double[][] consumptionRecords = new double[intervalEnd + 1][goalCountEnd + 1];
+        double[][] aggregateRecords = new double[intervalEnd + 1][goalCountEnd + 1];
+
+
+		for (int interval = 1; interval <= intervalEnd; interval++) {
+			for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount += goalCountStep) {
+				int capacity = infCapacity;
+				Random random = new Random(SEED);
+				for (int i = 0; i < repetitionCount; i++) {
+                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, random);
+                    AbstractAgent agent = genNewAgent(agentType, capacity);
+                    Environment environment = new Environment(agent, goals, interval);
+                    boolean running = true;
+                    while (running) {
+                        running = environment.run();
+                        if (isDrawGraphic) {
+                            displayer.display(environment);
+                        }
+                    }
+                    // add consumption value to record
+                    penaltyRecords[interval][goalCount] += agent.getTotalPenalty();
+                    consumptionRecords[interval][goalCount] += agent.getTotalFuelConsumption();
+                    aggregateRecords[interval][goalCount] += agent.getAggregateVal();
+				}
+                System.out.println("interval: " + interval);
+                System.out.println("goalCount: " + goalCount);
+                System.out.println("avg penalty: " + penaltyRecords[interval][goalCount] / repetitionCount);
+                System.out.println("avg consumption: " + consumptionRecords[interval][goalCount] / repetitionCount);
+                System.out.println("avg aggregate: " + aggregateRecords[interval][goalCount] / repetitionCount);
+			}
+		}
+
+        // get average value
+        for (int i = 0; i < penaltyRecords.length; i++) {
+            for (int j = 0; j < penaltyRecords[i].length; j++) {
+                penaltyRecords[i][j] /= repetitionCount;
+                consumptionRecords[i][j] /= repetitionCount;
+                aggregateRecords[i][j] /= repetitionCount;
+            }
+        }
+        System.out.println("------------------------------------------------------------Experiment: " + agentType + "---------------------------------------------------------------------------------------------");
+
+        if (isProduceFile) {
+            matrixToFile(penaltyRecords, join(RESULT_DIR, "penalty_" + agentType + ".txt"));
+            matrixToFile(consumptionRecords, join(RESULT_DIR, "cons_" + agentType + ".txt"));
+            matrixToFile(aggregateRecords, join(RESULT_DIR, "agg_" + agentType + ".txt"));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * state machine experiments.
+	 */
+    public void norm_exp_goalX_capY_varyInterval(String agentType, int interval) {
         double[][] penaltyRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
         double[][] consumptionRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
         double[][] aggregateRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
@@ -215,7 +281,7 @@ public class MGResultProducer {
                 for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    Environment environment = new Environment(agent, goals, defInterval);
+                    Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
                         running = environment.run();
@@ -230,6 +296,7 @@ public class MGResultProducer {
                 }
 			}
                 System.out.println("goalCount: " + goalCount + ", normCount: " + normCount);
+                System.out.println("interval: " + interval);
                 System.out.println("avg penalty: " + penaltyRecords[goalCount][normCountMultiplier] / repetitionCount);
                 System.out.println("avg consumption: " + consumptionRecords[goalCount][normCountMultiplier] / repetitionCount);
                 System.out.println("avg aggregate: " + aggregateRecords[goalCount][normCountMultiplier] / repetitionCount);
@@ -251,6 +318,72 @@ public class MGResultProducer {
         }
     }
 
+
+
+	/**
+	 * state machine experiments.
+	 */
+    public void norm_exp_intervalX_capacityY_varyGoalCount(String agentType, int goalCount) {
+        double[][] penaltyRecords = new double[intervalEnd + 1][capEndMultiplier + 1];
+        double[][] consumptionRecords = new double[intervalEnd + 1][capEndMultiplier + 1];
+        double[][] aggregateRecords = new double[intervalEnd + 1][capEndMultiplier + 1];
+
+
+		for (int interval = 1; interval <= intervalEnd; interval++) {
+			for (int capMultiplier = 2; capMultiplier <= capEndMultiplier; capMultiplier++) {
+				int capacity = def_map_size * capMultiplier;
+				Random random = new Random(SEED);
+				for (int i = 0; i < repetitionCount; i++) {
+                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, random);
+                    AbstractAgent agent = genNewAgent(agentType, capacity);
+                    Environment environment = new Environment(agent, goals, interval);
+                    boolean running = true;
+                    while (running) {
+                        running = environment.run();
+                        if (isDrawGraphic) {
+                            displayer.display(environment);
+                        }
+                    }
+                    // add consumption value to record
+                    penaltyRecords[interval][capMultiplier] += agent.getTotalPenalty();
+                    consumptionRecords[interval][capMultiplier] += agent.getTotalFuelConsumption();
+                    aggregateRecords[interval][capMultiplier] += agent.getAggregateVal();
+				}
+                System.out.println("goalCount: " + goalCount);
+                System.out.println("interval: " + interval);
+                System.out.println("avg penalty: " + penaltyRecords[goalCount][capMultiplier] / repetitionCount);
+                System.out.println("avg consumption: " + consumptionRecords[goalCount][capMultiplier] / repetitionCount);
+                System.out.println("avg aggregate: " + aggregateRecords[goalCount][capMultiplier] / repetitionCount);
+			}
+		}
+
+        // get average value
+        for (int i = 0; i < penaltyRecords.length; i++) {
+            for (int j = 0; j < penaltyRecords[i].length; j++) {
+                penaltyRecords[i][j] /= repetitionCount;
+                consumptionRecords[i][j] /= repetitionCount;
+                aggregateRecords[i][j] /= repetitionCount;
+            }
+        }
+        System.out.println("------------------------------------------------------------Experiment: " + agentType + "---------------------------------------------------------------------------------------------");
+
+        if (isProduceFile) {
+            matrixToFile(penaltyRecords, join(RESULT_DIR, "penalty_" + agentType + ".txt"));
+            matrixToFile(consumptionRecords, join(RESULT_DIR, "cons_" + agentType + ".txt"));
+            matrixToFile(aggregateRecords, join(RESULT_DIR, "agg_" + agentType + ".txt"));
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+	// Some utility functions.
     AbstractAgent genNewAgent(String agentType, int capacity) {
         AbstractAgent agent;
         switch (agentType) {
