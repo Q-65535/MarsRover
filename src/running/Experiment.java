@@ -71,7 +71,7 @@ public class Experiment {
 		String resDir = join(RESULT_ROOT_DIR, "sectorSetting_goalX_normY_infCap_static").getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
 //        resultProducer.setInterval(5);
-        resultProducer.setGoalRange(10, 30, 1);
+        resultProducer.setGoalRange(1, 15, 1);
 //        resultProducer.setNormRange(0, 5, 10);
 
         // resultProducer.enableProduceFile();
@@ -83,10 +83,10 @@ public class Experiment {
     }
 
     @Test
-    void goalX_normY_dynamic() {
+    void goalX_normY(int interval) {
 		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_infCap_dynamic").getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
-       resultProducer.setInterval(5);
+       resultProducer.setInterval(interval);
         resultProducer.setGoalRange(1, 15, 1);
         resultProducer.setNormRange(0, 5, 10);
 
@@ -141,10 +141,11 @@ public class Experiment {
     }
 
     @Test
-    void goalX_normY_dynamic(int capacity, int interval) {
-		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_fixCap" + capacity + "_interval" + interval).getPath();
+    void goalX_intervalY_norm(int interval) {
+		String resDir = join(RESULT_ROOT_DIR, "goalX_normY_interval" + interval).getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
         resultProducer.setInterval(interval);
+		resultProducer.setCapRange(2, 10, 20);
         resultProducer.setGoalRange(1, 15, 1);
         resultProducer.setNormRange(0, 5, 10);
 
@@ -153,11 +154,11 @@ public class Experiment {
 
         // resultProducer.exp_goalX_normY("NMG", capacity);
         // resultProducer.exp_goalX_normY("RMG", capacity);
-        resultProducer.exp_goalX_normY("PMG", capacity);
+        resultProducer.exp_goalX_normY("PMG");
         // resultProducer.exp_goalX_normY("NMCTS", capacity);
         // resultProducer.exp_goalX_normY("RMCTS", capacity);
-        resultProducer.exp_goalX_normY("vBDI", capacity);
-        resultProducer.exp_goalX_normY("PMCTS", capacity);
+        resultProducer.exp_goalX_normY("vBDI");
+        resultProducer.exp_goalX_normY("PMCTS");
     }
 
     @Test
@@ -176,11 +177,9 @@ public class Experiment {
 
     @Test
     void goalX_normY_fix_cap_varyInterval() {
-        for (int capacity = 40; capacity <= 200; capacity += 20) {
-			for (int interval = 1; interval <= 15; interval++) {
-				goalX_normY_dynamic(capacity, interval);
-			}
-        }
+		for (int interval = 1; interval <= 15; interval++) {
+			goalX_normY_dynamic(interval);
+		}
     }
 
     @Test

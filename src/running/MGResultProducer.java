@@ -200,14 +200,17 @@ public class MGResultProducer {
 	/**
 	 * norm experiments. In this experiment setting, we need to specify the fixed capacity.
 	 */
-    public void exp_goalX_normY(String agentType, int capacity) {
-        double[][] penaltyRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
-        double[][] consumptionRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
-        double[][] aggregateRecords = new double[goalCountEnd + 1][normCountEndMultiplier + 1];
+    public void exp_goalX_normY(String agentType) {
+        double[][] penaltyRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
+        double[][] consumptionRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
+        double[][] aggregateRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
         int normCount = defNormCount;
         int normCountMultiplier = 0;
 
         for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount++) {
+            for (int capMultiplier = capStartMultiplier; capMultiplier <= capEndMultiplier; capMultiplier++) {
+                int capacity = capStep * capMultiplier;
+                // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
                 for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
@@ -221,10 +224,11 @@ public class MGResultProducer {
                         }
                     }
                     // add consumption value to record
-                    penaltyRecords[goalCount][normCountMultiplier] += agent.getTotalPenalty();
-                    consumptionRecords[goalCount][normCountMultiplier] += agent.getTotalFuelConsumption();
-                    aggregateRecords[goalCount][normCountMultiplier] += agent.getAggregateVal();
+                    penaltyRecords[goalCount][capMultiplier] += agent.getTotalPenalty();
+                    consumptionRecords[goalCount][capMultiplier] += agent.getTotalFuelConsumption();
+                    aggregateRecords[goalCount][capMultiplier] += agent.getAggregateVal();
                 }
+			}
                 System.out.println("goalCount: " + goalCount + ", normCount: " + normCount);
                 System.out.println("avg penalty: " + penaltyRecords[goalCount][normCountMultiplier] / repetitionCount);
                 System.out.println("avg consumption: " + consumptionRecords[goalCount][normCountMultiplier] / repetitionCount);
