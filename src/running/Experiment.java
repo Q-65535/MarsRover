@@ -83,9 +83,9 @@ public class Experiment {
 // ------------------------------------state machine experiment------------------------------------
 
     @Test
-    void machine_goalX_capY_varyInterval() {
+    void machine_goalRow_capCol_varyInterval() {
 		for (int interval = 0; interval <= 0; interval++) {
-			String resDir = join(RESULT_ROOT_DIR, "sectorSetting_goalX_capY_interval" + interval).getPath();
+			String resDir = join(RESULT_ROOT_DIR, "oneLineBorder_goalRow_capCol_interval" + interval).getPath();
 			MGResultProducer resultProducer = new MGResultProducer(resDir);
 			resultProducer.setGoalRange(1, 15, 1);
 			resultProducer.setCapRange(2, 10, 20);
@@ -99,11 +99,11 @@ public class Experiment {
     }
 
     @Test
-    void machine_intervalX_capY_varyGoalCount() {
+    void machine_intervalRow_capCol_varyGoalCount() {
 		for (int goalCount = 10; goalCount <= 10; goalCount++) {
-			String resDir = join(RESULT_ROOT_DIR, "sectorSetting_intervalX_capY_GoalCount_" + goalCount).getPath();
+			String resDir = join(RESULT_ROOT_DIR, "oneLineBorder_intervalRow_capCol_GoalCount_" + goalCount).getPath();
 			MGResultProducer resultProducer = new MGResultProducer(resDir);
-			resultProducer.setIntervalRange(1, 15, 1);
+			resultProducer.setIntervalRange(0, 15, 1);
 			resultProducer.setCapRange(2, 10, 20);
 			 resultProducer.enableProduceFile();
 //			resultProducer.enableDrawGraphic();

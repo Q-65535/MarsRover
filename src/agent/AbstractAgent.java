@@ -11,7 +11,7 @@ import java.util.*;
 public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
     public static final double delta = 1e-6;
-	public static final double crossSectorPenalty = 0.1;
+	public static final double crossSectorPenalty = 0.5;
     Random rm = new Random(Default.SEED);
 
     /**
@@ -73,6 +73,7 @@ public abstract class AbstractAgent implements Cloneable {
     private void init() {
         this.currentPosition = def_initial_Position;
         this.prePosition = currentPosition;
+		// The initial sector is two.
 		this.curSector = Sector.two;
 		this.preSector = Sector.two;
         this.actFuelConsumption = def_act_consumption;
@@ -118,7 +119,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public double getAggregateVal() {
-        return achievedGoals.size() / (totalFuelConsumption + delta) - getTotalPenalty();
+        return (achievedGoals.size() - getTotalPenalty()) / (totalFuelConsumption + delta);
     }
 
     public int getRechargeFuelConsumption() {
@@ -279,9 +280,14 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
 	public void updateSectorPunish() {
-		if (this.curSector != this.preSector) {
+		if (isViolateNorm()) {
 			this.penalty += crossSectorPenalty;
 		}
+	}
+
+	// If the agent cross from sector two to sector one, it violates the norm.
+	public boolean isViolateNorm() {
+		return this.curSector == Sector.one && this.preSector == Sector.two;
 	}
 
 	public void updateSector() {
