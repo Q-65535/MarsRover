@@ -174,7 +174,6 @@ public class Environment {
         agent.updateGoal();
         agent.consumeFuel(realActFuelConsumption);
         agent.updateRecharge();
-		agent.updateSector();
         agent.updatePunish();
     }
 

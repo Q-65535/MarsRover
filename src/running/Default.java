@@ -1,7 +1,6 @@
 package running;
 
-import world.Cell;
-import world.Norm;
+import world.*;
 import static world.Calculator.*;
 
 import java.util.*;
@@ -58,41 +57,7 @@ public class Default {
         return res;
     }
 
-    /**
-     * Generate a list of goals. The distance between any two goals must be equal or greater than the minimum distance
-    */
-    public static List<Cell> genGoals(int mapSize, int goalCount, Cell except, Random rm, int minDistance) {
-        List<Cell> goals = new ArrayList<>();
-        while (goals.size() < goalCount) {
-            int x = rm.nextInt(mapSize);
-            int y = rm.nextInt(mapSize);
-            Cell newGoal = new Cell(x, y);
-
-            // make sure no duplicate locations
-            if (newGoal.equals(except) || goals.contains(newGoal)) {
-                continue;
-            }
-            // the distance between any two goals shall not be greater than the minimum distance
-            if (exceedMinDistance(newGoal, goals, minDistance)) {
-                continue;
-            }
-            goals.add(newGoal);
-        }
-        return goals;
-    }
-
-    private static boolean exceedMinDistance(Cell newGoal, List<Cell> goals, int minDistance) {
-        for (Cell goal : goals) {
-            int curDistance = calculateDistance(newGoal, goal);
-            if (curDistance < minDistance) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static HashMap<Cell, Norm> genNorms(int mapSize, int numOfNorms, double avgPenalty, Cell except, Random rm) {
-        HashMap<Cell, Norm> norms = new HashMap<>();
+    public static HashMap<Cell, Norm> genNorms(int mapSize, int numOfNorms, double avgPenalty, Cell except, Random rm) {HashMap<Cell, Norm> norms = new HashMap<>();
         while (norms.size() < numOfNorms) {
             int x = rm.nextInt(mapSize);
             int y = rm.nextInt(mapSize);
@@ -118,6 +83,46 @@ public class Default {
         }
         return value;
     }
+
+	public static List<Boundary> genBoundaries(int mapSize, int boundaryCount, int boundaryLen, Random rm) {
+		List<Boundary> res = new ArrayList<>();
+		outer: while (res.size() < boundaryCount) {
+			// First we need to determine whether the boundary is horizontal or vertical.
+			boolean isHorizontal = rm.nextBoolean();
+			// startCoordinate must be the smaller than endCoordinate and
+			// endCoordinate cannot be out of map boundary.
+			int startCoordinate = rm.nextInt(mapSize - boundaryLen);
+			int endCoordinate = startCoordinate + boundaryLen;
+			// Note that crossFrom cannot be the maximium coordinate in the map, thus mapSize - 1.
+			int crossFrom = rm.nextInt(mapSize - 1);
+			int crossTo = crossFrom + 1;
+			// Let rm determine the cross direction (whether switch the "from" and "to" direction).
+			if (rm.nextBoolean()) {
+				int temp = crossFrom;
+				crossFrom = crossTo;
+				crossTo = temp;
+			}
+			// Avoid overlapping boundaries.
+			for (Boundary boundary : res) {
+				if (isHorizontal != boundary.isHorizontal) {
+					continue;
+				}
+				if (endCoordinate <= boundary.endCoordinate && endCoordinate >= boundary.startCoordinate) {
+					if (crossTo == boundary.crossTo || crossTo == boundary.crossFrom || crossFrom == boundary.crossFrom || crossFrom == boundary.crossTo) {
+						continue outer;
+					}
+				}
+				if (startCoordinate <= boundary.endCoordinate && startCoordinate >= boundary.startCoordinate) {
+					if (crossTo == boundary.crossTo || crossTo == boundary.crossFrom || crossFrom == boundary.crossFrom || crossFrom == boundary.crossTo) {
+						continue outer;
+					}
+				}
+			}
+			Boundary newBoundary = new Boundary(isHorizontal, startCoordinate, endCoordinate, crossFrom, crossTo);
+			res.add(newBoundary);
+		}
+        return res;
+	}
 
     public static List<Cell> cloneCells(List<Cell> cells) {
         List<Cell> cloneSet = new ArrayList<>();

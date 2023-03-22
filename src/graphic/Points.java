@@ -1,6 +1,7 @@
 package graphic;
 
 import agent.AbstractAgent;
+import world.Boundary;
 import world.Cell;
 import world.Environment;
 
@@ -30,18 +31,11 @@ public class Points extends JPanel {
 
         AbstractAgent agent = env.getAgent();
 
-        // draw goals
-        g2d.setColor(Color.red);
-        List<Cell> goalPositions = agent.getGoals();
-        drawCellTo2D(g2d, goalPositions);
 
         //draw current goal
         g2d.setColor(Color.MAGENTA);
         drawCellTo2D(g2d, agent.getCurrentGoal());
 
-        //draw agent
-        g2d.setColor(Color.BLUE);
-        drawCellTo2D(g2d, agent.getCurrentPosition());
 
         //draw depot
         g2d.setColor(Color.green);
@@ -50,6 +44,29 @@ public class Points extends JPanel {
         // draw norm positions
         g2d.setColor(Color.DARK_GRAY);
         drawCellTo2D(g2d, agent.getNormPositions());
+
+		// draw boundaires
+		List<Boundary> brs = agent.getBoundaries();
+
+		for (int i = 0; i < brs.size(); i++) {
+			Boundary br = brs.get(i);
+			// draw from cells.
+			g2d.setColor(new Color(200, 56, 14));
+			drawCellTo2D(g2d, br.fromCells);
+			// draw to cells.
+			g2d.setColor(new Color(230, 150, 83));
+			drawCellTo2D(g2d, br.toCells);
+		}
+
+        // draw goals
+        g2d.setColor(Color.red);
+        List<Cell> goalPositions = agent.getGoals();
+        drawCellTo2D(g2d, goalPositions);
+
+        //draw agent
+        g2d.setColor(Color.BLUE);
+        drawCellTo2D(g2d, agent.getCurrentPosition());
+
 
         //draw status string
         g2d.setColor(Color.BLACK);

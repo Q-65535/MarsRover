@@ -3,11 +3,12 @@ package running;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static running.Default.*;
 import static running.Utils.*;
+import world.*;
 
 public class Experiment {
     public static String homeDir = System.getProperty("user.home");
@@ -85,7 +86,7 @@ public class Experiment {
     @Test
     void machine_goalRow_capCol_varyInterval() {
 		for (int interval = 0; interval <= 0; interval++) {
-			String resDir = join(RESULT_ROOT_DIR, "oneLineBorder_goalRow_capCol_interval" + interval).getPath();
+			String resDir = join(RESULT_ROOT_DIR, "5boundaries_goalRow_capCol_interval" + interval).getPath();
 			MGResultProducer resultProducer = new MGResultProducer(resDir);
 			resultProducer.setGoalRange(1, 15, 1);
 			resultProducer.setCapRange(2, 10, 20);
@@ -101,7 +102,7 @@ public class Experiment {
     @Test
     void machine_intervalRow_capCol_varyGoalCount() {
 		for (int goalCount = 10; goalCount <= 10; goalCount++) {
-			String resDir = join(RESULT_ROOT_DIR, "oneLineBorder_intervalRow_capCol_GoalCount_" + goalCount).getPath();
+			String resDir = join(RESULT_ROOT_DIR, "5boundaries_intervalRow_capCol_GoalCount_" + goalCount).getPath();
 			MGResultProducer resultProducer = new MGResultProducer(resDir);
 			resultProducer.setIntervalRange(0, 15, 1);
 			resultProducer.setCapRange(2, 10, 20);
@@ -110,17 +111,7 @@ public class Experiment {
 
 			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("PMG", goalCount);
 			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("vBDI", goalCount);
-			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("PMCTS", goalCount);
+//			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("PMCTS", goalCount);
 		}
-    }
-
-
-
-
-
-    @Test
-    void testDirectoryString() {
-        String homeDir = System.getProperty("user.home");
-        System.out.println(homeDir);
     }
 }

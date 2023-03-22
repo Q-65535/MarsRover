@@ -2,8 +2,9 @@ package running;
 
 import agent.*;
 import graphic.EnvironmentDisplayer;
-import world.Environment;
+import world.*;
 import static running.Default.*;
+import java.util.*;
 
 public class Main {
     static int naiveTotal = 0;
@@ -11,7 +12,7 @@ public class Main {
 
     public static void main(String[] args) {
         EnvironmentDisplayer displayer = new EnvironmentDisplayer();
-        Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm, 0);
+        Default.def_goals = Default.genGoals(def_map_size, def_num_goals, def_initial_Position, rm);
         Environment defEnv = new Environment(def_goals);
         AbstractAgent mctsAgent = new MCTSAgent(def_max_capacity);
 
@@ -24,12 +25,13 @@ public class Main {
 
         defEnv = new Environment(def_goals);
         AbstractAgent testAgent = new FIFOAgent(def_max_capacity);
+		List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, new Random());
+		testAgent.setBoundaries(boundaries);
         running = true;
         defEnv.setAgent(testAgent);
         while (running) {
             running = defEnv.run();
-//            displayer.display(defEnv);
-            System.out.println("1111111");
+            displayer.display(defEnv);
         }
         displayer.close();
 

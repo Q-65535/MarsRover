@@ -21,7 +21,7 @@ public class VBDIAgent extends FIFOAgent {
         // record all norm information to actions
         for (MoveAction act : allActs) {
             // actsPenalty.put(act, normPenalty(act));
-            actsPenalty.put(act, sectorPenalty(act));
+            actsPenalty.put(act, boundaryPenalty(act));
         }
         // get the act with the smallest penalty
         MoveAction smallestPenaltyAct = null;
@@ -38,28 +38,10 @@ public class VBDIAgent extends FIFOAgent {
         return smallestPenaltyAct;
     }
 
-    private double normPenalty(MoveAction act) {
-        Cell nextPosition = getNextPosition(act);
-        // If the agent is in norm position, and next position is also a norm position,
-        // no penalty imposed (We simulate the slope scenario).
-        if (norms.containsKey(currentPosition) && norms.containsKey(nextPosition)) {
-            return 0;
-        }
-        return normPenalty(nextPosition);
-    }
 
-    private double normPenalty(Cell position) {
-        if (!norms.containsKey(position)) {
-            return 0;
-        }
-        Norm relatedNorm = norms.get(position);
-        return relatedNorm.getPenalty();
-    }
-
-	private double sectorPenalty(MoveAction act) {
+	private double boundaryPenalty(MoveAction act) {
         Cell nextPosition = getNextPosition(act);
-		Sector nextSector = getSector(nextPosition);
-		if (isViolateNorm()) {
+		if (isCrossBoundary(currentPosition, nextPosition)) {
 			return crossSectorPenalty;
 		} else {
 			return 0;

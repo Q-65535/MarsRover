@@ -19,7 +19,7 @@ public class EnvironmentDisplayer {
         frame.add(points);
         frame.setVisible(true);
         try {
-            Thread.sleep(20);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

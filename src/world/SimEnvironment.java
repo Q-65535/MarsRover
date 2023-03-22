@@ -32,7 +32,6 @@ public class SimEnvironment extends Environment implements Cloneable {
         agent.updateGoal();
         agent.consumeFuel(realActFuelConsumption);
         agent.updateRecharge();
-		agent.updateSector();
         agent.updatePunish();
     }
 

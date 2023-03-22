@@ -2,6 +2,7 @@ package running;
 
 import agent.*;
 import graphic.EnvironmentDisplayer;
+import world.Boundary;
 import world.Cell;
 import world.Environment;
 import world.Norm;
@@ -10,9 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static running.Utils.*;
 
@@ -278,9 +277,13 @@ public class MGResultProducer {
                 int capacity = capStep * capMultiplier;
                 // always init the random object to make sure consistency
                 Random goalRandomObj = new Random(SEED);
+                Random boundaryRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
+                    // @Incomplete: We need specify the boundary parameters outside.
+                    List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
+                    agent.setBoundaries(boundaries);
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -332,10 +335,13 @@ public class MGResultProducer {
 		for (int interval = 1; interval <= intervalEnd; interval++) {
 			for (int capMultiplier = 2; capMultiplier <= capEndMultiplier; capMultiplier++) {
 				int capacity = def_map_size * capMultiplier;
-				Random random = new Random(SEED);
+                Random goalRandomObj = new Random(SEED);
+                Random boundaryRandomObj = new Random(SEED + 1);
 				for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, random);
+                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
+                    List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
+                    agent.setBoundaries(boundaries);
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {

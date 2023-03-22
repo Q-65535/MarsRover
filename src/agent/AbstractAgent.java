@@ -1,9 +1,7 @@
 package agent;
 
 import running.Default;
-import world.Calculator;
-import world.Cell;
-import world.Norm;
+import world.*;
 import static running.Default.*;
 
 import java.util.*;
@@ -29,6 +27,7 @@ public abstract class AbstractAgent implements Cloneable {
     final int mapSize = def_map_size;
     int maxCapacity;
     int currentFuel;
+	List<Boundary> boundaries;
 	Sector curSector;
 	Sector preSector;
 
@@ -276,51 +275,22 @@ public abstract class AbstractAgent implements Cloneable {
         //     this.penalty += relatedNorm.getPenalty();
         // }
 
-		updateSectorPunish();
+		updateBoundaryPunish();
     }
 
-	public void updateSectorPunish() {
-		if (isViolateNorm()) {
+	public void updateBoundaryPunish() {
+		if (isCrossBoundary(prePosition, currentPosition)) {
 			this.penalty += crossSectorPenalty;
 		}
 	}
 
-	// If the agent cross from sector two to sector one, it violates the norm.
-	public boolean isViolateNorm() {
-		return this.curSector == Sector.one && this.preSector == Sector.two;
-	}
-
-	public void updateSector() {
-		int x = this.currentPosition.getX();
-		int y = this.currentPosition.getY();
-		this.preSector = this.curSector;
-
-		// Separate the map into 4 sectors.
-		// if (x < 10 && y < 10) {
-		// 	this.curSector = 1;
-		// } else if (x < 10 && y >= 9) {
-		// 	this.curSector = 2;
-		// } else if (x >= 9 && y < 10) {
-		// 	this.curSector = 3;
-		// } else if (x >= 9 && y >= 9) {
-		// 	this.curSector = 4;
-		// }
-
-		// Separate the map into 2 sectors.
-		if (x < 10) {
-			this.curSector = Sector.one;
-		} else {
-			this.curSector = Sector.two;
+	public boolean isCrossBoundary(Cell from, Cell to) {
+		for (Boundary br : boundaries) {
+			if (br.fromCells.contains(to) && br.toCells.contains(from)) {
+				return true;
+			}
 		}
-	}
-
-	// Given the cell, return its sector.
-	public Sector getSector(Cell cell) {
-        if (cell.getX() < 10) {
-            return Sector.one;
-        } else {
-            return Sector.two;
-        }
+		return false;
 	}
 
     public double getTotalPenalty() {
@@ -333,4 +303,12 @@ public abstract class AbstractAgent implements Cloneable {
         }
         return norms.keySet();
     }
+
+	public void setBoundaries(List<Boundary> boundaries) {
+		this.boundaries = boundaries;
+	}
+
+	public List<Boundary> getBoundaries() {
+		return this.boundaries;
+	}
 }
