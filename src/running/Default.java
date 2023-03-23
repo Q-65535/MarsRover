@@ -124,6 +124,18 @@ public class Default {
         return res;
 	}
 
+	public static List<Boundary> genMiddleBoundary(int mapSize) {
+		List<Boundary> res = new ArrayList<>();
+		int crossFrom = mapSize / 2;
+		int crossTo = crossFrom - 1;
+		int endCoordinate = mapSize - 1;
+		int startCoordinate = 0;
+		// The boundary is vertical.
+		Boundary newBoundary = new Boundary(false, startCoordinate, endCoordinate, crossFrom, crossTo);
+		res.add(newBoundary);
+		return res;
+	}
+
     public static List<Cell> cloneCells(List<Cell> cells) {
         List<Cell> cloneSet = new ArrayList<>();
         for (Cell cell : cells) {

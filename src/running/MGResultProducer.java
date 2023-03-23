@@ -281,7 +281,9 @@ public class MGResultProducer {
                 for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
                     // @Incomplete: We need specify the boundary parameters outside.
-                    List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
+                    // List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
+					// Just single middle long boundary.
+                    List<Boundary> boundaries = genMiddleBoundary(def_map_size);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     agent.setBoundaries(boundaries);
                     Environment environment = new Environment(agent, goals, interval);
@@ -339,7 +341,10 @@ public class MGResultProducer {
                 Random boundaryRandomObj = new Random(SEED + 1);
 				for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
-                    List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
+                    // @Incomplete: We need specify the boundary parameters outside.
+                    // List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
+					// Just single middle long boundary.
+                    List<Boundary> boundaries = genMiddleBoundary(def_map_size);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     agent.setBoundaries(boundaries);
                     Environment environment = new Environment(agent, goals, interval);
