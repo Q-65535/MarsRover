@@ -69,11 +69,11 @@ public class Experiment {
 
     @Test
     void intervalX_goalY() {
-		String resDir = join(RESULT_ROOT_DIR, "sectorSetting_intervalX_goalY_onlyNorm").getPath();
+		String resDir = join(RESULT_ROOT_DIR, "singleMiddleBoundary_intervalRow_goalCol_onlyNorm").getPath();
 		MGResultProducer resultProducer = new MGResultProducer(resDir);
 		resultProducer.setGoalRange(1, 15, 1);
-		 resultProducer.enableProduceFile();
-//		resultProducer.enableDrawGraphic();
+		 // resultProducer.enableProduceFile();
+		resultProducer.enableDrawGraphic();
 
 		resultProducer.norm_exp_intervalX_goalY("NMG");
 		resultProducer.norm_exp_intervalX_goalY("vBDI");
@@ -86,12 +86,12 @@ public class Experiment {
     @Test
     void machine_goalRow_capCol_varyInterval() {
 		for (int interval = 0; interval <= 0; interval++) {
-			String resDir = join(RESULT_ROOT_DIR, "singleMiddleBoundary_goalRow_capCol_interval" + interval).getPath();
+			String resDir = join(RESULT_ROOT_DIR, "ShapeCollection_goalRow_capCol_interval" + interval).getPath();
 			MGResultProducer resultProducer = new MGResultProducer(resDir);
 			resultProducer.setGoalRange(1, 15, 1);
 			resultProducer.setCapRange(2, 10, 20);
-			 resultProducer.enableProduceFile();
-//			resultProducer.enableDrawGraphic();
+//			resultProducer.enableProduceFile();
+			resultProducer.enableDrawGraphic();
 
 			resultProducer.norm_exp_goalX_capY_varyInterval("PMG", interval);
 			resultProducer.norm_exp_goalX_capY_varyInterval("vBDI", interval);
@@ -102,12 +102,12 @@ public class Experiment {
     @Test
     void machine_intervalRow_capCol_varyGoalCount() {
 		for (int goalCount = 10; goalCount <= 10; goalCount++) {
-			String resDir = join(RESULT_ROOT_DIR, "singleMiddleBoundary_intervalRow_capCol_GoalCount_" + goalCount).getPath();
+			String resDir = join(RESULT_ROOT_DIR, "ShapeCollection_intervalRow_capCol_GoalCount_" + goalCount).getPath();
 			MGResultProducer resultProducer = new MGResultProducer(resDir);
 			resultProducer.setIntervalRange(1, 15, 1);
 			resultProducer.setCapRange(2, 10, 20);
-			 resultProducer.enableProduceFile();
-//			resultProducer.enableDrawGraphic();
+//			 resultProducer.enableProduceFile();
+			resultProducer.enableDrawGraphic();
 
 			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("PMG", goalCount);
 			resultProducer.norm_exp_intervalX_capacityY_varyGoalCount("vBDI", goalCount);

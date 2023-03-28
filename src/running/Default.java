@@ -126,8 +126,8 @@ public class Default {
 
 	public static List<Boundary> genMiddleBoundary(int mapSize) {
 		List<Boundary> res = new ArrayList<>();
-		int crossFrom = mapSize / 2;
-		int crossTo = crossFrom - 1;
+		int crossTo = mapSize / 2;
+		int crossFrom = crossTo - 1;
 		int endCoordinate = mapSize - 1;
 		int startCoordinate = 0;
 		// The boundary is vertical.
@@ -135,6 +135,83 @@ public class Default {
 		res.add(newBoundary);
 		return res;
 	}
+
+	public static NormLands genMiddleLineShape(int mapSize) {
+		Set<Cell> highlands = genVerticalLine(mapSize / 2 - 1, 0, mapSize);
+		Set<Cell> lowlands = genVerticalLine(mapSize / 2, 0, mapSize);
+		return new NormLands(highlands, lowlands);
+	}
+
+	public static NormLands genShapeCollection() {
+		NormLands normLands = genUShapeSlope(3, 5, 5);
+		normLands.extendNormLands(genLShapeSlope(15, 5, 5));
+		normLands.extendNormLands(genHorizontalLineSlope(10, 15, 5));
+		normLands.extendNormLands(genVerticalLineSlope(11, 1, 5));
+
+		return normLands;
+
+	}
+
+	public static NormLands genLShapeSlope(int x, int y, int len) {
+		Set<Cell> highlandCells = new HashSet<>();
+		Set<Cell> lowlandCells = new HashSet<>();
+
+		Set<Cell> horizontalHighlandCells = genHorizontalLine(x, y, len);
+		Set<Cell> horizontalLowlandCells = genHorizontalLine(x + 1, y + 1, len - 1);
+		Set<Cell> verticalHighlandCells = genVerticalLine(x, y, len);
+		Set<Cell> verticalLowlandCells = genVerticalLine(x + 1, y + 1, len - 1);
+
+		highlandCells.addAll(horizontalHighlandCells);
+		highlandCells.addAll(verticalHighlandCells);
+		lowlandCells.addAll(horizontalLowlandCells);
+		lowlandCells.addAll(verticalLowlandCells);
+		return new NormLands(highlandCells, lowlandCells);
+	}
+
+	public static NormLands genUShapeSlope(int x, int y, int len) {
+		NormLands UShapeSlope = genLShapeSlope(x, y, len);
+
+		Set<Cell> upperHorizontalHighlands = genHorizontalLine(x, y + len, len);
+		// upperHorizontalHighlands.add(new Cell(x, y - 1));
+		UShapeSlope.extendHighlands(upperHorizontalHighlands);
+
+		Set<Cell> upperHorizontalLowlands = genHorizontalLine(x + 1, y + len - 1, len - 1);
+		UShapeSlope.extendLowlands(upperHorizontalLowlands);
+		return UShapeSlope;
+	}
+
+	public static NormLands genHorizontalLineSlope(int x, int y, int len) {
+		Set<Cell> highlandCells = genHorizontalLine(x, y, len);
+		Set<Cell> lowlandCells = genHorizontalLine(x, y + 1, len);
+
+		return new NormLands(highlandCells, lowlandCells);
+	}
+
+	public static NormLands genVerticalLineSlope(int x, int y, int len) {
+		Set<Cell> highlandCells = genVerticalLine(x, y, len);
+		Set<Cell> lowlandCells = genVerticalLine(x + 1, y, len);
+
+		return new NormLands(highlandCells, lowlandCells);
+	}
+
+	// The coordinate is at the down-left of the line.
+	private static Set<Cell> genHorizontalLine(int x, int y, int len) {
+		Set<Cell> highlandCells = new HashSet<>();
+		for (int i = 0; i < len; i++) {
+			highlandCells.add(new Cell(x + i, y));
+		}
+		return highlandCells;
+	}
+
+	private static Set<Cell> genVerticalLine(int x, int y, int len) {
+		Set<Cell> highlandCells = new HashSet<>();
+		for (int i = 0; i < len; i++) {
+			highlandCells.add(new Cell(x, y + i));
+		}
+		return highlandCells;
+	}
+
+
 
     public static List<Cell> cloneCells(List<Cell> cells) {
         List<Cell> cloneSet = new ArrayList<>();

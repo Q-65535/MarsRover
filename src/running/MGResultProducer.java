@@ -159,7 +159,6 @@ public class MGResultProducer {
      * experiment a type of agent with differrent posting goal intervals and different capacity,
      * then write the result to a file
      */
-	//@Incomplete: We need the number of norms to be specifed.
     public void exp_intervalX_capY(String agentType, int goalCount) {
         double[][] consumptionRecords = new double[intervalEnd + 1][capEndMultiplier + 1];
         for (int interval = 1; interval <= intervalEnd; interval++) {
@@ -210,11 +209,18 @@ public class MGResultProducer {
 
 		for (int interval = 1; interval <= intervalEnd; interval++) {
 			for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount += goalCountStep) {
-				int capacity = infCapacity;
-				Random random = new Random(SEED);
+                Random goalRandomObj = new Random(SEED);
+                Random boundaryRandomObj = new Random(SEED + 1);
 				for (int i = 0; i < repetitionCount; i++) {
-                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, random);
-                    AbstractAgent agent = genNewAgent(agentType, capacity);
+					// Just single middle long boundary.
+					// List<Boundary> boundaries = genMiddleBoundary(def_map_size);
+                    List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
+					// The agent's capacity is set to be infinite.
+                    AbstractAgent agent = genNewAgent(agentType, infCapacity);
+                    // @Setting: Multiple shapes.
+                    agent.setNormLands(genShapeCollection());
+                    // @Setting: Single middle line.
+                    // agent.setNormLands(genMiddleLineShape());
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -269,8 +275,6 @@ public class MGResultProducer {
         double[][] penaltyRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
         double[][] consumptionRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
         double[][] aggregateRecords = new double[goalCountEnd + 1][capEndMultiplier + 1];
-        int normCount = defNormCount;
-        int normCountMultiplier = 0;
 
         for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount++) {
             for (int capMultiplier = capStartMultiplier; capMultiplier <= capEndMultiplier; capMultiplier++) {
@@ -280,12 +284,11 @@ public class MGResultProducer {
                 Random boundaryRandomObj = new Random(SEED + 1);
                 for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
-                    // @Incomplete: We need specify the boundary parameters outside.
-                    // List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
-					// Just single middle long boundary.
-                    List<Boundary> boundaries = genMiddleBoundary(def_map_size);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    agent.setBoundaries(boundaries);
+                    // @Setting: Multiple shapes.
+                    agent.setNormLands(genShapeCollection());
+                    // @Setting: Single middle line.
+                    // agent.setNormLands(genMiddleLineShape());
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -299,12 +302,12 @@ public class MGResultProducer {
                     consumptionRecords[goalCount][capMultiplier] += agent.getTotalFuelConsumption();
                     aggregateRecords[goalCount][capMultiplier] += agent.getAggregateVal();
                 }
-			}
-                System.out.println("goalCount: " + goalCount + ", normCount: " + normCount);
+                System.out.println("goalCount: " + goalCount);
                 System.out.println("interval: " + interval);
-                System.out.println("avg penalty: " + penaltyRecords[goalCount][normCountMultiplier] / repetitionCount);
-                System.out.println("avg consumption: " + consumptionRecords[goalCount][normCountMultiplier] / repetitionCount);
-                System.out.println("avg aggregate: " + aggregateRecords[goalCount][normCountMultiplier] / repetitionCount);
+                System.out.println("avg penalty: " + penaltyRecords[goalCount][capMultiplier] / repetitionCount);
+                System.out.println("avg consumption: " + consumptionRecords[goalCount][capMultiplier] / repetitionCount);
+                System.out.println("avg aggregate: " + aggregateRecords[goalCount][capMultiplier] / repetitionCount);
+			}
         }
         // get average value
         for (int i = 0; i < penaltyRecords.length; i++) {
@@ -341,12 +344,11 @@ public class MGResultProducer {
                 Random boundaryRandomObj = new Random(SEED + 1);
 				for (int i = 0; i < repetitionCount; i++) {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
-                    // @Incomplete: We need specify the boundary parameters outside.
-                    // List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, boundaryRandomObj);
-					// Just single middle long boundary.
-                    List<Boundary> boundaries = genMiddleBoundary(def_map_size);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
-                    agent.setBoundaries(boundaries);
+                    // @Setting: Multiple shapes.
+                    agent.setNormLands(genShapeCollection());
+                    // @Setting: Single middle line.
+                    // agent.setNormLands(genMiddleLineShape());
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -362,9 +364,9 @@ public class MGResultProducer {
 				}
                 System.out.println("goalCount: " + goalCount);
                 System.out.println("interval: " + interval);
-                System.out.println("avg penalty: " + penaltyRecords[goalCount][capMultiplier] / repetitionCount);
-                System.out.println("avg consumption: " + consumptionRecords[goalCount][capMultiplier] / repetitionCount);
-                System.out.println("avg aggregate: " + aggregateRecords[goalCount][capMultiplier] / repetitionCount);
+                System.out.println("avg penalty: " + penaltyRecords[interval][capMultiplier] / repetitionCount);
+                System.out.println("avg consumption: " + consumptionRecords[interval][capMultiplier] / repetitionCount);
+                System.out.println("avg aggregate: " + aggregateRecords[interval][capMultiplier] / repetitionCount);
 			}
 		}
 

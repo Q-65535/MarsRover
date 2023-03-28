@@ -1,16 +1,11 @@
 package graphic;
 
 import agent.AbstractAgent;
-import world.Boundary;
-import world.Cell;
-import world.Environment;
+import world.*;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.util.HashSet;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JPanel;
 
@@ -41,22 +36,14 @@ public class Points extends JPanel {
         g2d.setColor(Color.green);
         drawCellTo2D(g2d, env.getRechargePosition());
 
-        // draw norm positions
-        g2d.setColor(Color.DARK_GRAY);
-        drawCellTo2D(g2d, agent.getNormPositions());
-
-		// draw boundaires
-		List<Boundary> brs = agent.getBoundaries();
-
-		for (int i = 0; i < brs.size(); i++) {
-			Boundary br = brs.get(i);
-			// draw from cells.
-			g2d.setColor(new Color(200, 56, 14));
-			drawCellTo2D(g2d, br.fromCells);
-			// draw to cells.
-			g2d.setColor(new Color(230, 150, 83));
-			drawCellTo2D(g2d, br.toCells);
-		}
+        // Draw normLands.
+		NormLands normLands = agent.getNormLands();
+		// Draw lowlands.
+		g2d.setColor(new Color(230, 150, 83));
+		drawCellTo2D(g2d, normLands.lowlands);
+		// draw highlands.
+		g2d.setColor(new Color(200, 56, 14));
+		drawCellTo2D(g2d, normLands.highlands);
 
         // draw goals
         g2d.setColor(Color.red);

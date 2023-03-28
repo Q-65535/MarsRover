@@ -41,7 +41,7 @@ public class VBDIAgent extends FIFOAgent {
 
 	private double boundaryPenalty(MoveAction act) {
         Cell nextPosition = getNextPosition(act);
-		if (isCrossBoundary(currentPosition, nextPosition)) {
+		if (isViolateNorm(currentPosition, nextPosition)) {
 			return crossSectorPenalty;
 		} else {
 			return 0;

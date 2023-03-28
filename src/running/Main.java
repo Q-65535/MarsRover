@@ -25,8 +25,9 @@ public class Main {
 
         defEnv = new Environment(def_goals);
         AbstractAgent testAgent = new FIFOAgent(def_max_capacity);
-		List<Boundary> boundaries = genBoundaries(def_map_size, 5, 5, new Random());
-		testAgent.setBoundaries(boundaries);
+		// testAgent.setNormLands(genShapeCollection());
+		testAgent.setNormLands(genMiddleLineShape(def_map_size));
+
         running = true;
         defEnv.setAgent(testAgent);
         while (running) {

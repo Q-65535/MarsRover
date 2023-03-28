@@ -116,7 +116,7 @@ public class MCTSAgent extends AbstractAgent {
         cloneAgent.isAchieved = this.isAchieved;
         // clone norm information
         cloneAgent.norms = this.norms;
-		cloneAgent.boundaries = this.boundaries;
+		cloneAgent.normLands = this.normLands;
         cloneAgent.penalty = this.penalty;
 
         return cloneAgent;

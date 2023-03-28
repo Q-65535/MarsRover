@@ -9,7 +9,7 @@ import java.util.*;
 public abstract class AbstractAgent implements Cloneable {
     public static final int infinite_capacity = Integer.MAX_VALUE;
     public static final double delta = 1e-6;
-	public static final double crossSectorPenalty = 0.5;
+	public static final double crossSectorPenalty = 1;
     Random rm = new Random(Default.SEED);
 
     /**
@@ -27,9 +27,7 @@ public abstract class AbstractAgent implements Cloneable {
     final int mapSize = def_map_size;
     int maxCapacity;
     int currentFuel;
-	List<Boundary> boundaries;
-	Sector curSector;
-	Sector preSector;
+	NormLands normLands;
 
     int totalFuelConsumption;
     int rechargeFuelConsumption;
@@ -73,8 +71,6 @@ public abstract class AbstractAgent implements Cloneable {
         this.currentPosition = def_initial_Position;
         this.prePosition = currentPosition;
 		// The initial sector is two.
-		this.curSector = Sector.two;
-		this.preSector = Sector.two;
         this.actFuelConsumption = def_act_consumption;
         this.rechargePosition = def_initial_Position;
         goals = new ArrayList<>();
@@ -118,6 +114,9 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
     public double getAggregateVal() {
+		// @Setting: only consider goals and norms.
+        // return achievedGoals.size() + 1 / (penalty + delta);
+		// @Setting: Consider goals, battery consumption and norms.
         return (achievedGoals.size() - getTotalPenalty()) / (totalFuelConsumption + delta);
     }
 
@@ -264,51 +263,29 @@ public abstract class AbstractAgent implements Cloneable {
      * update total penalty value according to current position and norms
      */
     public void updatePunish() {
-        // If no norm, nothing happens.
-        // if (norms == null) {
-        //     return;
-        // }
 
-        // If current position is norm and previous position is not norm, punish is invoked.
-        // if (norms.containsKey(currentPosition) && !norms.containsKey(prePosition)) {
-        //     Norm relatedNorm = norms.get(currentPosition);
-        //     this.penalty += relatedNorm.getPenalty();
-        // }
-
-		updateBoundaryPunish();
-    }
-
-	public void updateBoundaryPunish() {
-		if (isCrossBoundary(prePosition, currentPosition)) {
+		if (isViolateNorm(prePosition, currentPosition)) {
 			this.penalty += crossSectorPenalty;
 		}
-	}
+    }
 
-	public boolean isCrossBoundary(Cell from, Cell to) {
-		for (Boundary br : boundaries) {
-			if (br.fromCells.contains(to) && br.toCells.contains(from)) {
-				return true;
-			}
+	public boolean isViolateNorm(Cell from, Cell to) {
+		if (normLands.lowlands.contains(from) && normLands.lowlands.contains(to)) {
+			return true;
+		} else {
+			return false;
 		}
-		return false;
 	}
 
     public double getTotalPenalty() {
         return penalty;
     }
 
-    public Set<Cell> getNormPositions() {
-        if (norms == null) {
-            return new HashSet<>();
-        }
-        return norms.keySet();
-    }
-
-	public void setBoundaries(List<Boundary> boundaries) {
-		this.boundaries = boundaries;
+	public void setNormLands(NormLands normlands) {
+		this.normLands = normlands;
 	}
 
-	public List<Boundary> getBoundaries() {
-		return this.boundaries;
+	public NormLands getNormLands() {
+		return this.normLands;
 	}
 }
