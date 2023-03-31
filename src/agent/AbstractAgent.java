@@ -270,7 +270,7 @@ public abstract class AbstractAgent implements Cloneable {
     }
 
 	public boolean isViolateNorm(Cell from, Cell to) {
-		if (normLands.lowlands.contains(from) && normLands.lowlands.contains(to)) {
+		if (normLands.lowlands.contains(from) && normLands.highlands.contains(to)) {
 			return true;
 		} else {
 			return false;

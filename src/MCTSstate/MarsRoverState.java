@@ -39,8 +39,8 @@ public class MarsRoverState extends AbstractState {
     @Override
     public double evaluateState() {
         // @Setting: This evaluation considers norm and consumption.
-		// double val = simAgent.getAggregateVal();
-		// return val;
+//		 double val = simAgent.getAggregateVal();
+//		 return val;
 
         // @Setting: This evaluation only considers norm.
 		double normEval = 1.0 / (simAgent.getTotalPenalty() + 1.0);

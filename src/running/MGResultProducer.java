@@ -54,6 +54,8 @@ public class MGResultProducer {
 	private int intervalStep = 1;
 	private int defInterval = 0;
 
+    private boolean isMiddleLineShape;
+
 
     public MGResultProducer(String RESULT_DIR) {
         this.RESULT_DIR = RESULT_DIR;
@@ -93,17 +95,19 @@ public class MGResultProducer {
 		this.capStep = step;
 	}
 
-	public void setNormRange(int startMultiplier, int endMultiplier, int step) {
-		this.normCountStartMultiplier = startMultiplier;
-		this.normCountEndMultiplier = endMultiplier;
-		this.normCountStep = step;
-	}
-
 	public void setIntervalRange(int start, int end, int step) {
 		this.intervalStart = start;
 		this.intervalEnd = end;
 		this.intervalStep = step;
 	}
+
+    public void setMiddleLineShape() {
+        this.isMiddleLineShape = true;
+    }
+
+    public void setMultipleShape() {
+        this.isMiddleLineShape = false;
+    }
 
     /**
      * experiment a type of agent with different number of goals and different capacity, then write the result to a file
@@ -198,6 +202,14 @@ public class MGResultProducer {
 
 
 
+
+
+
+
+
+
+
+
 	/**
 	 * norm experiments. (the capacity is infinite)
 	 */
@@ -207,7 +219,7 @@ public class MGResultProducer {
         double[][] aggregateRecords = new double[intervalEnd + 1][goalCountEnd + 1];
 
 
-		for (int interval = 1; interval <= intervalEnd; interval++) {
+		for (int interval = intervalStart; interval <= intervalEnd; interval++) {
 			for (int goalCount = goalCountStart; goalCount <= goalCountEnd; goalCount += goalCountStep) {
                 Random goalRandomObj = new Random(SEED);
                 Random boundaryRandomObj = new Random(SEED + 1);
@@ -217,10 +229,13 @@ public class MGResultProducer {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
 					// The agent's capacity is set to be infinite.
                     AbstractAgent agent = genNewAgent(agentType, infCapacity);
-                    // @Setting: Multiple shapes.
+                    if (isMiddleLineShape) {
+                        // @Setting: Single middle line.
+                        agent.setNormLands(genMiddleLineShape(def_map_size));
+                    } else {
+                        // @Setting: Multiple shapes.
                     agent.setNormLands(genShapeCollection());
-                    // @Setting: Single middle line.
-                    // agent.setNormLands(genMiddleLineShape());
+                    }
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -228,6 +243,9 @@ public class MGResultProducer {
                         if (isDrawGraphic) {
                             displayer.display(environment);
                         }
+                    }
+                    if (agent.getAchievedGoalCount() != goalCount) {
+                        throw new RuntimeException("bug!! achieved goal:" + agent.getAchievedGoalCount() + " target: " + goalCount);
                     }
                     // add consumption value to record
                     penaltyRecords[interval][goalCount] += agent.getTotalPenalty();
@@ -286,9 +304,9 @@ public class MGResultProducer {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     // @Setting: Multiple shapes.
-                    agent.setNormLands(genShapeCollection());
+//                    agent.setNormLands(genShapeCollection());
                     // @Setting: Single middle line.
-                    // agent.setNormLands(genMiddleLineShape());
+                     agent.setNormLands(genMiddleLineShape(def_map_size));
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -296,6 +314,9 @@ public class MGResultProducer {
                         if (isDrawGraphic) {
                             displayer.display(environment);
                         }
+                    }
+                    if (agent.getAchievedGoalCount() != goalCount) {
+                        throw new RuntimeException("bug!! achieved goal:" + agent.getAchievedGoalCount() + " target: " + goalCount);
                     }
                     // add consumption value to record
                     penaltyRecords[goalCount][capMultiplier] += agent.getTotalPenalty();
@@ -346,9 +367,9 @@ public class MGResultProducer {
                     List<Cell> goals = genGoals(def_map_size, goalCount, def_initial_Position, goalRandomObj);
                     AbstractAgent agent = genNewAgent(agentType, capacity);
                     // @Setting: Multiple shapes.
-                    agent.setNormLands(genShapeCollection());
+//                    agent.setNormLands(genShapeCollection());
                     // @Setting: Single middle line.
-                    // agent.setNormLands(genMiddleLineShape());
+                     agent.setNormLands(genMiddleLineShape(def_map_size));
                     Environment environment = new Environment(agent, goals, interval);
                     boolean running = true;
                     while (running) {
@@ -356,6 +377,9 @@ public class MGResultProducer {
                         if (isDrawGraphic) {
                             displayer.display(environment);
                         }
+                    }
+                    if (agent.getAchievedGoalCount() != goalCount) {
+                        throw new RuntimeException("bug!! achieved goal:" + agent.getAchievedGoalCount() + " target: " + goalCount);
                     }
                     // add consumption value to record
                     penaltyRecords[interval][capMultiplier] += agent.getTotalPenalty();
