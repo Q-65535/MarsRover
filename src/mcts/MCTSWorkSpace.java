@@ -20,6 +20,7 @@ public class MCTSWorkSpace {
      */
     public List<Choice> bestChoices;
 
+    // number of goals achieved so far
     int curAchievedGoalCount = 0;
 
     /**
